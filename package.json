@@ -1,6 +1,6 @@
 {
   "name": "pddl-workspace",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
     "pretest": "eslint ./src/**/*.ts && npm run compile",
     "build": "tsc",
     "compile": "tsc && npm run copyToDist",
-    "copyToDist": "copyfiles --error --verbose --up 2 ./out/src/**/*.* ./dist/",
+    "copyToDist": "copyfiles --error --verbose --up 2 ./out/src/*.* ./out/src/**/*.* ./dist/",
     "prepack": "npm run test && npm run copyToDist",
     "watch": "tsc -w"
   },
