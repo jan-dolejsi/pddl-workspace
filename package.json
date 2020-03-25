@@ -1,6 +1,6 @@
 {
   "name": "pddl-workspace",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,11 @@
     "prepack": "npm run test && npm run copyToDist",
     "watch": "tsc -w"
   },
-  "keywords": [],
+  "keywords": [
+    "pddl",
+    "ai",
+    "planning"
+  ],
   "author": "Jan Dolejsi",
   "license": "MIT/UNLICENSED",
   "devDependencies": {

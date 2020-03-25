@@ -7,7 +7,7 @@ import { FileInfo, Variable } from "../FileInfo";
 import { PddlTokenType } from "./PddlTokenizer";
 import { PddlSyntaxNode } from "./PddlSyntaxNode";
 import { VariablesParser } from "./VariablesParser";
-import { DocumentPositionResolver } from "../DocumentPositionResolver";
+import { DocumentPositionResolver, SimpleDocumentPositionResolver } from "../DocumentPositionResolver";
 import { DerivedVariablesParser } from "./DerivedVariableParser";
 import { DomainInfo, Action } from "../DomainInfo";
 import { PddlSyntaxTree } from "./PddlSyntaxTree";
@@ -15,6 +15,7 @@ import { InstantActionParser } from "./InstantActionParser";
 import { DurativeActionParser } from "./DurativeActionParser";
 import { PddlInheritanceParser } from "./PddlInheritanceParser";
 import { PddlConstraintsParser } from "./PddlConstraintsParser";
+import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
 
 /**
  * Planning Domain parser.
@@ -31,6 +32,23 @@ export class PddlDomainParser {
             this.domainInfo.setText(fileText);
             this.parseDomainStructure();
         }
+    }
+
+    static parseText(domainText: string, fileNameOrIdentifier = 'string://noname', version = -1): DomainInfo | undefined {
+        const parser = new PddlSyntaxTreeBuilder(domainText);
+        const syntaxTree = parser.getTree();
+        //(define (domain domain_name)
+
+        const defineNode = syntaxTree.getDefineNode();
+        if (!defineNode) { return undefined; }
+
+        const domainNode = defineNode.getFirstOpenBracket('domain');
+        if (!domainNode) { return undefined; }
+
+        const positionResolver = new SimpleDocumentPositionResolver(domainText);
+
+        return new PddlDomainParser(fileNameOrIdentifier, version, domainText, domainNode, syntaxTree, positionResolver)
+            .getDomain();
     }
 
     getDomain(): DomainInfo | undefined {

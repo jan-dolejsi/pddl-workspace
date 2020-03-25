@@ -7,7 +7,7 @@
 import { ProblemParserPreProcessor } from "../ProblemParserPreProcessor";
 import { dirname } from "path";
 import { Util } from "../utils/util";
-import { DocumentPositionResolver } from "../DocumentPositionResolver";
+import { DocumentPositionResolver, SimpleDocumentPositionResolver } from "../DocumentPositionResolver";
 import { PddlSyntaxTree } from "./PddlSyntaxTree";
 import { ParsingProblem, stripComments } from "../FileInfo";
 import { PreProcessingError, PreProcessor } from "../PreProcessors";
@@ -18,6 +18,7 @@ import { PddlSyntaxNode } from "./PddlSyntaxNode";
 import { PddlTokenType, isOpenBracket } from "./PddlTokenizer";
 import { PddlInheritanceParser } from "./PddlInheritanceParser";
 import { PddlConstraintsParser } from "./PddlConstraintsParser";
+import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
 
 /**
  * Planning Problem parser.
@@ -31,6 +32,16 @@ export class PddlProblemParser {
         if (context) {
             this.problemPreParser = new ProblemParserPreProcessor(context);
         }
+    }
+
+    static async parseText(problemText: string, fileNameOrIdentifier = 'string://noname', version = -1): Promise<ProblemInfo | undefined> {
+        const parser = new PddlSyntaxTreeBuilder(problemText);
+        const syntaxTree = parser.getTree();
+
+        const positionResolver = new SimpleDocumentPositionResolver(problemText);
+
+        return await new PddlProblemParser()
+            .parse(fileNameOrIdentifier, version, problemText, syntaxTree, positionResolver);
     }
 
     async parse(fileUri: string, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<ProblemInfo | undefined> {
