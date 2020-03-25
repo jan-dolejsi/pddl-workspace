@@ -14,6 +14,7 @@ import { DocumentPositionResolver } from "./DocumentPositionResolver";
 export class PlanInfo extends FileInfo {
     steps: PlanStep[] = [];
     constructor(fileUri: string, version: number, public problemName: string, public domainName: string, text: string, positionResolver: DocumentPositionResolver) {
+        // note we use the `problemName` as the plan name as the plan does not have any declared name
         super(fileUri, version, problemName, PddlSyntaxTree.EMPTY, positionResolver);
         this.setText(text);
     }

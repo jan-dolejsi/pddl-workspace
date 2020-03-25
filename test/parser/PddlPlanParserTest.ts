@@ -5,280 +5,72 @@
 
 import * as assert from 'assert';
 import { PddlPlanParser } from './src';
-import { DomainInfo } from '../src';
-import { ProblemInfo } from '../src';
-import { PddlSyntaxTree } from './src';
-import { SimpleDocumentPositionResolver } from '../src';
-
-const dummyDomain = new DomainInfo('uri', 1, '', new PddlSyntaxTree(), new SimpleDocumentPositionResolver(''));
-const dummyProblem = new ProblemInfo('uri', 1, 'name', 'name', new PddlSyntaxTree(), new SimpleDocumentPositionResolver(''));
-const EPSILON = 1e-3;
+import { PlanStep, Happening, HappeningType, PddlLanguage } from '../src';
 
 describe('PddlPlanParser', () => {
 
-    describe('#appendBuffer()', () => {
+    describe('#parseText', () => {
 
-        it('parses single-durative-action plan', () => {
+        it('parses non-temporal plan', () => {
             // GIVEN
-            const planText = '1: (action) [20]';
-
-            // WHEN
-            const parser = new PddlPlanParser(dummyDomain, dummyProblem, { epsilon: EPSILON });
-            parser.appendBuffer(planText);
-            parser.onPlanFinished();
-            const plans = parser.getPlans();
-
-            // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
-            const plan = plans[0];
-            assert.strictEqual(plan.makespan, 21, 'plan makespan');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
-            assert.strictEqual(plan.steps[0].getStartTime(), 1, 'start time');
-            assert.strictEqual(plan.steps[0].getActionName(), 'action', 'action name');
-            assert.strictEqual(plan.steps[0].getFullActionName(), 'action', 'full action name');
-            assert.strictEqual(plan.steps[0].isDurative, true, 'action isDurative');
-            assert.strictEqual(plan.steps[0].getDuration(), 20, 'action duration');
-        });
-
-        it('parses plan metrics', () => {
-            // GIVEN
-            const metricNumber = 123.321;
-            const metricText = "123.321";
-            const duration = 20;
-            const startTime = 1;
-            const actionName = "aciton1";
-            const planText = `Plan found with cost: ${metricText}\n${startTime}: (${actionName}) [${duration}]`;
-
-            // WHEN
-            const parser = new PddlPlanParser(dummyDomain, dummyProblem, { epsilon: EPSILON });
-            parser.appendBuffer(planText);
-            parser.onPlanFinished();
-            const plans = parser.getPlans();
-
-            // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
-            const plan = plans[0];
-            assert.strictEqual(plan.makespan, duration + startTime, 'plan makespan');
-            assert.strictEqual(plan.cost, metricNumber, 'plan cost');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
-            assert.strictEqual(plan.steps[0].getStartTime(), startTime, 'start time');
-            assert.strictEqual(plan.steps[0].getActionName(), actionName, 'action name');
-            assert.strictEqual(plan.steps[0].getFullActionName(), actionName, 'full action name');
-            assert.strictEqual(plan.steps[0].isDurative, true, 'action isDurative');
-            assert.strictEqual(plan.steps[0].getDuration(), duration, 'action duration');
-        });
-
-
-        it('parses plan with negative metrics', () => {
-            // GIVEN
-            const metricNumber = -123.321;
-            const metricText = "-123.321";
-            const duration = 20;
-            const startTime = 1;
-            const actionName = "aciton1";
-            const planText = `Plan found with cost: ${metricText}\n${startTime}: (${actionName}) [${duration}]`;
-
-            // WHEN
-            const parser = new PddlPlanParser(dummyDomain, dummyProblem, { epsilon: EPSILON });
-            parser.appendBuffer(planText);
-            parser.onPlanFinished();
-            const plans = parser.getPlans();
-
-            // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
-            const plan = plans[0];
-            assert.strictEqual(plan.cost, metricNumber, 'plan cost');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
-        });
-
-        it('parses plan metrics in scientific notation', () => {
-            // GIVEN
-            const metricNumber = -1.23451e-50;
-            const metricText = "-1.23451e-50";
-            const duration = 20;
-            const startTime = 1;
-            const actionName = "aciton1";
-            const planText = `Plan found with cost: ${metricText}\n${startTime}: (${actionName}) [${duration}]`;
-
-            // WHEN
-            const parser = new PddlPlanParser(dummyDomain, dummyProblem, { epsilon: EPSILON });
-            parser.appendBuffer(planText);
-            parser.onPlanFinished();
-            const plans = parser.getPlans();
-
-            // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
-            const plan = plans[0];
-            assert.strictEqual(plan.makespan, duration + startTime, 'plan makespan');
-            assert.strictEqual(plan.cost, metricNumber, 'plan cost');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
-            assert.strictEqual(plan.steps[0].getStartTime(), startTime, 'start time');
-            assert.strictEqual(plan.steps[0].getActionName(), actionName, 'action name');
-            assert.strictEqual(plan.steps[0].getFullActionName(), actionName, 'full action name');
-            assert.strictEqual(plan.steps[0].isDurative, true, 'action isDurative');
-            assert.strictEqual(plan.steps[0].getDuration(), duration, 'action duration');
-        });
-
-        it('parses empty document', () => {
-            // GIVEN
-            const planText = '';
-
-            // WHEN
-            const parser = new PddlPlanParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 });
-            parser.appendBuffer(planText);
-            parser.onPlanFinished();
-            const plans = parser.getPlans();
-
-            // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
-        });
-
-        it('parses empty plan with only meta-data', () => {
-            // GIVEN
-            const planText = `;;!domain: d1
-            ;;!problem: p1
+            const planText = `;;!domain: domain1
+            ;;!problem: problem1
             
-            ; Makespan: 0.000
-            ; Cost: 0.000
-            ; States evaluated: 10`;
+            0.00100: (a)
+            
+            ; Makespan: 0.001
+            ; Cost: 0.001
+            ; States evaluated: 1`;
 
+            const fileUri = 'file://directory/file1.plan';
+            const epsilon = 0.1;
             // WHEN
-            const parser = new PddlPlanParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 });
-            parser.appendBuffer(planText);
-            parser.onPlanFinished();
-            const plans = parser.getPlans();
+            const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
-            const plan = plans[0];
-            assert.strictEqual(plan.makespan, 0, 'plan makespan');
-            assert.strictEqual(plan.cost, 0, 'plan metric');
-            assert.strictEqual(plan.statesEvaluated, 10, 'states evaluated');
+            assert.ok(planInfo !== undefined);
+            assert.strictEqual(planInfo?.fileUri, fileUri);
+            const expectedHappening = new Happening(0.001, HappeningType.INSTANTANEOUS, 'a', 0, 0);
+            assert.deepStrictEqual(planInfo?.getHappenings(), [expectedHappening], 'there should be 1 happening');
+            assert.strictEqual(planInfo?.getLanguage(), PddlLanguage.PLAN, 'the language should be plan');
+            assert.deepStrictEqual(planInfo?.isPlan(), true, 'this should be a plan');
+            assert.deepStrictEqual(planInfo?.getParsingProblems(), [], 'there should be no parsing issues');
+            assert.deepStrictEqual(planInfo?.getVersion(), 33, 'version');
+            const expectedStep = new PlanStep(0.001, 'a', false, epsilon, 3);
+            assert.deepStrictEqual(planInfo?.getSteps(), [expectedStep], 'this should be a plan');
         });
 
-        it('parses xml plan', async () => {
+        it('parses temporal plan', () => {
             // GIVEN
-            const planText = `States evaluated: 51
-            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-            <Plan>
-                <Actions>
-                    <OrderedHappening>
-                        <HappeningID>1</HappeningID>
-                        <ComesBefore>
-                            <HappeningID>2</HappeningID>
-                        </ComesBefore>
-                        <Happening>
-                            <ActionStart>
-                                <ActionID>1</ActionID>
-                                <Name>action1</Name>
-                                <Parameters>
-                                    <Parameter>
-                                        <Symbol>c</Symbol>
-                                    </Parameter>
-                                    <Parameter>
-                                        <Symbol>a</Symbol>
-                                    </Parameter>
-                                </Parameters>        
-                                <ExpectedStartTime>P0DT3H0M7.200S</ExpectedStartTime>
-                            </ActionStart>
-                        </Happening>
-            </OrderedHappening>
-        </Actions>
-        </Plan>
-            End of plan print-out.`;
+            const planText = `;;!domain: domain1
+            ;;!problem: problem1
+            
+            0.00100: (a p1 p2) [10]
+            
+            ; Makespan: 0.001
+            ; Cost: 0.001
+            ; States evaluated: 1`;
 
+            const fileUri = 'file://directory/file1.plan';
+            const epsilon = 0.1;
             // WHEN
-            let parser: PddlPlanParser | null = null;
-            await new Promise((resolve) => {
-                parser = new PddlPlanParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve());
-                parser.appendBuffer(planText);
-            });
-            if (!parser) { assert.fail("launching plan parser failed"); }
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const plans = parser!.getPlans();
+            const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one plan');
-            const plan = plans[0];
-            assert.strictEqual(plan.makespan, 10807.2, 'plan makespan');
-            assert.strictEqual(plan.cost, 10807.2, 'plan metric');
-            assert.strictEqual(plan.statesEvaluated, 51, 'states evaluated');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
-            assert.strictEqual(plan.steps[0].getStartTime(), 10807.2, 'start time');
-            assert.strictEqual(plan.steps[0].getActionName(), 'action1', 'action name');
-            assert.strictEqual(plan.steps[0].getFullActionName(), 'action1 c a', 'full action name');
-            assert.strictEqual(plan.steps[0].isDurative, false, 'action isDurative');
-        });
-
-        it('parses xml with temporal plan', async () => {
-            // GIVEN
-            const planText = `States evaluated: 51
-            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-            <Plan>
-                <Actions>
-                    <OrderedHappening>
-                        <HappeningID>1</HappeningID>
-                        <ComesBefore>
-                            <HappeningID>2</HappeningID>
-                        </ComesBefore>
-                        <Happening>
-                            <ActionStart>
-                                <ActionID>1</ActionID>
-                                <Name>action1</Name>
-                                <Parameters>
-                                    <Parameter>
-                                        <Symbol>c</Symbol>
-                                    </Parameter>
-                                    <Parameter>
-                                        <Symbol>a</Symbol>
-                                    </Parameter>
-                                </Parameters>        
-                                <ExpectedStartTime>P0DT0H1M0.000S</ExpectedStartTime>
-                                <ExpectedDuration>P0DT1H0M0.000S</ExpectedDuration>
-                            </ActionStart>
-                        </Happening>
-                </OrderedHappening>
-                <OrderedHappening>
-                    <HappeningID>2</HappeningID>
-                    <ComesBefore>
-                        <HappeningID>3</HappeningID>
-                        <HappeningID>9</HappeningID>
-                    </ComesBefore>
-                    <ComesAfter>
-                        <HappeningID>1</HappeningID>
-                    </ComesAfter>
-                    <Happening>
-                        <ActionEnd>
-                            <ActionID>1</ActionID>
-                            </ActionEnd>
-                        </Happening>
-                    </OrderedHappening>                    
-                </Actions>
-            </Plan>
-            End of plan print-out.`;
-
-            // WHEN
-            let parser: PddlPlanParser | null = null;
-            await new Promise((resolve) => {
-                parser = new PddlPlanParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve());
-                parser.appendBuffer(planText);
-            });
-            if (!parser) { assert.fail("launching plan parser failed"); }
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const plans = parser!.getPlans();
-
-            // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one plan');
-            const plan = plans[0];
-            assert.strictEqual(plan.makespan, 60+60*60, 'plan makespan');
-            assert.strictEqual(plan.cost, 60+60*60, 'plan metric');
-            assert.strictEqual(plan.statesEvaluated, 51, 'states evaluated');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
-            assert.strictEqual(plan.steps[0].getStartTime(), 60, 'start time');
-            assert.strictEqual(plan.steps[0].getActionName(), 'action1', 'action name');
-            assert.strictEqual(plan.steps[0].getFullActionName(), 'action1 c a', 'full action name');
-            assert.strictEqual(plan.steps[0].isDurative, true, 'action isDurative');
-            assert.strictEqual(plan.steps[0].getDuration(), 60*60, 'action duration');
+            assert.ok(planInfo !== undefined);
+            assert.strictEqual(planInfo?.fileUri, fileUri);
+            const expectedHappenings = [
+                new Happening(0.001, HappeningType.START, 'a p1 p2', 0, 0),
+                new Happening(10.001, HappeningType.END, 'a p1 p2', 0, 0)
+            ];
+            assert.deepStrictEqual(planInfo?.getHappenings(), expectedHappenings, 'there should be 2 happenings');
+            assert.strictEqual(planInfo?.getLanguage(), PddlLanguage.PLAN, 'the language should be plan');
+            assert.deepStrictEqual(planInfo?.isPlan(), true, 'this should be a plan');
+            assert.deepStrictEqual(planInfo?.getParsingProblems(), [], 'there should be no parsing issues');
+            assert.deepStrictEqual(planInfo?.getVersion(), 33, 'version');
+            const expectedStep = new PlanStep(0.001, 'a p1 p2', true, 10, 3);
+            assert.deepStrictEqual(planInfo?.getSteps(), [expectedStep], 'this should be a plan');
         });
     });
 });
+

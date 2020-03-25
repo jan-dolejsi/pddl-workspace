@@ -16,6 +16,7 @@ import { DocumentPositionResolver } from './DocumentPositionResolver';
 import { DomainInfo } from './DomainInfo';
 import { URI } from 'vscode-uri';
 import { PlanInfo } from './PlanInfo';
+import { PddlPlanParser } from './parser/PddlPlanParser';
 
 function lowerCaseEquals(first: string, second: string): boolean {
     if (first === null || first === undefined) { return second === null || second === undefined; }
@@ -234,7 +235,7 @@ export class PddlWorkspace extends EventEmitter {
             return unknownFile;
         }
         else if (language === PddlLanguage.PLAN) {
-            return this.parser.parsePlan(fileUri, fileVersion, fileText, this.epsilon, positionResolver);
+            return PddlPlanParser.parseText(fileText, this.epsilon, fileUri, fileVersion, positionResolver);
         }
         else if (language === PddlLanguage.HAPPENINGS) {
             return this.parser.parseHappenings(fileUri, fileVersion, fileText, this.epsilon, positionResolver);
