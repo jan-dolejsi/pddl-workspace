@@ -17,7 +17,9 @@ export * from './typeInheritance';
 export { Grounder } from './Grounder';
 
 // parser
-export * as parser from './parser/parserIndex';
+import * as parser from './parser/parserIndex';
+export { parser }; // until Typescript 3.8
 
 // utils
-export * as utils from './utils/index';
+import * as utils from './utils/index';
+export { utils }; // until Typescript 3.8
