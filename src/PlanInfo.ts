@@ -5,9 +5,10 @@
 
 import { PlanStep } from "./PlanStep";
 import { Happening } from "./HappeningsInfo";
-import { FileInfo, PddlLanguage } from "./FileInfo";
+import { FileInfo } from "./FileInfo";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { DocumentPositionResolver } from "./DocumentPositionResolver";
+import { PddlLanguage } from "./language";
 /**
  * Plan file.
  */

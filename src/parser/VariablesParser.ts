@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import { PddlSyntaxNode } from "./PddlSyntaxNode";
-import { Variable, Parameter } from "../FileInfo";
+import { Variable, Parameter } from "../language";
 import { PddlTokenType, isOpenBracket } from "./PddlTokenizer";
 import { PddlRange, DocumentPositionResolver } from "../DocumentPositionResolver";
 import { Util } from "../utils/util";

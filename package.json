@@ -1,6 +1,6 @@
 {
   "name": "pddl-workspace",
-  "version": "1.2.1",
+  "version": "2.0.0",
   "description": "PDDL Workspace",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,6 +20,10 @@
   ],
   "author": "Jan Dolejsi",
   "license": "MIT/UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jan-dolejsi/pddl-workspace"
+  },
   "devDependencies": {
     "typescript": "^3.8.3",
     "@types/node": "^13.9.1",

@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import { PddlSyntaxNode } from "./PddlSyntaxNode";
-import { Variable, Term, Parameter, ObjectInstance } from "../FileInfo";
+import { Variable, Term, Parameter, ObjectInstance } from "../language";
 
 function parseTerm(termText: string): Term {
     if (termText.startsWith('?')) {

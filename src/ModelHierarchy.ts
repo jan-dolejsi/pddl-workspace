@@ -6,7 +6,7 @@
 'use strict';
 
 import { DomainInfo, DurativeAction, InstantAction, PddlDomainConstruct, UnrecognizedStructure } from "./DomainInfo";
-import { Variable } from "./FileInfo";
+import { Variable } from "./language";
 import { PddlTokenType } from "./parser/PddlTokenizer";
 import { PddlSyntaxNode } from "./parser/PddlSyntaxNode";
 import { PddlRange } from "./DocumentPositionResolver";

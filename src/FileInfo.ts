@@ -8,6 +8,21 @@ import { PddlRange, DocumentPositionResolver } from "./DocumentPositionResolver"
 import { PddlSyntaxNode } from "./parser/PddlSyntaxNode";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { PddlTokenType } from "./parser/PddlTokenizer";
+import { FileStatus, PddlLanguage, Variable } from "./language";
+
+export function stripComments(pddlText: string): string {
+    const lines = pddlText.split(/\r?\n/g);
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const index = line.indexOf(';');
+        if (index > -1) {
+            lines[i] = line.substring(0, index);
+        }
+    }
+
+    return lines.join("\n");
+}
 
 /**
  * An abstract PDDL file.
@@ -175,126 +190,16 @@ export class ParsingProblem {
     constructor(public problem: string, public lineIndex?: number, public columnIndex: number = 0) { }
 }
 
-export enum PddlLanguage {
-    // domain or problem
-    PDDL,
-    // plan (output of the planner)
-    PLAN,
-    // plan happenings sequence (instantaneous happenings)
-    HAPPENINGS
-}
-
-/**
- * Status of the file parsing.
- */
-export enum FileStatus { Parsed, Dirty, Validating, Validated }
-
-/**
- * State variable.
- */
-export class Variable {
-    readonly name: string;
-    readonly declaredNameWithoutTypes: string;
-    private location?: PddlRange; // initialized lazily
-    private documentation: string[] = []; // initialized lazily
-    private unit = ''; // initialized lazily
-
-    constructor(public readonly declaredName: string, public readonly parameters: Term[] = []) {
-        this.declaredNameWithoutTypes = declaredName.replace(/\s+-\s+[\w-_]+/gi, '');
-        this.name = declaredName.replace(/( .*)$/gi, '');
+export class UnknownFileInfo extends FileInfo {
+    constructor(fileUri: string, version: number, positionResolver: DocumentPositionResolver) {
+        super(fileUri, version, "", PddlSyntaxTree.EMPTY, positionResolver);
     }
 
-    bind(objects: ObjectInstance[]): Variable {
-        const objectNames = objects.map(o => o.name).join(" ");
-        if (this.parameters.length !== objects.length) {
-            throw new Error(`Invalid objects '${objectNames}' for function '${this.getFullName()}' with ${this.parameters.length} parameters.`);
-        }
-        let fullName = this.name;
-        if (objects) { fullName += " " + objectNames; }
-        return new Variable(fullName, objects);
+    getLanguage(): PddlLanguage {
+        return PddlLanguage.PDDL;
     }
 
-    getFullName(): string {
-        return this.name + this.parameters.map(par => " " + par.toPddlString()).join('');
+    isUnknownPddl(): boolean {
+        return true;
     }
-
-    matchesShortNameCaseInsensitive(symbolName: string): boolean {
-        return this.name.toLowerCase() === symbolName.toLowerCase();
-    }
-
-    isGrounded(): boolean {
-        return this.parameters.every(parameter => parameter.isGrounded());
-    }
-
-    setDocumentation(documentation: string[]): void {
-        this.documentation = documentation;
-        const match = documentation.join('\n').match(/\[([^\]]*)\]/);
-        if (match) {
-            this.unit = match[1];
-        }
-    }
-
-    getDocumentation(): string[] {
-        return this.documentation;
-    }
-
-    getUnit(): string {
-        return this.unit;
-    }
-
-    setLocation(range: PddlRange): void {
-        this.location = range;
-    }
-
-    getLocation(): PddlRange {
-        if (this.location === undefined) { throw new Error('Accessing getLocation() before parsing.'); }
-        return this.location;
-    }
-}
-
-
-export abstract class Term {
-    constructor(public type: string) { }
-
-    abstract toPddlString(): string;
-
-    abstract isGrounded(): boolean;
-}
-
-export class Parameter extends Term {
-    constructor(public name: string, type: string) {
-        super(type);
-    }
-
-    toPddlString(): string {
-        return `?${this.name} - ${this.type}`;
-    }
-
-    isGrounded(): boolean { return false; }
-}
-
-export class ObjectInstance extends Term {
-    constructor(public name: string, type: string) {
-        super(type);
-    }
-
-    toPddlString(): string {
-        return this.name;
-    }
-
-    isGrounded(): boolean { return true; }
-}
-
-export function stripComments(pddlText: string): string {
-    const lines = pddlText.split(/\r?\n/g);
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const index = line.indexOf(';');
-        if (index > -1) {
-            lines[i] = line.substring(0, index);
-        }
-    }
-
-    return lines.join("\n");
 }

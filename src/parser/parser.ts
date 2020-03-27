@@ -5,7 +5,6 @@
 
 import { PddlExtensionContext } from "../PddlExtensionContext";
 import { HappeningsInfo, PlanHappeningsBuilder } from "../HappeningsInfo";
-import { FileInfo, PddlLanguage } from "../FileInfo";
 import { PddlSyntaxTree } from "./PddlSyntaxTree";
 import { DocumentPositionResolver } from "../DocumentPositionResolver";
 import { DomainInfo } from "../DomainInfo";
@@ -57,33 +56,4 @@ export class Parser {
     }
 }
 
-export class UnknownFileInfo extends FileInfo {
-    constructor(fileUri: string, version: number, positionResolver: DocumentPositionResolver) {
-        super(fileUri, version, "", PddlSyntaxTree.EMPTY, positionResolver);
-    }
 
-    getLanguage(): PddlLanguage {
-        return PddlLanguage.PDDL;
-    }
-
-    isUnknownPddl(): boolean {
-        return true;
-    }
-}
-
-// Language ID of Domain and Problem files
-export const PDDL = 'pddl';
-// Language ID of Plan files
-export const PLAN = 'plan';
-// Language ID of Happenings files
-export const HAPPENINGS = 'happenings';
-
-const languageMap = new Map<string, PddlLanguage>([
-    [PDDL, PddlLanguage.PDDL],
-    [PLAN, PddlLanguage.PLAN],
-    [HAPPENINGS, PddlLanguage.HAPPENINGS]
-]);
-
-export function toLanguageFromId(languageId: string): PddlLanguage | undefined {
-    return languageMap.get(languageId);
-}

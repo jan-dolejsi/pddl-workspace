@@ -41,7 +41,7 @@ export class PddlRange {
     get start(): PddlPosition {
         return new PddlPosition(this.startLine, this.startCharacter);
     }
-    
+
     get end(): PddlPosition {
         return new PddlPosition(this.endLine, this.endCharacter);
     }
@@ -52,7 +52,7 @@ export class PddlRange {
  */
 export abstract class DocumentPositionResolver {
     abstract resolveToPosition(offset: number): PddlPosition;
-    
+
     resolveToRange(start: number, end: number): PddlRange {
         return PddlRange.from(this.resolveToPosition(start), this.resolveToPosition(end));
     }
@@ -60,7 +60,7 @@ export abstract class DocumentPositionResolver {
     rangeIncludesOffset(range: PddlRange, offset: number): boolean {
         const positionAtOffset = this.resolveToPosition(offset);
 
-        return range.includes(positionAtOffset); 
+        return range.includes(positionAtOffset);
     }
 
     nodeToRange(node: PddlSyntaxNode): PddlRange {

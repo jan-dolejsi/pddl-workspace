@@ -3,7 +3,7 @@
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
-import { FileInfo, Variable } from "../FileInfo";
+import { FileInfo } from "../FileInfo";
 import { PddlTokenType } from "./PddlTokenizer";
 import { PddlSyntaxNode } from "./PddlSyntaxNode";
 import { VariablesParser } from "./VariablesParser";
@@ -16,6 +16,7 @@ import { DurativeActionParser } from "./DurativeActionParser";
 import { PddlInheritanceParser } from "./PddlInheritanceParser";
 import { PddlConstraintsParser } from "./PddlConstraintsParser";
 import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
+import { Variable } from "../language";
 
 /**
  * Planning Domain parser.

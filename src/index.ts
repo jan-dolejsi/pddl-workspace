@@ -1,3 +1,4 @@
+export * from './language';
 export * from './PddlWorkspace';
 export * from './HappeningsInfo';
 export * from './DocumentPositionResolver';
@@ -10,8 +11,9 @@ export * from './PlanStep';
 export * from './constraints';
 export * from './PreProcessors';
 export * from './ModelHierarchy';
+export * from './PddlExtensionContext';
 
-export { getObjectsInheritingFrom, getTypesInheritingFromPlusSelf } from './typeInheritance';
+export * from './typeInheritance';
 export { Grounder } from './Grounder';
 
 // parser

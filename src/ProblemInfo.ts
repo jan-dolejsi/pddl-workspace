@@ -3,12 +3,13 @@
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
-import { FileInfo, PddlLanguage } from "./FileInfo";
+import { FileInfo } from "./FileInfo";
 import { PreProcessor } from "./PreProcessors";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { DocumentPositionResolver } from "./DocumentPositionResolver";
 import { TypeObjectMap } from "./DomainInfo";
 import { Constraint } from "./constraints";
+import { PddlLanguage } from "./language";
 
 
 /**

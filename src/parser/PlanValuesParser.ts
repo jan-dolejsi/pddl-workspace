@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import { PlanStep } from '../PlanStep';
-import { Variable } from '../FileInfo';
+import { Variable } from '../language';
 
 class StateValues {
 

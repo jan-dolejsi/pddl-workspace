@@ -3,9 +3,10 @@
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
-import { FileInfo, PddlLanguage, ParsingProblem } from "./FileInfo";
+import { FileInfo, ParsingProblem } from "./FileInfo";
 import { DocumentPositionResolver } from "./DocumentPositionResolver";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
+import { PddlLanguage } from "./language";
 
 
 export enum HappeningType {

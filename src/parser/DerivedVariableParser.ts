@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import { PddlSyntaxNode } from "./PddlSyntaxNode";
-import { Variable } from "../FileInfo";
+import { Variable } from "../language";
 import { PddlTokenType } from "./PddlTokenizer";
 import { PddlRange, DocumentPositionResolver } from "../DocumentPositionResolver";
 import { parseParameters } from "./VariablesParser";

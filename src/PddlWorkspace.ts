@@ -3,9 +3,9 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { Parser, UnknownFileInfo } from './parser/parser';
+import { Parser } from './parser/parser';
 import { ProblemInfo } from './ProblemInfo';
-import { FileInfo, PddlLanguage, FileStatus, ParsingProblem } from './FileInfo';
+import { FileInfo, ParsingProblem, UnknownFileInfo } from './FileInfo';
 import { HappeningsInfo } from "./HappeningsInfo";
 import { Util } from './utils/util';
 import { dirname, basename } from 'path';
@@ -17,6 +17,7 @@ import { DomainInfo } from './DomainInfo';
 import { URI } from 'vscode-uri';
 import { PlanInfo } from './PlanInfo';
 import { PddlPlanParser } from './parser/PddlPlanParser';
+import { PddlLanguage, FileStatus } from './language';
 
 function lowerCaseEquals(first: string, second: string): boolean {
     if (first === null || first === undefined) { return second === null || second === undefined; }

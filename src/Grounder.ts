@@ -5,7 +5,7 @@
 
 import { ProblemInfo } from "./ProblemInfo";
 import { DomainInfo, TypeObjectMap } from './DomainInfo';
-import { Variable, ObjectInstance, Term } from './FileInfo';
+import { Variable, ObjectInstance, Term } from './language';
 import { getObjectsInheritingFrom } from './typeInheritance';
 
 export class Grounder {

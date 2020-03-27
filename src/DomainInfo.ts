@@ -4,7 +4,8 @@
 * ------------------------------------------------------------------------------------------ */
 
 import { DirectionalGraph } from "./utils/DirectionalGraph";
-import { FileInfo, Variable, PddlLanguage, ObjectInstance, Parameter } from "./FileInfo";
+import { FileInfo } from "./FileInfo";
+import { Variable, PddlLanguage, ObjectInstance, Parameter } from "./language";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { PddlRange, DocumentPositionResolver } from "./DocumentPositionResolver";
 import { PddlBracketNode } from "./parser/PddlSyntaxNode";
