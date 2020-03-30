@@ -20,7 +20,7 @@ describe('DomainInfo', () => {
             tank)
             `;
 
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
             if (domainInfo === undefined) {
                 assert.fail("could not parse domain");
             }
@@ -39,7 +39,7 @@ describe('DomainInfo', () => {
         it('finds type location in single line declaration', () => {
             // GIVEN
             const domainPddl = `(define (domain generator) (:types generator tankstelle tank)`;
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
             if (domainInfo === undefined) { assert.fail('should parse'); }
 
             // WHEN
@@ -86,7 +86,7 @@ describe('DomainInfo', () => {
                 )
             )
             `;
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
             if (domainInfo === undefined) { assert.fail('should parse'); }
 
             // WHEN
@@ -132,7 +132,7 @@ describe('DomainInfo', () => {
     :effect (and (increase (f11 ?t1) 1))
 )
 )`;
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
             if (domainInfo === undefined) { assert.fail('should parse'); }
             assert.deepStrictEqual(domainInfo.getTypes(), ['tt1'], 'there should be 1 type');
             assert.deepStrictEqual(domainInfo.getPredicates().map(p => p.name), ['p3'], 'there should be 1 predicate');
@@ -164,7 +164,7 @@ describe('DomainInfo', () => {
     :effect (and (increase (f11 ?t1) 1))
 )
 )`;
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
             if (domainInfo === undefined) { assert.fail('should parse'); }
             assert.deepStrictEqual(domainInfo.getPredicates().map(p => p.name), ['p0'], 'there should be 1 predicate');
             const p0 = domainInfo.getPredicates()[0];

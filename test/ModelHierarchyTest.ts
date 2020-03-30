@@ -23,7 +23,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -52,7 +52,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -81,7 +81,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -110,7 +110,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -139,7 +139,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -168,7 +168,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -198,7 +198,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -227,7 +227,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -256,7 +256,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -285,7 +285,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -317,7 +317,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -346,7 +346,7 @@ describe('ModelHierarchy', () => {
             )
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 
@@ -374,7 +374,7 @@ describe('ModelHierarchy', () => {
             ))
             )`;
             
-            const domainInfo = createPddlDomainParser(pddlText).getDomain();
+            const domainInfo = createPddlDomainParser(pddlText);
             
             if (!domainInfo) { assert.fail("could not parse test PDDL"); }
 

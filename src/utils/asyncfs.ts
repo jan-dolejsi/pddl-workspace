@@ -14,6 +14,7 @@ export const readdir = util.promisify(fs.readdir);
 export const unlink = util.promisify(fs.unlink);
 export const rmdir = util.promisify(fs.rmdir);
 export const stat = util.promisify(fs.stat);
+export const copyFile = util.promisify(fs.copyFile);
 
 export const mkdirIfDoesNotExist:
     (path: string, mode: number) => void =

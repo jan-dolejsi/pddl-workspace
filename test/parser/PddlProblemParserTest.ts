@@ -4,12 +4,41 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import * as path from 'path';
+import { expect } from 'chai';
+import { URI } from 'vscode-uri';
 import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver } from '../src';
 import { ProblemInfo, VariableValue, TimedVariableValue, SupplyDemand } from '../src';
 import { PddlProblemParser } from './src';
 
 describe('PddlProblemParser', () => {
+    describe('#tryParse', () => {
+        it('extracts domain name', async () => {
+
+            const pddlProblemText = `(define (problem p1) (:domain domain_name))`;
+            const syntaxTree = new PddlSyntaxTreeBuilder(pddlProblemText).getTree();
+            const positionResolver = new SimpleDocumentPositionResolver(pddlProblemText);
+
+            const problemUri = URI.file(path.join('folder1', 'problem.pddl')).toString();
+            // WHEN
+            const problemInfo = await new PddlProblemParser()
+            .tryParse(
+                problemUri,
+                1, // content version
+                pddlProblemText,
+                syntaxTree,
+                positionResolver);
+            
+            // THEN
+            expect(problemInfo).to.not.be.undefined;
+            expect(problemInfo).to.be.instanceOf(ProblemInfo);
+            expect(problemInfo?.fileUri).to.equal(problemUri, "uri");
+            expect(problemInfo?.name).to.equal('p1');
+            expect(problemInfo?.domainName).to.equal('domain_name');
+        });
+    });
+
     describe('#getProblemStructure', () => {
         it('parses objects for types with dashes', () => {
             // GIVEN

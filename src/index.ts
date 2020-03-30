@@ -12,12 +12,13 @@ export * from './constraints';
 export * from './PreProcessors';
 export * from './ModelHierarchy';
 export * from './PddlExtensionContext';
+export * from './PddlWorkspaceExtension';
 
 export * from './typeInheritance';
 export { Grounder } from './Grounder';
 
 // parser
-import * as parser from './parser/parserIndex';
+import * as parser from './parser/index';
 export { parser }; // until Typescript 3.8
 
 // utils

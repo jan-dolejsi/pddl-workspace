@@ -4,22 +4,29 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { PddlSyntaxTreeBuilder } from './src';
-import { SimpleDocumentPositionResolver, PddlRange } from '../src';
+import { SimpleDocumentPositionResolver, PddlRange, DomainInfo } from '../src';
 import { PddlDomainParser } from './src';
 
-export function createPddlDomainParser(domainPddl: string): PddlDomainParser {
+export function createPddlDomainParser(domainPddl: string): DomainInfo {
     const syntaxTree = new PddlSyntaxTreeBuilder(domainPddl).getTree();
     const domainNode = syntaxTree.getDefineNodeOrThrow().getFirstOpenBracketOrThrow('domain');
     const positionResolver = new SimpleDocumentPositionResolver(domainPddl);
 
-    return new PddlDomainParser("uri", 1, domainPddl, domainNode, syntaxTree, positionResolver);
+    const domainInfo = new PddlDomainParser().parse("uri", 1, domainPddl, domainNode, syntaxTree, positionResolver);
+    if (domainInfo) {
+        return domainInfo;
+    } else {
+        expect(domainInfo).to.not.be.undefined;
+        throw new assert.AssertionError();
+    }
 }
 
 describe('PddlDomainParser', () => {
 
     describe('#constructor', () => {
-        it('should parse domain from snippet template', () =>{
+        it('should parse domain from snippet template', () => {
             // GIVEN
             const domainPddl = `;Header and description
 
@@ -45,10 +52,8 @@ describe('PddlDomainParser', () => {
             
             )`;
 
-            const domainParser = createPddlDomainParser(domainPddl);
-
             // WHEN
-            const domainInfo = domainParser.getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);
@@ -59,6 +64,44 @@ describe('PddlDomainParser', () => {
             assert.deepStrictEqual(domainInfo?.getPredicates(), [], 'there should be no predicates');
             assert.deepStrictEqual(domainInfo?.getFunctions(), [], 'there should be no functions');
             assert.deepStrictEqual(domainInfo?.getActions(), [], 'there should be no actions');
+        });
+    });
+
+    describe('#tryDomain', () => {
+        it('should parse domain meta', async () => {
+            // GIVEN
+            const fileText = `;Header and description
+
+            (define (domain domain_name)
+            ...
+            `;
+            const syntaxTree = new PddlSyntaxTreeBuilder(fileText).getTree();
+            const positionResolver = new SimpleDocumentPositionResolver(fileText);
+
+            // WHEN
+            const domainInfo = await new PddlDomainParser().tryParse('file:///file', 0, fileText, syntaxTree, positionResolver);
+
+            // THEN
+            assert.notStrictEqual(domainInfo, null, 'domain should not be null');
+            if (domainInfo === null) { return; }
+            assert.strictEqual(domainInfo?.name, 'domain_name');
+        });
+
+        it('should return null on non-domain PDDL', async () => {
+            // GIVEN
+            const fileText = `;Header and description
+
+            (define (problem name)
+            ...
+            `;
+            const syntaxTree = new PddlSyntaxTreeBuilder(fileText).getTree();
+            const positionResolver = new SimpleDocumentPositionResolver(fileText);
+
+            // WHEN
+            const domainInfo = await new PddlDomainParser().tryParse('file:///file', 0, fileText, syntaxTree, positionResolver);
+
+            // THEN
+            assert.strictEqual(domainInfo, undefined, 'domain should be null');
         });
     });
 
@@ -111,7 +154,7 @@ describe('PddlDomainParser', () => {
             )`;
 
             // WHEN
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);
@@ -130,7 +173,7 @@ describe('PddlDomainParser', () => {
             )`;
 
             // WHEN
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);
@@ -148,7 +191,7 @@ describe('PddlDomainParser', () => {
             )`;
 
             // WHEN
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);
@@ -167,7 +210,7 @@ describe('PddlDomainParser', () => {
             )`;
 
             // WHEN
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);
@@ -185,13 +228,13 @@ describe('PddlDomainParser', () => {
             )`;
 
             // WHEN
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);
             assert.equal(domainInfo?.getTypes().length, 1, 'there should be 1 type');
             assert.equal(domainInfo?.getTypes()[0], "type1", 'the function should be "count"');
-            assert.deepStrictEqual(domainInfo?.getTypeLocation('type1'), new PddlRange(3, 16, 3, 16+'type1'.length));
+            assert.deepStrictEqual(domainInfo?.getTypeLocation('type1'), new PddlRange(3, 16, 3, 16 + 'type1'.length));
         });
 
         it('extracts types with dashes', () => {
@@ -204,7 +247,7 @@ describe('PddlDomainParser', () => {
             )`;
 
             // WHEN
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);
@@ -223,7 +266,7 @@ describe('PddlDomainParser', () => {
             )`;
 
             // WHEN
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);
@@ -244,7 +287,7 @@ describe('PddlDomainParser', () => {
             )`;
 
             // WHEN
-            const domainInfo = createPddlDomainParser(domainPddl).getDomain();
+            const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
             assert.ok(domainInfo !== undefined);

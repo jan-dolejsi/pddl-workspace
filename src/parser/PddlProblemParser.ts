@@ -19,16 +19,18 @@ import { PddlTokenType, isOpenBracket } from "./PddlTokenizer";
 import { PddlInheritanceParser } from "./PddlInheritanceParser";
 import { PddlConstraintsParser } from "./PddlConstraintsParser";
 import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
+import { PddlFileParser } from "./PddlFileParser";
 
 /**
  * Planning Problem parser.
  */
-export class PddlProblemParser {
+export class PddlProblemParser extends PddlFileParser<ProblemInfo> {
 
     private problemPreParser: ProblemParserPreProcessor | undefined;
-    private problemPattern = /^\s*\(define\s*\(problem\s+(\S+)\s*\)\s*\(:domain\s+(\S+)\s*\)/gi;
+    private problemPattern = /^\s*\(define\s*\(problem\s+(\S+)\s*\)\s*\(:domain\s+([^\r\n\t\f\v \)]+)\s*\)/gi;
 
     constructor(context?: PddlExtensionContext) {
+        super();
         if (context) {
             this.problemPreParser = new ProblemParserPreProcessor(context);
         }
@@ -41,10 +43,10 @@ export class PddlProblemParser {
         const positionResolver = new SimpleDocumentPositionResolver(problemText);
 
         return await new PddlProblemParser()
-            .parse(fileNameOrIdentifier, version, problemText, syntaxTree, positionResolver);
+            .tryParse(fileNameOrIdentifier, version, problemText, syntaxTree, positionResolver);
     }
 
-    async parse(fileUri: string, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<ProblemInfo | undefined> {
+    async tryParse(fileUri: string, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<ProblemInfo | undefined> {
         const filePath = Util.fsPath(fileUri);
         const workingDirectory = dirname(filePath);
         let preProcessor: PreProcessor | undefined;

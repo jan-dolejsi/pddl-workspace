@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { Parser } from './parser/parser';
+import { HappeningsParser } from './parser/HappeningsParser';
 import { ProblemInfo } from './ProblemInfo';
 import { FileInfo, ParsingProblem, UnknownFileInfo } from './FileInfo';
 import { HappeningsInfo } from "./HappeningsInfo";
@@ -18,6 +18,8 @@ import { URI } from 'vscode-uri';
 import { PlanInfo } from './PlanInfo';
 import { PddlPlanParser } from './parser/PddlPlanParser';
 import { PddlLanguage, FileStatus } from './language';
+import { PddlFileParser, PddlDomainParser, PddlProblemParser } from './parser/index';
+import { PddlWorkspaceExtension } from './PddlWorkspaceExtension';
 
 function lowerCaseEquals(first: string, second: string): boolean {
     if (first === null || first === undefined) { return second === null || second === undefined; }
@@ -79,9 +81,9 @@ class Folder {
 
 export class PddlWorkspace extends EventEmitter {
     public readonly folders: Map<string, Folder> = new Map<string, Folder>();
-    public readonly parser: Parser;
     private parsingTimeout: NodeJS.Timer | undefined;
     private defaultTimerDelayInSeconds = 1;
+    private pddlFileParsers: PddlFileParser<FileInfo>[];
 
     public static INSERTED = Symbol("INSERTED");
     public static UPDATED = Symbol("UPDATED");
@@ -89,7 +91,22 @@ export class PddlWorkspace extends EventEmitter {
 
     constructor(public epsilon: number, context?: PddlExtensionContext) {
         super();
-        this.parser = new Parser(context);
+        this.pddlFileParsers = [new PddlDomainParser(), new PddlProblemParser(context)];
+    }
+
+    addExtension(extension: PddlWorkspaceExtension): void {
+        const parsers = extension.getPddlParsers();
+        if (parsers) {
+            this.addPddlFileParser(parsers);
+        }
+    }
+
+    addPddlFileParser(parsers: PddlFileParser<FileInfo>[]): void {
+        this.pddlFileParsers.unshift(...parsers);
+        if (parsers.length > 0) {
+            this.getAllFilesIf(fi => fi.getLanguage() === PddlLanguage.PDDL)
+                .forEach(fi => this.invalidateDiagnostics(fi));
+        }
     }
 
     static getFolderPath(documentUri: string): string {
@@ -213,22 +230,18 @@ export class PddlWorkspace extends EventEmitter {
         }
         this.emit(symbol, fileInfo);
     }
+
     private async parseFile(fileUri: string, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver): Promise<FileInfo> {
         if (language === PddlLanguage.PDDL) {
             const parser = new PddlSyntaxTreeBuilder(fileText);
             const syntaxTree = parser.getTree();
-            const domainInfo = this.parser.tryDomain(fileUri, fileVersion, fileText, syntaxTree, positionResolver);
 
-            if (domainInfo) {
-                this.appendOffendingTokenToParsingProblems(domainInfo, parser, positionResolver);
-                return domainInfo;
-            } 
-
-            const problemInfo = await this.parser.tryProblem(fileUri, fileVersion, fileText, syntaxTree, positionResolver);
-
-            if (problemInfo) {
-                this.appendOffendingTokenToParsingProblems(problemInfo, parser, positionResolver);
-                return problemInfo;
+            for (const pddlParser of this.pddlFileParsers) {
+                const pddlFile = await pddlParser.tryParse(fileUri, fileVersion, fileText, syntaxTree, positionResolver);
+                if (pddlFile) {
+                    this.appendOffendingTokenToParsingProblems(pddlFile, parser, positionResolver);
+                    return pddlFile;
+                }
             }
 
             const unknownFile = new UnknownFileInfo(fileUri, fileVersion, positionResolver);
@@ -239,7 +252,7 @@ export class PddlWorkspace extends EventEmitter {
             return PddlPlanParser.parseText(fileText, this.epsilon, fileUri, fileVersion, positionResolver);
         }
         else if (language === PddlLanguage.HAPPENINGS) {
-            return this.parser.parseHappenings(fileUri, fileVersion, fileText, this.epsilon, positionResolver);
+            return new HappeningsParser().parseHappenings(fileUri, fileVersion, fileText, this.epsilon, positionResolver);
         }
         else {
             throw Error("Unknown language: " + language);
@@ -375,7 +388,7 @@ export class PddlWorkspace extends EventEmitter {
      * @returns corresponding domain file if fileInfo is a problem file,
      * or `fileInfo` itself if the `fileInfo` is a domain file, or `null` otherwise.
      */
-    asDomain(fileInfo: FileInfo): DomainInfo | undefined{
+    asDomain(fileInfo: FileInfo): DomainInfo | undefined {
         if (fileInfo.isDomain()) {
             return fileInfo as DomainInfo;
         }

@@ -17,22 +17,35 @@ import { PddlInheritanceParser } from "./PddlInheritanceParser";
 import { PddlConstraintsParser } from "./PddlConstraintsParser";
 import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
 import { Variable } from "../language";
+import { PddlFileParser } from "./PddlFileParser";
 
 /**
  * Planning Domain parser.
  */
-export class PddlDomainParser {
-    private domainInfo: DomainInfo | undefined;
+export class PddlDomainParser extends PddlFileParser<DomainInfo> {
+    async tryParse(fileUri: string, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<DomainInfo | undefined> {
+        //(define (domain domain_name)
 
-    constructor(fileUri: string, fileVersion: number, fileText: string, domainNode: PddlSyntaxNode, syntaxTree: PddlSyntaxTree, private positionResolver: DocumentPositionResolver) {
+        const defineNode = syntaxTree.getDefineNode();
+        if (!defineNode) { return undefined; }
+
+        const domainNode = defineNode.getFirstOpenBracket('domain');
+        if (!domainNode) { return undefined; }
+
+        return this.parse(fileUri, fileVersion, fileText, domainNode, syntaxTree, positionResolver);
+    }
+
+    parse(fileUri: string, fileVersion: number, fileText: string, domainNode: PddlSyntaxNode,
+        syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): DomainInfo | undefined {
         const domainNameNode = domainNode.getFirstChild(PddlTokenType.Other, /./);
-        if (domainNameNode) {
-            const domainName = domainNameNode.getToken().tokenText;
+        if (!domainNameNode) return undefined;
 
-            this.domainInfo = new DomainInfo(fileUri, fileVersion, domainName, syntaxTree, positionResolver);
-            this.domainInfo.setText(fileText);
-            this.parseDomainStructure();
-        }
+        const domainName = domainNameNode.getToken().tokenText;
+
+        const domainInfo = new DomainInfo(fileUri, fileVersion, domainName, syntaxTree, positionResolver);
+        domainInfo.setText(fileText);
+        this.parseDomainStructure(domainInfo, positionResolver);
+        return domainInfo;
     }
 
     static parseText(domainText: string, fileNameOrIdentifier = 'string://noname', version = -1): DomainInfo | undefined {
@@ -48,58 +61,52 @@ export class PddlDomainParser {
 
         const positionResolver = new SimpleDocumentPositionResolver(domainText);
 
-        return new PddlDomainParser(fileNameOrIdentifier, version, domainText, domainNode, syntaxTree, positionResolver)
-            .getDomain();
+        return new PddlDomainParser().parse(fileNameOrIdentifier, version, domainText, domainNode, syntaxTree, positionResolver);
     }
 
-    getDomain(): DomainInfo | undefined {
-        return this.domainInfo;
-    }
+    private parseDomainStructure(domainInfo: DomainInfo, positionResolver: DocumentPositionResolver): void {
 
-    private parseDomainStructure(): void {
-        if (this.domainInfo === undefined) { return; }
-
-        const defineNode = this.domainInfo.syntaxTree.getDefineNodeOrThrow();
-        PddlDomainParser.parseRequirements(defineNode, this.domainInfo);
+        const defineNode = domainInfo.syntaxTree.getDefineNodeOrThrow();
+        PddlDomainParser.parseRequirements(defineNode, domainInfo);
 
         const typesNode = defineNode.getFirstOpenBracket(':types');
         if (typesNode) {
-            this.domainInfo.setTypeInheritance(PddlInheritanceParser.parseInheritance(typesNode.getNestedNonCommentText()), typesNode, this.positionResolver);
+            domainInfo.setTypeInheritance(PddlInheritanceParser.parseInheritance(typesNode.getNestedNonCommentText()), typesNode, positionResolver);
         }
 
         const constantsNode = defineNode.getFirstOpenBracket(':constants');
         if (constantsNode) {
             const constantsText = constantsNode.getNestedNonCommentText();
-            this.domainInfo.setConstants(PddlInheritanceParser.toTypeObjects(PddlInheritanceParser.parseInheritance(constantsText)));
+            domainInfo.setConstants(PddlInheritanceParser.toTypeObjects(PddlInheritanceParser.parseInheritance(constantsText)));
         }
 
         const predicatesNode = defineNode.getFirstOpenBracket(':predicates');
         if (predicatesNode) {
-            const predicates = new VariablesParser(predicatesNode, this.positionResolver).getVariables();
-            this.domainInfo.setPredicates(predicates);
+            const predicates = new VariablesParser(predicatesNode, positionResolver).getVariables();
+            domainInfo.setPredicates(predicates);
         }
 
         const functionsNode = defineNode.getFirstOpenBracket(':functions');
         if (functionsNode) {
-            const functions = new VariablesParser(functionsNode, this.positionResolver).getVariables();
-            this.domainInfo.setFunctions(functions);
+            const functions = new VariablesParser(functionsNode, positionResolver).getVariables();
+            domainInfo.setFunctions(functions);
         }
 
-        this.domainInfo.setDerived(PddlDomainParser.parseDerived(defineNode, this.positionResolver));
+        domainInfo.setDerived(PddlDomainParser.parseDerived(defineNode, positionResolver));
 
-        const instantActions = this.parseActionProcessOrEvent(defineNode, this.positionResolver, "action");
-        const durativeActions = this.parseDurativeActions(defineNode, this.positionResolver);
-        this.domainInfo.setActions(instantActions.concat(durativeActions));
+        const instantActions = this.parseActionProcessOrEvent(defineNode, positionResolver, "action");
+        const durativeActions = this.parseDurativeActions(defineNode, positionResolver);
+        domainInfo.setActions(instantActions.concat(durativeActions));
 
-        const processes = this.parseActionProcessOrEvent(defineNode, this.positionResolver, "process");
-        const events = this.parseActionProcessOrEvent(defineNode, this.positionResolver, "event");
-        this.domainInfo.setProcesses(processes);
-        this.domainInfo.setEvents(events);
+        const processes = this.parseActionProcessOrEvent(defineNode, positionResolver, "process");
+        const events = this.parseActionProcessOrEvent(defineNode, positionResolver, "event");
+        domainInfo.setProcesses(processes);
+        domainInfo.setEvents(events);
 
         const constraintsNode = defineNode.getFirstOpenBracket(':constraints');
         if (constraintsNode) {
             const constraints = new PddlConstraintsParser().parseConstraints(constraintsNode);
-            this.domainInfo.setConstraints(constraints);
+            domainInfo.setConstraints(constraints);
         }
     }
 

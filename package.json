@@ -1,6 +1,6 @@
 {
   "name": "pddl-workspace",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "PDDL Workspace",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,8 @@
     "compile": "tsc && npm run copyToDist",
     "copyToDist": "copyfiles --error --verbose --up 2 ./out/src/*.* ./out/src/**/*.* ./dist/",
     "prepack": "npm run test && npm run copyToDist",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "clean": "rmdir out /s && rmdir dist /s"
   },
   "keywords": [
     "pddl",

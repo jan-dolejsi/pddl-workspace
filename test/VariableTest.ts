@@ -4,57 +4,8 @@
  * ------------------------------------------------------------------------------------------ */
 'use strict';
 
-import { Parser } from './src';
 import * as assert from 'assert';
-import { Variable, Parameter, ObjectInstance } from '../src';
-import { PddlSyntaxTreeBuilder } from './src';
-import { SimpleDocumentPositionResolver } from '../src';
-
-describe('Parser', () => {
-    let subject: Parser;
-
-    beforeEach(function () {
-        subject = new Parser();
-    });
-
-    describe('#tryDomain', () => {
-        it('should parse domain meta', () => {
-            // GIVEN
-            const fileText = `;Header and description
-
-            (define (domain domain_name)
-            ...
-            `;
-            const syntaxTree = new PddlSyntaxTreeBuilder(fileText).getTree();
-            const positionResolver = new SimpleDocumentPositionResolver(fileText);
-
-            // WHEN
-            const domainInfo = subject.tryDomain('file:///file', 0, fileText, syntaxTree, positionResolver);
-
-            // THEN
-            assert.notStrictEqual(domainInfo, null, 'domain should not be null');
-            if (domainInfo === null) { return; }
-            assert.strictEqual(domainInfo?.name, 'domain_name');
-        });
-
-        it('should return null on non-domain PDDL', () => {
-            // GIVEN
-            const fileText = `;Header and description
-
-            (define (problem name)
-            ...
-            `;
-            const syntaxTree = new PddlSyntaxTreeBuilder(fileText).getTree();
-            const positionResolver = new SimpleDocumentPositionResolver(fileText);
-
-            // WHEN
-            const domainInfo = subject.tryDomain('file:///file', 0, fileText, syntaxTree, positionResolver);
-
-            // THEN
-            assert.strictEqual(domainInfo, undefined, 'domain should be null');
-        });
-    });
-});
+import { Variable, Parameter, ObjectInstance } from './src';
 
 describe('Variable', () => {
 

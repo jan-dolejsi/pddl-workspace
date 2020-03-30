@@ -1,1 +1,1 @@
-export * from '../../src/parser/parserIndex';
+export * from '../../src/parser/index';
