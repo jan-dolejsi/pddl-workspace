@@ -151,6 +151,17 @@ export class PddlSyntaxNode extends TextRange {
         }
     }
 
+    /**
+     * Get all keyword open brackets e.g. `(:action ...)`
+     * @param keyword keyword name e.g. `action` to match `(:action ...)`
+     */
+    getKeywordOpenBrackets(keyword: string): PddlBracketNode[] {
+        return this.getChildrenOfType(
+            PddlTokenType.OpenBracketOperator,
+            new RegExp("\\(\\s*:" + keyword + "$"))
+            .map(node => node as PddlBracketNode);
+    }
+
     hasChildren(): boolean {
         return this.getNestedChildren().length > 0;
     }
@@ -259,7 +270,7 @@ export class PddlSyntaxNode extends TextRange {
         const parameterDefinition = parametersNode && parametersNode.getNestedText();
 
         const pattern = new RegExp("\\?" + parameterName + "\\b");
-        return (parameterDefinition!==undefined) && pattern.test(parameterDefinition);
+        return (parameterDefinition !== undefined) && pattern.test(parameterDefinition);
     }
 
     expand(): PddlSyntaxNode {

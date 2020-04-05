@@ -82,7 +82,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket!==undefined);
+            assert.ok(keywordBracket !== undefined);
             assert.strictEqual(keywordBracket?.getNestedChildren().length, 0);
         });
 
@@ -95,7 +95,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket!==undefined);
+            assert.ok(keywordBracket !== undefined);
             assert.strictEqual(keywordBracket?.getNestedChildren().length, 1);
             assert.strictEqual(keywordBracket?.getText(), '(p)');
         });
@@ -109,7 +109,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket!==undefined);
+            assert.ok(keywordBracket !== undefined);
             assert.strictEqual(keywordBracket?.getNestedChildren().length, 1);
             assert.strictEqual(keywordBracket?.getText(), '(p)');
         });
@@ -123,7 +123,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket!==undefined);
+            assert.ok(keywordBracket !== undefined);
             assert.strictEqual(keywordBracket?.getNonWhitespaceChildren().length, 2);
             assert.strictEqual(keywordBracket?.getToken().tokenText, '(and');
         });
@@ -137,9 +137,64 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket!==undefined);
+            assert.ok(keywordBracket !== undefined);
             assert.strictEqual(keywordBracket?.getNestedChildren().length, 1);
             assert.strictEqual(keywordBracket?.getText(), '(p)');
+        });
+    });
+    
+    describe('#getKeywordOpenBrackets', () => {
+        it('returns empty array for missing keyword', () => {
+            // GIVEN
+            const actionPddl = `(action)`;
+            const action = new PddlSyntaxTreeBuilder(actionPddl).getTree().getRootNode().getSingleChild();
+
+            // WHEN
+            const keywordBrackets = action.getKeywordOpenBrackets('keyword');
+
+            // THEN
+            assert.deepStrictEqual(keywordBrackets, []);
+        });
+
+        it('returns empty array for missing brackets nested in the keyword', () => {
+            // GIVEN
+            const actionPddl = `(action :keyword)`;
+            const action = new PddlSyntaxTreeBuilder(actionPddl).getTree().getRootNode().getSingleChild();
+
+            // WHEN
+            const keywordBrackets = action.getKeywordOpenBrackets('keyword');
+
+            // THEN
+            assert.deepStrictEqual(keywordBrackets, []);
+        });
+
+        it('returns single keyword when empty brackets', () => {
+            // GIVEN
+            const actionPddl = `(domain (:keyword))`;
+            const action = new PddlSyntaxTreeBuilder(actionPddl).getTree().getRootNode().getSingleChild();
+
+            // WHEN
+            const keywordBrackets = action.getKeywordOpenBrackets('keyword');
+
+            // THEN
+            assert.ok(keywordBrackets!==undefined);
+            assert.ok(keywordBrackets.length === 1);
+            assert.strictEqual(keywordBrackets[0].getNestedChildren().length, 0);
+        });
+
+        it('returns single bracket contents', () => {
+            // GIVEN
+            const actionPddl = `(domain (:keyword value1))`;
+            const action = new PddlSyntaxTreeBuilder(actionPddl).getTree().getRootNode().getSingleChild();
+
+            // WHEN
+            const keywordBrackets = action.getKeywordOpenBrackets('keyword');
+
+            // THEN
+            assert.ok(keywordBrackets!==undefined);
+            assert.ok(keywordBrackets.length === 1);
+            assert.strictEqual(keywordBrackets[0].getNonWhitespaceChildren().length, 1);
+            assert.strictEqual(keywordBrackets[0].getNonWhitespaceChildren()[0].getText(), 'value1');
         });
     });
 

@@ -35,7 +35,16 @@ export function toLanguageFromId(languageId: string): PddlLanguage | undefined {
 /**
  * Status of the file parsing.
  */
-export enum FileStatus { Parsed, Dirty, Validating, Validated }
+export enum FileStatus {
+    /** File is parsed when the FileInfo object is created. */
+    Parsed,
+    /** File was parsed before, but was updated, but not re-parsed yet. */
+    Dirty,
+    /** Running external language-specific deep parser/validator.  */
+    Validating,
+    /** Finished running external language-specific deep parser/validator.  */
+    Validated
+}
 
 /**
  * State variable.
