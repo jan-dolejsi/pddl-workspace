@@ -3,8 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as atmp from './asynctmp';
-import * as tmp from 'tmp';
+import * as tmp from 'tmp-promise';
 import fs = require('fs');
 import * as afs from './asyncfs';
 import { URI } from 'vscode-uri';
@@ -36,7 +35,7 @@ export class Util {
     }
 
     static async toFile(prefix: string, suffix: string, text: string): Promise<string> {
-        const tempFile = await atmp.file(0o644, prefix + '-', suffix);
+        const tempFile = await tmp.file({ mode: 0o644, prefix: prefix + '-', postfix: suffix });
         await afs.write(tempFile.fd, text, 0, 'utf8');
         return tempFile.path;
     }

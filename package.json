@@ -1,6 +1,6 @@
 {
   "name": "pddl-workspace",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "PDDL Workspace",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -41,7 +41,7 @@
     "nyc": "^15.0.0"
   },
   "dependencies": {
-    "tmp": "^0.1.0",
+    "tmp-promise": "2.0.2",
     "nunjucks": "^3.2.0",
     "xml2js": "^0.4.23",
     "parse-xsd-duration": "^0.5.0",

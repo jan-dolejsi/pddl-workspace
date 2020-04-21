@@ -24,7 +24,7 @@ export class PddlPlannerOutputParser {
     private readonly plans: Plan[] = [];
     public static readonly planStepPattern = /^\s*((\d+|\d+\.\d+)\s*:)?\s*\((.*)\)\s*(\[\s*(\d+|\d+\.\d+)\s*\])?\s*$/gim;
     private readonly planStatesEvaluatedPattern = /^\s*;?\s*States evaluated[\w ]*:[ ]*(\d*)\s*$/i;
-    private readonly planCostPattern = /[\w ]*(cost|metric)[\D]*:\s*([+-]?\d*(\.\d+)?|[+-]?\d(\.\d+)?[Ee][+-]?\d+)\s*$/i;
+    private readonly planCostPattern = /[\w ]*(cost|metric)[^-\w]*:?\s*([+-]?\d*(\.\d+)?|[+-]?\d(\.\d+)?[Ee][+-]?\d+)\s*$/i;
     private planBuilder: PddlPlanBuilder;
     private endOfBufferToBeParsedNextTime = '';
     private xmlPlanBuilder: XmlPlanBuilder | undefined;

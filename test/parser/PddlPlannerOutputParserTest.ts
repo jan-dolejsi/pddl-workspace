@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { PddlPlannerOutputParser } from './src';
 import { DomainInfo } from '../src';
 import { ProblemInfo } from '../src';
@@ -46,7 +47,7 @@ describe('PddlPlannerOutputParser', () => {
             const metricText = "123.321";
             const duration = 20;
             const startTime = 1;
-            const actionName = "aciton1";
+            const actionName = "action1";
             const planText = `Plan found with cost: ${metricText}\n${startTime}: (${actionName}) [${duration}]`;
 
             // WHEN
@@ -68,14 +69,13 @@ describe('PddlPlannerOutputParser', () => {
             assert.strictEqual(plan.steps[0].getDuration(), duration, 'action duration');
         });
 
-
         it('parses plan with negative metrics', () => {
             // GIVEN
             const metricNumber = -123.321;
             const metricText = "-123.321";
             const duration = 20;
             const startTime = 1;
-            const actionName = "aciton1";
+            const actionName = "action1";
             const planText = `Plan found with cost: ${metricText}\n${startTime}: (${actionName}) [${duration}]`;
 
             // WHEN
@@ -85,19 +85,195 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
+            assert.strictEqual(plans.length, 1, 'there should be one plan');
             const plan = plans[0];
             assert.strictEqual(plan.cost, metricNumber, 'plan cost');
             assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
         });
 
-        it('parses plan metrics in scientific notation', () => {
+        it('parses improving plan cost', () => {
             // GIVEN
-            const metricNumber = -1.23451e-50;
-            const metricText = "-1.23451e-50";
+            const metricNumber = 95.000;
+            const metricText = "95.000";
             const duration = 20;
             const startTime = 1;
-            const actionName = "aciton1";
+            const actionName = "action1";
+            const planText = `; Plan found with metric ${metricText}\n${startTime}: (${actionName}) [${duration}]`;
+
+            // WHEN
+            const parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON });
+            parser.appendBuffer(planText);
+            parser.onPlanFinished();
+            const plans = parser.getPlans();
+
+            // THEN
+            expect(plans, 'there should be one empty plan').to.have.lengthOf(1);
+            const plan = plans[0];
+            expect(plan.cost, 'plan cost').to.equal(metricNumber);
+            expect(plan.steps, 'plan should have one action').to.have.lengthOf(1);
+        });
+
+        it('parses multiple improving plans', () => {
+            // GIVEN
+            const planText = `; All the ground actions in this problem are compression-safe
+            ; Initial heuristic = 15.000
+            ; b (14.000 | 140.000)b (12.000 | 140.001)b (10.000 | 140.001)b (8.000 | 140.001)b (6.000 | 140.001)b (5.000 | 245.002)b (3.000 | 245.003)b (2.000 | 260.001)
+            ; Plan found with metric 515.000
+            ; States evaluated so far: 10
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action2 auv2 drake base-w)  [130.00000]
+            0.00000: (action2 auv1 base-m base-a)  [55.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            55.00100: (action2 auv1 base-a base-r)  [40.00000]
+            95.00200: (action4 auv1 base-r)  [150.00000]
+            95.00300: (action3 auv1 base-r)  [150.00000]
+            130.00100: (action4 auv2 base-w)  [130.00000]
+            130.00200: (action3 auv2 base-w)  [130.00000]
+            
+            ; Resorting to best-first search
+            ; b (14.000 | 140.000)b (13.000 | 130.000)b (13.000 | 55.000)b (12.000 | 140.000)b (11.000 | 130.000)b (9.000 | 200.000)b (8.000 | 200.000)b (6.000 | 200.000)b (5.000 | 260.001)b (3.000 | 260.002)b (2.000 | 2150.001)
+            ; Plan found with metric 490.000
+            ; States evaluated so far: 413
+            0.00000: (action2 auv2 drake base-w)  [130.00000]
+            0.00000: (action2 auv1 base-m base-r)  [200.00000]
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action5 g3 base-m base-r)  [2000.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            130.00100: (action4 auv2 base-w)  [130.00000]
+            130.00200: (action3 auv2 base-w)  [130.00000]
+            2000.00100: (action1 g3 base-r)  [150.00000]
+            2000.00200: (action3 g3 base-r)  [150.00000]
+            b (0.000 | 2150.002)
+            ; Plan found with metric 380.000
+            ; States evaluated so far: 842
+            0.00000: (action2 auv2 drake base-w)  [130.00000]
+            0.00000: (action2 auv1 base-m base-r)  [200.00000]
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action5 g2 base-h base-w)  [750.00000]
+            0.00000: (action5 g3 base-m base-r)  [2000.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            750.00100: (action1 g2 base-w)  [130.00000]
+            750.00200: (action3 g2 base-w)  [130.00000]
+            2000.00100: (action1 g3 base-r)  [150.00000]
+            2000.00200: (action3 g3 base-r)  [150.00000]
+            
+            ; Plan found with metric 275.000
+            ; States evaluated so far: 7804
+            0.00000: (action2 auv2 drake base-w)  [130.00000]
+            0.00000: (action2 auv1 base-m base-a)  [55.00000]
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action5 g2 base-h base-w)  [750.00000]
+            0.00000: (action5 g3 base-m base-r)  [2000.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            55.00100: (action2 auv1 base-a base-r)  [40.00000]
+            750.00100: (action1 g2 base-w)  [130.00000]
+            750.00200: (action3 g2 base-w)  [130.00000]
+            2000.00100: (action1 g3 base-r)  [150.00000]
+            2000.00200: (action3 g3 base-r)  [150.00000]
+            
+            ; Plan found with metric 235.000
+            ; States evaluated so far: 14221
+            0.00000: (action2 auv2 drake base-w)  [130.00000]
+            0.00000: (action2 auv1 base-m base-a)  [55.00000]
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action5 g2 base-h base-w)  [750.00000]
+            0.00000: (action5 g3 base-m base-r)  [2000.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            750.00100: (action1 g2 base-w)  [130.00000]
+            750.00200: (action3 g2 base-w)  [130.00000]
+            2000.00100: (action1 g3 base-r)  [150.00000]
+            2000.00200: (action3 g3 base-r)  [150.00000]
+            
+            ; Plan found with metric 180.000
+            ; States evaluated so far: 20775
+            0.00000: (action2 auv2 drake base-w)  [130.00000]
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action5 g2 base-h base-w)  [750.00000]
+            0.00000: (action5 g3 base-m base-r)  [2000.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            750.00100: (action1 g2 base-w)  [130.00000]
+            750.00200: (action3 g2 base-w)  [130.00000]
+            2000.00100: (action1 g3 base-r)  [150.00000]
+            2000.00200: (action3 g3 base-r)  [150.00000]
+            
+            ; Plan found with metric 145.000
+            ; States evaluated so far: 23964
+            0.00000: (action2 auv1 base-m base-a)  [55.00000]
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action5 g2 base-h base-w)  [750.00000]
+            0.00000: (action5 g3 base-m base-r)  [2000.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            55.00100: (action2 auv1 base-a base-r)  [40.00000]
+            750.00100: (action1 g2 base-w)  [130.00000]
+            750.00200: (action3 g2 base-w)  [130.00000]
+            2000.00100: (action1 g3 base-r)  [150.00000]
+            2000.00200: (action3 g3 base-r)  [150.00000]
+            
+            ; Plan found with metric 105.000
+            ; States evaluated so far: 30628
+            0.00000: (action2 auv1 base-m base-a)  [55.00000]
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action5 g2 base-h base-w)  [750.00000]
+            0.00000: (action5 g3 base-m base-r)  [2000.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            750.00100: (action1 g2 base-w)  [130.00000]
+            750.00200: (action3 g2 base-w)  [130.00000]
+            2000.00100: (action1 g3 base-r)  [150.00000]
+            2000.00200: (action3 g3 base-r)  [150.00000]
+            
+            ; Plan found with metric 50.000
+            ; States evaluated so far: 40250
+            0.00000: (action1 g1 base-h)  [140.00000]
+            0.00000: (action5 g2 base-h base-w)  [750.00000]
+            0.00000: (action5 g3 base-m base-r)  [2000.00000]
+            0.00100: (action3 g1 base-h)  [140.00000]
+            750.00100: (action1 g2 base-w)  [130.00000]
+            750.00200: (action3 g2 base-w)  [130.00000]
+            2000.00100: (action1 g3 base-r)  [150.00000]
+            2000.00200: (action3 g3 base-r)  [150.00000]
+            Error: terminate called after throwing an instance of 'std::bad_alloc'
+              what():  std::bad_alloc
+            
+            `;
+
+            // WHEN
+            const parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON });
+            parser.appendBuffer(planText);
+            parser.onPlanFinished();
+            const plans = parser.getPlans();
+
+            // THEN
+            expect(plans, 'there should be one empty plan').to.have.lengthOf(9);
+            {
+                const plan0 = plans[0];
+                expect(plan0.cost, 'plan0 cost').to.equal(515);
+                expect(plan0.statesEvaluated, 'plan0 states evaluated').to.equal(10);
+                expect(plan0.makespan, 'plan0 makespan').to.equal(260.002);
+                expect(plan0.steps, 'plan0 should have one action').to.have.lengthOf(9);
+            }
+            {
+                const plan1 = plans[1];
+                expect(plan1.cost, 'plan1 cost').to.equal(490);
+                expect(plan1.statesEvaluated, 'plan1 states evaluated').to.equal(413);
+                expect(plan1.makespan, 'plan1 makespan').to.equal(2150.002);
+                expect(plan1.steps, 'plan1 should have one action').to.have.lengthOf(9);
+            }
+            {
+                const plan8 = plans[8];
+                expect(plan8.cost, 'plan8 cost').to.equal(50);
+                expect(plan8.statesEvaluated, 'plan8 states evaluated').to.equal(40250);
+                expect(plan8.makespan, 'plan8 makespan').to.equal(2150.002);
+                expect(plan8.steps, 'plan8 should have one action').to.have.lengthOf(8);
+            }
+        });
+
+        it('parses plan metrics in scientific notation', () => {
+            // GIVEN
+            const metricNumber = -1.23456e-30;
+            const metricText = "-1.23456e-30";
+            const duration = 20;
+            const startTime = 1;
+            const actionName = "action1";
             const planText = `Plan found with cost: ${metricText}\n${startTime}: (${actionName}) [${duration}]`;
 
             // WHEN
@@ -107,10 +283,10 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
+            expect(plans, 'there should be one plan').to.have.lengthOf(1);
             const plan = plans[0];
-            assert.strictEqual(plan.makespan, duration + startTime, 'plan makespan');
-            assert.strictEqual(plan.cost, metricNumber, 'plan cost');
+            expect(plan.makespan, 'plan makespan').to.equal(duration + startTime);
+            expect(plan.cost, 'plan cost').to.be.closeTo(metricNumber, 1e-40);
             assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), startTime, 'start time');
             assert.strictEqual(plan.steps[0].getActionName(), actionName, 'action name');
