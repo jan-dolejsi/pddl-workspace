@@ -7,10 +7,11 @@ import { HappeningsInfo } from "../HappeningsInfo";
 import { PlanHappeningsBuilder } from "./PlanHappeningsBuilder";
 import { DocumentPositionResolver } from "../DocumentPositionResolver";
 import { PddlPlanParser } from "./PddlPlanParser";
+import { URI } from "vscode-uri";
 
 export class HappeningsParser {
 
-    parseHappenings(fileUri: string, fileVersion: number, fileText: string, epsilon: number, positionResolver: DocumentPositionResolver): HappeningsInfo {
+    parseHappenings(fileUri: URI, fileVersion: number, fileText: string, epsilon: number, positionResolver: DocumentPositionResolver): HappeningsInfo {
         const meta = PddlPlanParser.parsePlanMeta(fileText);
 
         const happeningsInfo = new HappeningsInfo(fileUri, fileVersion, meta.problemName, meta.domainName, fileText, positionResolver);

@@ -11,6 +11,7 @@ import { PddlRange, DocumentPositionResolver } from "./DocumentPositionResolver"
 import { PddlBracketNode } from "./parser/PddlSyntaxNode";
 import { PddlTokenType } from "./parser/PddlTokenizer";
 import { Constraint } from "./constraints";
+import { URI } from "vscode-uri";
 
 
 /**
@@ -119,7 +120,7 @@ export class DomainInfo extends FileInfo {
     private processes?: Action[];
     private constraints: Constraint[] = [];
 
-    constructor(fileUri: string, version: number, domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
+    constructor(fileUri: URI, version: number, domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
         super(fileUri, version, domainName, syntaxTree, positionResolver);
     }
 

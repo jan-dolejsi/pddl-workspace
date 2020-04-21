@@ -10,6 +10,7 @@ import { PddlSyntaxTree } from './PddlSyntaxTree';
 import { SimpleDocumentPositionResolver } from '../DocumentPositionResolver';
 import { XmlPlanBuilder } from "./XmlPlanBuilder";
 import { PddlPlanBuilder } from "./PddlPlanBuilder";
+import { URI } from 'vscode-uri';
 
 export interface PddlPlanParserOptions {
     epsilon: number;
@@ -141,9 +142,9 @@ export class PddlPlannerOutputParser {
     getPlans(): Plan[] {
         return this.plans;
     }
-    static parseOnePlan(planText: string, planPath: string, epsilon: number): Plan {
-        const dummyDomain = new DomainInfo(planPath, 1, 'domain', PddlSyntaxTree.EMPTY, new SimpleDocumentPositionResolver(''));
-        const dummyProblem = new ProblemInfo(planPath, 1, 'problem', 'domain', PddlSyntaxTree.EMPTY, new SimpleDocumentPositionResolver(''));
+    static parseOnePlan(planText: string, planUri: URI, epsilon: number): Plan {
+        const dummyDomain = new DomainInfo(planUri, 1, 'domain', PddlSyntaxTree.EMPTY, new SimpleDocumentPositionResolver(''));
+        const dummyProblem = new ProblemInfo(planUri, 1, 'problem', 'domain', PddlSyntaxTree.EMPTY, new SimpleDocumentPositionResolver(''));
         const parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { minimumPlansExpected: 1, epsilon: epsilon });
         parser.appendBuffer(planText);
         parser.onPlanFinished();
@@ -152,7 +153,7 @@ export class PddlPlannerOutputParser {
             return plans[0];
         }
         else {
-            throw new Error(`Unexpected number of expected plans (${plans.length}) in file ${planPath}.`);
+            throw new Error(`Unexpected number of expected plans (${plans.length}) in file ${planUri.toString()}.`);
         }
     }
 }

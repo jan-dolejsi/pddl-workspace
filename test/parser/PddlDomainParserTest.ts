@@ -8,13 +8,14 @@ import { expect } from 'chai';
 import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver, PddlRange, DomainInfo } from '../src';
 import { PddlDomainParser } from './src';
+import { URI } from 'vscode-uri';
 
 export function createPddlDomainParser(domainPddl: string): DomainInfo {
     const syntaxTree = new PddlSyntaxTreeBuilder(domainPddl).getTree();
     const domainNode = syntaxTree.getDefineNodeOrThrow().getFirstOpenBracketOrThrow('domain');
     const positionResolver = new SimpleDocumentPositionResolver(domainPddl);
 
-    const domainInfo = new PddlDomainParser().parse("uri", 1, domainPddl, domainNode, syntaxTree, positionResolver);
+    const domainInfo = new PddlDomainParser().parse(URI.parse("file:///mock"), 1, domainPddl, domainNode, syntaxTree, positionResolver);
     if (domainInfo) {
         return domainInfo;
     } else {
@@ -79,7 +80,7 @@ describe('PddlDomainParser', () => {
             const positionResolver = new SimpleDocumentPositionResolver(fileText);
 
             // WHEN
-            const domainInfo = await new PddlDomainParser().tryParse('file:///file', 0, fileText, syntaxTree, positionResolver);
+            const domainInfo = await new PddlDomainParser().tryParse(URI.parse('file:///file'), 0, fileText, syntaxTree, positionResolver);
 
             // THEN
             assert.notStrictEqual(domainInfo, null, 'domain should not be null');
@@ -98,7 +99,7 @@ describe('PddlDomainParser', () => {
             const positionResolver = new SimpleDocumentPositionResolver(fileText);
 
             // WHEN
-            const domainInfo = await new PddlDomainParser().tryParse('file:///file', 0, fileText, syntaxTree, positionResolver);
+            const domainInfo = await new PddlDomainParser().tryParse(URI.parse('file:///file'), 0, fileText, syntaxTree, positionResolver);
 
             // THEN
             assert.strictEqual(domainInfo, undefined, 'domain should be null');

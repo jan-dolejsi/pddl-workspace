@@ -10,6 +10,7 @@ import { DocumentPositionResolver } from "./DocumentPositionResolver";
 import { TypeObjectMap } from "./DomainInfo";
 import { Constraint } from "./constraints";
 import { PddlLanguage } from "./language";
+import { URI } from "vscode-uri";
 
 
 /**
@@ -72,7 +73,7 @@ export class ProblemInfo extends FileInfo {
     private constraints: Constraint[] = [];
     private preParsingPreProcessor: PreProcessor | undefined;
 
-    constructor(fileUri: string, version: number, problemName: string, public domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
+    constructor(fileUri: URI, version: number, problemName: string, public domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
         super(fileUri, version, problemName, syntaxTree, positionResolver);
     }
 

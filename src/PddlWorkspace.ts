@@ -7,7 +7,6 @@ import { HappeningsParser } from './parser/HappeningsParser';
 import { ProblemInfo } from './ProblemInfo';
 import { FileInfo, ParsingProblem, UnknownFileInfo } from './FileInfo';
 import { HappeningsInfo } from "./HappeningsInfo";
-import { Util } from './utils/util';
 import { dirname, basename } from 'path';
 import { PddlExtensionContext } from './PddlExtensionContext';
 import { EventEmitter } from 'events';
@@ -35,26 +34,26 @@ class Folder {
         this.folderPath = folderPath;
     }
 
-    hasFile(fileUri: string): boolean {
-        return this.files.has(fileUri);
+    hasFile(fileUri: URI): boolean {
+        return this.files.has(fileUri.toString());
     }
 
-    get(fileUri: string): FileInfo | undefined {
-        return this.files.get(fileUri);
+    get(fileUri: URI): FileInfo | undefined {
+        return this.files.get(fileUri.toString());
     }
 
     add(fileInfo: FileInfo): void {
-        if (URI.parse(fileInfo.fileUri).scheme !== "git") {
-            this.files.set(fileInfo.fileUri, fileInfo);
+        if (fileInfo.fileUri.scheme !== "git") {
+            this.files.set(fileInfo.fileUri.toString(), fileInfo);
         }
     }
 
     remove(fileInfo: FileInfo): boolean {
-        return this.files.delete(fileInfo.fileUri);
+        return this.files.delete(fileInfo.fileUri.toString());
     }
 
-    removeByUri(fileUri: string): boolean {
-        return this.files.delete(fileUri);
+    removeByUri(fileUri: URI): boolean {
+        return this.files.delete(fileUri.toString());
     }
 
     getProblemFileWithName(problemName: string): ProblemInfo | undefined {
@@ -109,13 +108,13 @@ export class PddlWorkspace extends EventEmitter {
         }
     }
 
-    static getFolderPath(documentUri: string): string {
-        const documentPath = Util.fsPath(documentUri);
+    static getFolderPath(documentUri: URI): string {
+        const documentPath = documentUri.fsPath;
         return dirname(documentPath);
     }
 
-    static getFileName(documentUri: string): string {
-        const documentPath = Util.fsPath(documentUri);
+    static getFileName(documentUri: URI): string {
+        const documentPath = documentUri.fsPath;
         return basename(documentPath);
     }
 
@@ -123,7 +122,7 @@ export class PddlWorkspace extends EventEmitter {
         return this.getFileName(fileInfo.fileUri);
     }
 
-    async upsertAndParseFile(fileUri: string, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver): Promise<FileInfo> {
+    async upsertAndParseFile(fileUri: URI, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver): Promise<FileInfo> {
         let fileInfo = await this.upsertFile(fileUri, language, fileVersion, fileText, positionResolver);
         if (fileInfo.getStatus() === FileStatus.Dirty) {
             fileInfo = await this.reParseFile(fileInfo);
@@ -132,7 +131,7 @@ export class PddlWorkspace extends EventEmitter {
         return fileInfo;
     }
 
-    async upsertFile(fileUri: string, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver, force = false): Promise<FileInfo> {
+    async upsertFile(fileUri: URI, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver, force = false): Promise<FileInfo> {
 
         const folderPath = PddlWorkspace.getFolderPath(fileUri);
 
@@ -151,7 +150,7 @@ export class PddlWorkspace extends EventEmitter {
         return fileInfo;
     }
 
-    private async insertFile(folder: Folder, fileUri: string, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver): Promise<FileInfo> {
+    private async insertFile(folder: Folder, fileUri: URI, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver): Promise<FileInfo> {
         const fileInfo = await this.parseFile(fileUri, language, fileVersion, fileText, positionResolver);
         folder.add(fileInfo);
 
@@ -220,18 +219,18 @@ export class PddlWorkspace extends EventEmitter {
      */
     private emitIfNew(symbol: symbol, fileInfo: FileInfo): void {
         if (symbol === PddlWorkspace.UPDATED) {
-            const lastVersion = this.lastVersionUpdateEmitted.get(fileInfo.fileUri);
+            const lastVersion = this.lastVersionUpdateEmitted.get(fileInfo.fileUri.toString());
             if (lastVersion !== undefined && fileInfo.getVersion() <= lastVersion) {
                 return;
             }
             else {
-                this.lastVersionUpdateEmitted.set(fileInfo.fileUri, fileInfo.getVersion());
+                this.lastVersionUpdateEmitted.set(fileInfo.fileUri.toString(), fileInfo.getVersion());
             }
         }
         this.emit(symbol, fileInfo);
     }
 
-    private async parseFile(fileUri: string, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver): Promise<FileInfo> {
+    private async parseFile(fileUri: URI, language: PddlLanguage, fileVersion: number, fileText: string, positionResolver: DocumentPositionResolver): Promise<FileInfo> {
         if (language === PddlLanguage.PDDL) {
             const parser = new PddlSyntaxTreeBuilder(fileText);
             const syntaxTree = parser.getTree();
@@ -281,7 +280,7 @@ export class PddlWorkspace extends EventEmitter {
         return folder;
     }
 
-    removeFile(documentUri: string, options: FileRemovalOptions): boolean {
+    removeFile(documentUri: URI, options: FileRemovalOptions): boolean {
 
         if (this.hasExplicitAssociations(documentUri)) {
             if (!options.removeAllReferences) { return false; }
@@ -304,12 +303,12 @@ export class PddlWorkspace extends EventEmitter {
         return false;
     }
 
-    hasExplicitAssociations(documentUri: string): boolean {
-        return this.problemToDomainMap.has(documentUri) || [...this.problemToDomainMap.values()].includes(documentUri)
-            || this.planToProblemMap.has(documentUri) || [...this.planToProblemMap.values()].includes(documentUri);
+    hasExplicitAssociations(documentUri: URI): boolean {
+        return this.problemToDomainMap.has(documentUri.toString()) || [...this.problemToDomainMap.values()].includes(documentUri.toString())
+            || this.planToProblemMap.has(documentUri.toString()) || [...this.planToProblemMap.values()].includes(documentUri.toString());
     }
 
-    getFileInfo<T extends FileInfo>(fileUri: string): T | undefined {
+    getFileInfo<T extends FileInfo>(fileUri: URI): T | undefined {
         const folderPath = PddlWorkspace.getFolderPath(fileUri);
 
         if (this.folders.has(folderPath)) {
@@ -412,7 +411,7 @@ export class PddlWorkspace extends EventEmitter {
     private problemToDomainMap = new Map<string, string>();
 
     associateProblemToDomain(problemInfo: ProblemInfo, domainInfo: DomainInfo): void {
-        this.problemToDomainMap.set(problemInfo.fileUri, domainInfo.fileUri);
+        this.problemToDomainMap.set(problemInfo.fileUri.toString(), domainInfo.fileUri.toString());
     }
 
     /**
@@ -421,10 +420,11 @@ export class PddlWorkspace extends EventEmitter {
      * @returns matching domain files (zero, one or many)
      */
     getDomainFilesFor(problemFile: ProblemInfo): DomainInfo[] {
+        const key = problemFile.fileUri.toString();
         // does an explicit association exist?
-        if (this.problemToDomainMap.has(problemFile.fileUri)) {
+        if (this.problemToDomainMap.has(key)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const domainFileUri = this.problemToDomainMap.get(problemFile.fileUri)!;
+            const domainFileUri = URI.parse(this.problemToDomainMap.get(key)!);
             const associatedDomain = this.getFileInfo<DomainInfo>(domainFileUri);
             return associatedDomain ? [associatedDomain] : [];
         }
@@ -455,15 +455,16 @@ export class PddlWorkspace extends EventEmitter {
     /** Explicit associations between plan files and problem files. */
     private planToProblemMap = new Map<string, string>();
 
-    associatePlanToProblem(planUri: string, problemFileInfo: ProblemInfo): void {
-        this.planToProblemMap.set(planUri, problemFileInfo.fileUri);
+    associatePlanToProblem(planUri: URI, problemFileInfo: ProblemInfo): void {
+        this.planToProblemMap.set(planUri.toString(), problemFileInfo.fileUri.toString());
     }
 
     getProblemFileForPlan(planInfo: PlanInfo): ProblemInfo | undefined {
+        const key = planInfo.fileUri.toString();
         // does an explicit association exist?
-        if (this.planToProblemMap.has(planInfo.fileUri)) {
+        if (this.planToProblemMap.has(key)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const problemFileUri = this.planToProblemMap.get(planInfo.fileUri)!;
+            const problemFileUri = URI.parse(this.planToProblemMap.get(key)!);
             return this.getFileInfo<ProblemInfo>(problemFileUri);
         }
         else {

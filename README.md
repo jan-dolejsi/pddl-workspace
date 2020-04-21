@@ -40,6 +40,10 @@ The _workspace_ groups features necessary for interactive authoring of PDDL file
 And management of such files. The `PddlWorkspace` class is used by the VS Code PDDL extension.
 
 ```typescript
+import { URI } from 'vscode-uri';
+```
+
+```typescript
 const pddlWorkspace = new PddlWorkspace(1e-3);
 const insertedFiles: FileInfo[] = [];
 
@@ -57,14 +61,14 @@ const pddlProblemText = `(define (problem p1) (:domain domain_name))`;
 
 // WHEN
 const domainInfo = await pddlWorkspace.upsertFile(
-    'file:///folder1/domain.pddl,
+    URI.parse('file:///folder1/domain.pddl),
     PddlLanguage.PDDL,
     1, // content version
     pddlDomainText,
     new SimpleDocumentPositionResolver(pddlDomainText));
 
 const problemInfo = await pddlWorkspace.upsertFile(
-    'file:///folder1/problem.pddl',
+    URI.parse('file:///folder1/problem.pddl'),
     PddlLanguage.PDDL,
     1, // content version
     pddlProblemText,
@@ -89,7 +93,7 @@ class CustomPddlFile extends FileInfo {
 }
 
 class CustomParser extends PddlFileParser<CustomPddlFile> {
-    async tryParse(fileUri: string, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<CustomPddlFile | undefined> {
+    async tryParse(fileUri: URI, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<CustomPddlFile | undefined> {
         if ('(:custom-pddl') {
             return new CustomPddlFile(fileUri, fileVersion, 'custom', syntaxTree, positionResolver);
         }
@@ -107,5 +111,5 @@ pddlWorkspace.addExtension(new CustomExtension());
 const pddlText = `(:custom-pddl)`;
 
 // WHEN
-const parsedFile = await pddlWorkspace.upsertFile('file:///test', PddlLanguage.PDDL, 1, pddlText, new SimpleDocumentPositionResolver(pddlText));
+const parsedFile = await pddlWorkspace.upsertFile(URI.parse('file:///test'), PddlLanguage.PDDL, 1, pddlText, new SimpleDocumentPositionResolver(pddlText));
 ```

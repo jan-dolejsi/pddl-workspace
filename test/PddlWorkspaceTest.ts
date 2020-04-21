@@ -26,13 +26,13 @@ describe('PddlWorkspace', () => {
 
     describe('#getFileName', () => {
         it('should handle tpddl schema and encoded encoded windows file name', () => {
-            const uri = URI.file(path.join('c:', 'folder', 'file.txt')).with({ scheme: 'tpddl' }).toString();
+            const uri = URI.file(path.join('c:', 'folder', 'file.txt')).with({ scheme: 'tpddl' });
             const fileName = PddlWorkspace.getFileName(uri);
             assert.equal(fileName, 'file.txt');
         });
 
         it('should handle file schema and encoded encoded windows file name', () => {
-            const uri = URI.file(path.join('c:', 'folder', 'file.txt')).toString();
+            const uri = URI.file(path.join('c:', 'folder', 'file.txt'));
             const fileName = PddlWorkspace.getFileName(uri);
             assert.equal(fileName, 'file.txt');
         });
@@ -40,19 +40,19 @@ describe('PddlWorkspace', () => {
 
     describe('#getFolderUri', () => {
         it('should handle tpddl schema and encoded windows file name', () => {
-            const uri = URI.file(path.join('c:', 'folder', 'file.txt')).with({ scheme: 'tpddl' }).toString();
+            const uri = URI.file(path.join('c:', 'folder', 'file.txt')).with({ scheme: 'tpddl' });
             const fileName = PddlWorkspace.getFolderPath(uri);
             assert.equal(fileName, path.join('c:', 'folder'));
         });
 
         it('should handle file schema and encoded windows file name', () => {
-            const uri = URI.file(path.join('c:', 'folder', 'file.txt')).toString();
+            const uri = URI.file(path.join('c:', 'folder', 'file.txt'));
             const fileName = PddlWorkspace.getFolderPath(uri);
             assert.equal(fileName, path.join('c:', 'folder'));
         });
 
         it('should handle longer path with file schema and encoded windows file name', () => {
-            const uri = URI.file(path.join('c:', 'folder', 'sub-folder', 'file.txt')).toString();
+            const uri = URI.file(path.join('c:', 'folder', 'sub-folder', 'file.txt'));
             const fileName = PddlWorkspace.getFolderPath(uri);
             assert.equal(fileName, path.join('c:', 'folder', 'sub-folder'));
         });
@@ -74,14 +74,14 @@ describe('PddlWorkspace', () => {
 
             // WHEN
             const domainInfo = await pddlWorkspace.upsertFile(
-                URI.file(path.join('folder1', 'domain.pddl')).toString(),
+                URI.file(path.join('folder1', 'domain.pddl')),
                 PddlLanguage.PDDL,
                 1, // content version
                 pddlDomainText,
                 new SimpleDocumentPositionResolver(pddlDomainText));
 
             const problemInfo = await pddlWorkspace.upsertFile(
-                URI.file(path.join('folder1', 'problem.pddl')).toString(),
+                URI.file(path.join('folder1', 'problem.pddl')),
                 PddlLanguage.PDDL,
                 1, // content version
                 pddlProblemText,
@@ -112,7 +112,7 @@ describe('PddlWorkspace', () => {
             const pddlText = `(:custom-pddl)`;
 
             // WHEN
-            const actual = await pddlWorkspace.upsertFile('file:///test', PddlLanguage.PDDL, 1, pddlText, new SimpleDocumentPositionResolver(pddlText));
+            const actual = await pddlWorkspace.upsertFile(URI.parse('file:///test'), PddlLanguage.PDDL, 1, pddlText, new SimpleDocumentPositionResolver(pddlText));
 
             // THEN
             expect(actual).be.instanceOf(CustomPddlFile);
@@ -125,9 +125,9 @@ describe('PddlWorkspace', () => {
         it('parses file only once per version', async () => {
             // GIVEN
             const pddlWorkspace = new PddlWorkspace(1e-3);
-            const parsed = new Array<[string, number]>();
+            const parsed = new Array<[URI, number]>();
             pddlWorkspace.addPddlFileParser([new CustomParser((file, version) => parsed.push([file, version]))]);
-            const fileUri = 'file:///test';
+            const fileUri = URI.parse('file:///test');
 
             const v1 = 1;
 
@@ -174,10 +174,10 @@ class CustomPddlFile extends FileInfo {
 }
 
 class CustomParser extends PddlFileParser<CustomPddlFile> {
-    constructor(private callback?: (fileUri: string, fileVersion: number) => void) {
+    constructor(private callback?: (fileUri: URI, fileVersion: number) => void) {
         super();
     }
-    async tryParse(fileUri: string, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<CustomPddlFile | undefined> {
+    async tryParse(fileUri: URI, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<CustomPddlFile | undefined> {
         this.callback && this.callback(fileUri, fileVersion);
         if ('(:custom-pddl') {
             const pddlFile = new CustomPddlFile(fileUri, fileVersion, 'custom', syntaxTree, positionResolver);

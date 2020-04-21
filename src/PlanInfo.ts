@@ -9,12 +9,13 @@ import { FileInfo } from "./FileInfo";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { DocumentPositionResolver } from "./DocumentPositionResolver";
 import { PddlLanguage } from "./language";
+import { URI } from "vscode-uri";
 /**
  * Plan file.
  */
 export class PlanInfo extends FileInfo {
     steps: PlanStep[] = [];
-    constructor(fileUri: string, version: number, public problemName: string, public domainName: string, text: string, positionResolver: DocumentPositionResolver) {
+    constructor(fileUri: URI, version: number, public problemName: string, public domainName: string, text: string, positionResolver: DocumentPositionResolver) {
         // note we use the `problemName` as the plan name as the plan does not have any declared name
         super(fileUri, version, problemName, PddlSyntaxTree.EMPTY, positionResolver);
         this.setText(text);

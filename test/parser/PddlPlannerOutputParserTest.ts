@@ -10,9 +10,11 @@ import { DomainInfo } from '../src';
 import { ProblemInfo } from '../src';
 import { PddlSyntaxTree } from './src';
 import { SimpleDocumentPositionResolver } from '../src';
+import { URI } from 'vscode-uri';
 
-const dummyDomain = new DomainInfo('uri', 1, '', new PddlSyntaxTree(), new SimpleDocumentPositionResolver(''));
-const dummyProblem = new ProblemInfo('uri', 1, 'name', 'name', new PddlSyntaxTree(), new SimpleDocumentPositionResolver(''));
+const uri = URI.parse('file:///mock');
+const dummyDomain = new DomainInfo(uri, 1, '', new PddlSyntaxTree(), new SimpleDocumentPositionResolver(''));
+const dummyProblem = new ProblemInfo(uri, 1, 'name', 'name', new PddlSyntaxTree(), new SimpleDocumentPositionResolver(''));
 const EPSILON = 1e-3;
 
 describe('PddlPlannerOutputParser', () => {

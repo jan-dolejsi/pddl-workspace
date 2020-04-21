@@ -9,6 +9,7 @@ import { PddlSyntaxNode } from "./parser/PddlSyntaxNode";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { PddlTokenType } from "./parser/PddlTokenizer";
 import { FileStatus, PddlLanguage, Variable } from "./language";
+import { URI } from "vscode-uri";
 
 export function stripComments(pddlText: string): string {
     const lines = pddlText.split(/\r?\n/g);
@@ -33,7 +34,7 @@ export abstract class FileInfo {
     private parsingProblems: ParsingProblem[] = [];
     private requirements?: string[];
 
-    constructor(public readonly fileUri: string, private version: number, public readonly name: string, public readonly syntaxTree: PddlSyntaxTree, private readonly positionResolver: DocumentPositionResolver) {
+    constructor(public readonly fileUri: URI, private version: number, public readonly name: string, public readonly syntaxTree: PddlSyntaxTree, private readonly positionResolver: DocumentPositionResolver) {
     }
 
     abstract getLanguage(): PddlLanguage;
@@ -191,7 +192,7 @@ export class ParsingProblem {
 }
 
 export class UnknownFileInfo extends FileInfo {
-    constructor(fileUri: string, version: number, positionResolver: DocumentPositionResolver) {
+    constructor(fileUri: URI, version: number, positionResolver: DocumentPositionResolver) {
         super(fileUri, version, "", PddlSyntaxTree.EMPTY, positionResolver);
     }
 

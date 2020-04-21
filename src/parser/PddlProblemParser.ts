@@ -6,7 +6,6 @@
 
 import { ProblemParserPreProcessor } from "../ProblemParserPreProcessor";
 import { dirname } from "path";
-import { Util } from "../utils/util";
 import { DocumentPositionResolver, SimpleDocumentPositionResolver } from "../DocumentPositionResolver";
 import { PddlSyntaxTree } from "./PddlSyntaxTree";
 import { ParsingProblem, stripComments } from "../FileInfo";
@@ -20,6 +19,7 @@ import { PddlInheritanceParser } from "./PddlInheritanceParser";
 import { PddlConstraintsParser } from "./PddlConstraintsParser";
 import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
 import { PddlFileParser } from "./PddlFileParser";
+import { URI } from "vscode-uri";
 
 /**
  * Planning Problem parser.
@@ -36,7 +36,7 @@ export class PddlProblemParser extends PddlFileParser<ProblemInfo> {
         }
     }
 
-    static async parseText(problemText: string, fileNameOrIdentifier = 'string://noname', version = -1): Promise<ProblemInfo | undefined> {
+    static async parseText(problemText: string, fileNameOrIdentifier = URI.parse('file:///noname'), version = -1): Promise<ProblemInfo | undefined> {
         const parser = new PddlSyntaxTreeBuilder(problemText);
         const syntaxTree = parser.getTree();
 
@@ -46,8 +46,8 @@ export class PddlProblemParser extends PddlFileParser<ProblemInfo> {
             .tryParse(fileNameOrIdentifier, version, problemText, syntaxTree, positionResolver);
     }
 
-    async tryParse(fileUri: string, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<ProblemInfo | undefined> {
-        const filePath = Util.fsPath(fileUri);
+    async tryParse(fileUri: URI, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<ProblemInfo | undefined> {
+        const filePath = fileUri.fsPath;
         const workingDirectory = dirname(filePath);
         let preProcessor: PreProcessor | undefined;
 
