@@ -48,7 +48,7 @@ export interface PlannerConfiguration {
     /**  true if this planner is currently selected */
     isSelected: boolean;
     /** machine | workspaceFolder | workspace | extension */
-    scope: string;
+    scope?: string;
     /**  user can configure this planner */
     canConfigure: boolean;
 }
