@@ -5,14 +5,20 @@
 
 import { PddlFileParser } from "./parser/PddlFileParser";
 import { FileInfo } from "./FileInfo";
+import { PlannerProvider } from "./planner/PlannerProvider";
 
 /**
  * Manifest of `PddlWorkspace` extension's capabilities.
  */
-export abstract class PddlWorkspaceExtension {
-    
+export interface PddlWorkspaceExtension {
+   
     /**
      * Implement this to inject a specific PDDL file parser to the `PddlWorkspace`.
      */
-    abstract getPddlParsers(): PddlFileParser<FileInfo>[] | undefined;
+    getPddlParsers?(): PddlFileParser<FileInfo>[] | undefined;
+
+    /**
+     * Implement this to provider a planner specification to the `PddlWorkspace`.
+     */
+    getPlannerProvider?(): PlannerProvider[] | undefined;
 }

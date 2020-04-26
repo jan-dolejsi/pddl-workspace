@@ -6,7 +6,6 @@
 import * as tmp from 'tmp-promise';
 import fs = require('fs');
 import * as afs from './asyncfs';
-import { URI } from 'vscode-uri';
 
 
 export class Util {
@@ -46,10 +45,6 @@ export class Util {
 
     static async toPddlFile(prefix: string, text: string): Promise<string> {
         return Util.toFile(prefix, '.pddl', text);
-    }
-
-    static fsPath(fileUri: string): string {
-        return URI.parse(fileUri).fsPath;
     }
 
     /**

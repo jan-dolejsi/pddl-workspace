@@ -6,6 +6,7 @@
 import * as assert from 'assert';
 import { PddlPlanParser } from './src';
 import { PlanStep, Happening, HappeningType, PddlLanguage } from '../src';
+import { URI } from 'vscode-uri';
 
 describe('PddlPlanParser', () => {
 
@@ -22,7 +23,7 @@ describe('PddlPlanParser', () => {
             ; Cost: 0.001
             ; States evaluated: 1`;
 
-            const fileUri = 'file://directory/file1.plan';
+            const fileUri = URI.parse('file://directory/file1.plan');
             const epsilon = 0.1;
             // WHEN
             const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);
@@ -51,7 +52,7 @@ describe('PddlPlanParser', () => {
             ; Cost: 0.001
             ; States evaluated: 1`;
 
-            const fileUri = 'file://directory/file1.plan';
+            const fileUri = URI.parse('file://directory/file1.plan');
             const epsilon = 0.1;
             // WHEN
             const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);

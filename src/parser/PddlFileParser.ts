@@ -5,6 +5,7 @@
 
 import { PddlSyntaxTree } from "./index";
 import { DocumentPositionResolver, FileInfo } from "../index";
+import { URI } from "vscode-uri";
 
 /**
  * Abstract PDDL file parser. Implement this interface.
@@ -20,6 +21,6 @@ export abstract class PddlFileParser<T extends FileInfo> {
      * @param positionResolver document position resolver
      * @returns `undefined` if the content does not parse in this parser
      */
-    abstract tryParse(fileUri: string, fileVersion: number, fileText: string,
+    abstract tryParse(fileUri: URI, fileVersion: number, fileText: string,
         syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<T | undefined>;
 }

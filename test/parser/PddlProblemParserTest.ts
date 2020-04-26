@@ -13,6 +13,9 @@ import { ProblemInfo, VariableValue, TimedVariableValue, SupplyDemand } from '..
 import { PddlProblemParser } from './src';
 
 describe('PddlProblemParser', () => {
+
+    const uri = URI.parse('file:///mock');
+
     describe('#tryParse', () => {
         it('extracts domain name', async () => {
 
@@ -20,7 +23,7 @@ describe('PddlProblemParser', () => {
             const syntaxTree = new PddlSyntaxTreeBuilder(pddlProblemText).getTree();
             const positionResolver = new SimpleDocumentPositionResolver(pddlProblemText);
 
-            const problemUri = URI.file(path.join('folder1', 'problem.pddl')).toString();
+            const problemUri = URI.file(path.join('folder1', 'problem.pddl'));
             // WHEN
             const problemInfo = await new PddlProblemParser()
             .tryParse(
@@ -55,7 +58,7 @@ describe('PddlProblemParser', () => {
             `;
             const syntaxTree = new PddlSyntaxTreeBuilder(problemPddl).getTree();
             const positionResolver = new SimpleDocumentPositionResolver(problemPddl);
-            const problemInfo = new ProblemInfo("uri", 1, "p1", "d1", syntaxTree, positionResolver);
+            const problemInfo = new ProblemInfo(uri, 1, "p1", "d1", syntaxTree, positionResolver);
 
             // WHEN
             new PddlProblemParser().getProblemStructure(problemInfo);
@@ -78,7 +81,7 @@ describe('PddlProblemParser', () => {
             `;
             const syntaxTree = new PddlSyntaxTreeBuilder(problemPddl).getTree();
             const positionResolver = new SimpleDocumentPositionResolver(problemPddl);
-            const problemInfo = new ProblemInfo("uri", 1, "p1", "d1", syntaxTree, positionResolver);
+            const problemInfo = new ProblemInfo(uri, 1, "p1", "d1", syntaxTree, positionResolver);
 
             // WHEN
             new PddlProblemParser().getProblemStructure(problemInfo);
@@ -101,7 +104,7 @@ describe('PddlProblemParser', () => {
             `;
             const syntaxTree = new PddlSyntaxTreeBuilder(problemPddl).getTree();
             const positionResolver = new SimpleDocumentPositionResolver(problemPddl);
-            const problemInfo = new ProblemInfo("uri", 1, "p1", "d1", syntaxTree, positionResolver);
+            const problemInfo = new ProblemInfo(uri, 1, "p1", "d1", syntaxTree, positionResolver);
 
             // WHEN
             new PddlProblemParser().getProblemStructure(problemInfo);
@@ -125,7 +128,7 @@ describe('PddlProblemParser', () => {
             `;
             const syntaxTree = new PddlSyntaxTreeBuilder(problemPddl).getTree();
             const positionResolver = new SimpleDocumentPositionResolver(problemPddl);
-            const problemInfo = new ProblemInfo("uri", 1, "p1", "d1", syntaxTree, positionResolver);
+            const problemInfo = new ProblemInfo(uri, 1, "p1", "d1", syntaxTree, positionResolver);
 
             // WHEN
             new PddlProblemParser().getProblemStructure(problemInfo);

@@ -11,6 +11,7 @@ import { PddlSyntaxTree } from './parser/src';
 import { SimpleDocumentPositionResolver } from './src';
 import { DomainInfo, TypeObjectMap } from './src';
 import { DirectionalGraph } from './utils/src';
+import { URI } from 'vscode-uri';
 
 function createPositionResolver(): DocumentPositionResolver {
     return new SimpleDocumentPositionResolver('');
@@ -21,8 +22,8 @@ describe('Grounder', () => {
     describe('#ground', () => {
         it('grounds un-parameterized variable', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             const liftedVariable = new Variable("cost", []);
 
             // WHEN
@@ -33,8 +34,8 @@ describe('Grounder', () => {
 
         it('grounds 1-parameterized variable with no objects', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             domain.setTypeInheritance(new DirectionalGraph().addEdge("type1", "object"));
             const liftedVariable = new Variable("cost", [new Parameter("p1", "type1")]);
 
@@ -46,8 +47,8 @@ describe('Grounder', () => {
 
         it('grounds 1-parameterized variable with one object', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             const type1 = "type1";
             const object1 = "object1";
             problem.setObjects(new TypeObjectMap().addAll(type1, [object1]));
@@ -63,8 +64,8 @@ describe('Grounder', () => {
 
         it('grounds 1-parameterized variable with one child-type object', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             const parent = "parent";
             const child = "child";
             const object1 = "object1";
@@ -82,8 +83,8 @@ describe('Grounder', () => {
 
         it('grounds 1-parameterized variable with two objects', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             const type1 = "type1";
             const object1 = "object1";
             const object2 = "object2";
@@ -98,8 +99,8 @@ describe('Grounder', () => {
 
         it('grounds 2-parameterized variable with two objects', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             const type1 = "type1";
             const object1 = "object1";
             const object2 = "object2";
@@ -116,8 +117,8 @@ describe('Grounder', () => {
     describe('#getObjects', () => {
         it('get objects for 1 type', () => {
             // GIVEN
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             const type1 = "type1";
             const object1 = "object1";
             const object2 = "object2";
@@ -134,8 +135,8 @@ describe('Grounder', () => {
 
         it('get objects for 2 types', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
 
             const type1 = "type1";
             const type1object1 = "t1object1";
@@ -162,8 +163,8 @@ describe('Grounder', () => {
     describe('#getObjectPermutations', () => {
         it('get object permutations for 1 type', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             const type1 = "type1";
             const object1 = "object1";
             const object2 = "object2";
@@ -178,8 +179,8 @@ describe('Grounder', () => {
 
         it('get object permutations for 2 types', () => {
             // GIVEN            
-            const domain = new DomainInfo("file://fake", 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo("file://fake", 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
 
             const type1 = "type1";
             const type1object1 = "t1object1";

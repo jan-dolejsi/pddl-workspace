@@ -43,6 +43,12 @@ export abstract class StringifyingMap<K, V> {
     keyList(): K[] {
         return [...this.keys()];
     }
+    values(): IterableIterator<V> {
+        return this.map.values();
+    }
+    valueList(): V[] {
+        return [...this.values()];
+    }
     delete(key: K): boolean {
         const keyString = this.stringifyKey(key);
         const flag = this.map.delete(keyString);

@@ -6,6 +6,7 @@
 import { PlanInfo } from '../PlanInfo';
 import { PddlPlanBuilder } from './PddlPlanBuilder';
 import { DocumentPositionResolver, SimpleDocumentPositionResolver } from '../DocumentPositionResolver';
+import { URI } from 'vscode-uri';
 
 export const UNSPECIFIED_PROBLEM = 'unspecified';
 export const UNSPECIFIED_DOMAIN = 'unspecified';
@@ -34,7 +35,7 @@ export class PddlPlanParser {
         return { domainName: domainName, problemName: problemName };
     }
     
-    static parseText(planText: string, epsilon = 0.001, fileUri = 'string://noname', fileVersion = -1, positionResolver?: DocumentPositionResolver): PlanInfo {
+    static parseText(planText: string, epsilon = 0.001, fileUri = URI.parse('string://noname'), fileVersion = -1, positionResolver?: DocumentPositionResolver): PlanInfo {
         const meta = PddlPlanParser.parsePlanMeta(planText);
 
         const definedPositionResolver = positionResolver ?? new SimpleDocumentPositionResolver(planText);

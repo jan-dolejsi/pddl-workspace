@@ -18,12 +18,13 @@ import { PddlConstraintsParser } from "./PddlConstraintsParser";
 import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
 import { Variable } from "../language";
 import { PddlFileParser } from "./PddlFileParser";
+import { URI } from "vscode-uri";
 
 /**
  * Planning Domain parser.
  */
 export class PddlDomainParser extends PddlFileParser<DomainInfo> {
-    async tryParse(fileUri: string, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<DomainInfo | undefined> {
+    async tryParse(fileUri: URI, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<DomainInfo | undefined> {
         //(define (domain domain_name)
 
         const defineNode = syntaxTree.getDefineNode();
@@ -35,7 +36,7 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
         return this.parse(fileUri, fileVersion, fileText, domainNode, syntaxTree, positionResolver);
     }
 
-    parse(fileUri: string, fileVersion: number, fileText: string, domainNode: PddlSyntaxNode,
+    parse(fileUri: URI, fileVersion: number, fileText: string, domainNode: PddlSyntaxNode,
         syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): DomainInfo | undefined {
         const domainNameNode = domainNode.getFirstChild(PddlTokenType.Other, /./);
         if (!domainNameNode) return undefined;
@@ -48,7 +49,7 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
         return domainInfo;
     }
 
-    static parseText(domainText: string, fileNameOrIdentifier = 'string://noname', version = -1): DomainInfo | undefined {
+    static parseText(domainText: string, fileNameOrIdentifier = URI.parse('string://noname'), version = -1): DomainInfo | undefined {
         const parser = new PddlSyntaxTreeBuilder(domainText);
         const syntaxTree = parser.getTree();
         //(define (domain domain_name)
