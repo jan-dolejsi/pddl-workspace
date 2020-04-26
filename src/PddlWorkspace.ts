@@ -19,6 +19,7 @@ import { PddlPlanParser } from './parser/PddlPlanParser';
 import { PddlLanguage, FileStatus } from './language';
 import { PddlFileParser, PddlDomainParser, PddlProblemParser } from './parser/index';
 import { PddlWorkspaceExtension } from './PddlWorkspaceExtension';
+import { PlannerRegistrar } from './planner/PlannerRegistrar';
 
 function lowerCaseEquals(first: string, second: string): boolean {
     if (first === null || first === undefined) { return second === null || second === undefined; }
@@ -83,6 +84,7 @@ export class PddlWorkspace extends EventEmitter {
     private parsingTimeout: NodeJS.Timer | undefined;
     private defaultTimerDelayInSeconds = 1;
     private pddlFileParsers: PddlFileParser<FileInfo>[];
+    private plannerRegistrar: PlannerRegistrar;
 
     public static INSERTED = Symbol("INSERTED");
     public static UPDATED = Symbol("UPDATED");
@@ -91,12 +93,28 @@ export class PddlWorkspace extends EventEmitter {
     constructor(public epsilon: number, context?: PddlExtensionContext) {
         super();
         this.pddlFileParsers = [new PddlDomainParser(), new PddlProblemParser(context)];
+        this.plannerRegistrar = new PlannerRegistrar();
+    }
+
+    getPlannerRegistrar(): PlannerRegistrar {
+        return this.plannerRegistrar;
     }
 
     addExtension(extension: PddlWorkspaceExtension): void {
-        const parsers = extension.getPddlParsers();
-        if (parsers) {
-            this.addPddlFileParser(parsers);
+        if (extension.getPddlParsers) {
+            const parsers = extension.getPddlParsers();
+            if (parsers) {
+                this.addPddlFileParser(parsers);
+            }
+        }
+
+        if (extension.getPlannerProvider) {
+            const plannerProviders =  extension.getPlannerProvider();
+            if (plannerProviders) {
+                plannerProviders
+                    .forEach(provider =>
+                        this.plannerRegistrar.registerPlannerProvider(provider.kind, provider));
+            }
         }
     }
 

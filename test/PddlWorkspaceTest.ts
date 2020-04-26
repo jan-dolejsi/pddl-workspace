@@ -16,6 +16,7 @@ import {
     FileStatus
 } from './src';
 import { PddlFileParser, PddlSyntaxTree } from './parser/src';
+import { PlannerProvider } from './planner/PlannerProvider';
 
 describe('PddlWorkspace', () => {
     // var subject: PddlWorkspace;
@@ -187,8 +188,11 @@ class CustomParser extends PddlFileParser<CustomPddlFile> {
     }
 }
 
-class CustomExtension extends PddlWorkspaceExtension {
+class CustomExtension implements PddlWorkspaceExtension {
     getPddlParsers(): PddlFileParser<FileInfo>[] | undefined {
         return [new CustomParser()];
+    }
+    getPlannerProvider(): PlannerProvider[] | undefined {
+        return undefined;
     }
 }
