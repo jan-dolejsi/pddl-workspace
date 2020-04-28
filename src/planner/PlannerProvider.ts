@@ -45,10 +45,6 @@ export interface PlannerConfiguration {
     syntax?: string;
     /** service url  */
     url?: string;
-    /**  true if this planner is currently selected */
-    isSelected: boolean;
-    /** machine | workspaceFolder | workspace | extension */
-    scope?: string;
     /**  user can configure this planner */
     canConfigure: boolean;
 }
