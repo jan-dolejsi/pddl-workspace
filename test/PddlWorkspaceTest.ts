@@ -11,12 +11,12 @@ import { URI } from 'vscode-uri';
 import * as path from 'path';
 
 import {
-    PddlWorkspace, FileInfo, PddlLanguage, DocumentPositionResolver,
-    SimpleDocumentPositionResolver, PddlWorkspaceExtension, DomainInfo, ProblemInfo,
-    FileStatus
+    PddlWorkspace, FileInfo, PddlLanguage, 
+    SimpleDocumentPositionResolver, DomainInfo, ProblemInfo,
+    FileStatus,
 } from './src';
-import { PddlFileParser, PddlSyntaxTree } from './parser/src';
-import { PlannerProvider } from './planner/PlannerProvider';
+import { CustomPddlParserExtension, CustomParser, CustomPddlFile } from './CustomPddlParserExtension';
+import { CustomPlannerProviderExtension, plannerKind as myPlannerKind, SolveServicePlannerProvider } from './CustomPlannerProvider';
 
 describe('PddlWorkspace', () => {
     // var subject: PddlWorkspace;
@@ -109,7 +109,7 @@ describe('PddlWorkspace', () => {
         it('supports custom PDDL parsers', async () => {
             // GIVEN
             const pddlWorkspace = new PddlWorkspace(1e-3);
-            pddlWorkspace.addExtension(new CustomExtension());
+            pddlWorkspace.addExtension(new CustomPddlParserExtension());
             const pddlText = `(:custom-pddl)`;
 
             // WHEN
@@ -165,34 +165,21 @@ describe('PddlWorkspace', () => {
         });
     });
 
+    describe('#addExtension', () => {
+
+        it('supports custom PDDL parsers', async () => {
+            // GIVEN
+            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const extension = new CustomPlannerProviderExtension();
+            pddlWorkspace.addExtension(extension);
+
+            // WHEN
+            const actualProvider = pddlWorkspace.getPlannerRegistrar().getPlannerProvider(myPlannerKind);
+
+            // THEN
+            expect(actualProvider).be.instanceOf(SolveServicePlannerProvider);
+            const plannerConfiguration = await actualProvider?.configurePlanner();
+            expect(plannerConfiguration?.url).to.equal('http://solver.planning.domains/solve');
+        });
+    });
 });
-
-
-class CustomPddlFile extends FileInfo {
-    getLanguage(): PddlLanguage {
-        return PddlLanguage.PDDL;
-    }
-}
-
-class CustomParser extends PddlFileParser<CustomPddlFile> {
-    constructor(private callback?: (fileUri: URI, fileVersion: number) => void) {
-        super();
-    }
-    async tryParse(fileUri: URI, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<CustomPddlFile | undefined> {
-        this.callback && this.callback(fileUri, fileVersion);
-        if ('(:custom-pddl') {
-            const pddlFile = new CustomPddlFile(fileUri, fileVersion, 'custom', syntaxTree, positionResolver);
-            pddlFile.setText(fileText);
-            return pddlFile;
-        }
-    }
-}
-
-class CustomExtension implements PddlWorkspaceExtension {
-    getPddlParsers(): PddlFileParser<FileInfo>[] | undefined {
-        return [new CustomParser()];
-    }
-    getPlannerProvider(): PlannerProvider[] | undefined {
-        return undefined;
-    }
-}

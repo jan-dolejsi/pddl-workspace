@@ -61,7 +61,7 @@ const pddlProblemText = `(define (problem p1) (:domain domain_name))`;
 
 // WHEN
 const domainInfo = await pddlWorkspace.upsertFile(
-    URI.parse('file:///folder1/domain.pddl),
+    URI.parse('file:///folder1/domain.pddl'),
     PddlLanguage.PDDL,
     1, // content version
     pddlDomainText,
@@ -83,7 +83,7 @@ const correspondingDomain = pddlWorkspace.getDomainFileFor(problemInfo as Proble
 ### Extending PDDL Workspace with custom syntaxes and functionality
 
 Creators of non-standard PDDL syntaxes, parsers, planning enginens can inject
-their extensions to the `PddlWorkspace`. Here is how:
+their extensions to the `PddlWorkspace`. Here is how (full working code is in `CustomPddlParserExtension.ts`):
 
 ```typescript
 class CustomPddlFile extends FileInfo {
@@ -100,7 +100,7 @@ class CustomParser extends PddlFileParser<CustomPddlFile> {
     }
 }
 
-class CustomExtension extends PddlWorkspaceExtension {
+class CustomExtension implements PddlWorkspaceExtension {
     getPddlParsers(): PddlFileParser<FileInfo>[] | undefined {
         return [new CustomParser()];
     }
@@ -112,4 +112,55 @@ const pddlText = `(:custom-pddl)`;
 
 // WHEN
 const parsedFile = await pddlWorkspace.upsertFile(URI.parse('file:///test'), PddlLanguage.PDDL, 1, pddlText, new SimpleDocumentPositionResolver(pddlText));
+```
+
+### Extending PDDL VS Code Extension with custom planner configuration providers
+
+The `pddl-workspace` package is the external API of the PDDL VS Code extension.
+To make it convenient for your users to configure and use your planner in VS Code,
+implement the `PlannerProvider` interface (see full working code in `CustomPlannerProvider.ts`):
+
+```typescript
+export const plannerKind = new planner.PlannerKind("my-planning-service");
+
+export class SolveServicePlannerProvider implements planner.PlannerProvider {
+    get kind(): planner.PlannerKind {
+        return plannerKind;
+    }
+    getNewPlannerLabel(): string {
+        return "$(cloud-upload) Input a planning service URL...";
+    }
+
+    async configurePlanner(previousConfiguration?: planner.PlannerConfiguration): Promise<planner.PlannerConfiguration | undefined> {
+        const existingValue = previousConfiguration?.url ?? "http://solver.planning.domains/solve";
+
+        const previouslyUsedUri = URI.parse(existingValue);
+
+        console.log(`Previously, you configured ${previouslyUsedUri.toString()}, what do you want to change it to?`);
+
+        // let's pretend the user entered 'http://solver.planning.domains/solve'
+        const newPlannerUrl = 'http://solver.planning.domains/solve';
+
+        return this.createPlannerConfiguration(newPlannerUrl);
+    }
+
+    createPlannerConfiguration(newPlannerUrl: string): planner.PlannerConfiguration {
+        return {
+            kind: this.kind.kind,
+            url: newPlannerUrl,
+            title: newPlannerUrl,
+            canConfigure: true
+        };
+    }
+}
+
+
+/**
+ * Example custom Planner Provider extension.
+ */
+export class CustomPlannerProviderExtension implements PddlWorkspaceExtension {
+    getPlannerProvider(): PlannerProvider[] | undefined {
+        return [new SolveServicePlannerProvider()];
+    }
+}
 ```
