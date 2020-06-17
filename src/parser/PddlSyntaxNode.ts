@@ -18,6 +18,11 @@ export class PddlSyntaxNode extends TextRange {
      */
     constructor(private token: PddlToken, private parent?: PddlSyntaxNode) {
         super();
+        if (parent === undefined) {
+            if (token.type !== PddlTokenType.Document) {
+                throw new Error(`Node of type ${token.type} must have parent defined.`)
+            }
+        }
         this.maxChildEnd = token.getEnd();
     }
 
@@ -337,7 +342,7 @@ export class PddlBracketNode extends PddlSyntaxNode {
     setCloseBracket(token: PddlToken): void {
         this._isClosed = true;
         this.closeToken = token;
-        this.addChild(new PddlSyntaxNode(token));
+        this.addChild(new PddlSyntaxNode(token, this));
         this.recalculateEnd(token);
     }
 
