@@ -13,6 +13,7 @@ export * from './PreProcessors';
 export * from './ModelHierarchy';
 export * from './PddlExtensionContext';
 export * from './PddlWorkspaceExtension';
+export * from './NumericExpression';
 
 export * from './typeInheritance';
 export { Grounder } from './Grounder';

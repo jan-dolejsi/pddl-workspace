@@ -8,6 +8,8 @@ export * from './DerivedVariableParser';
 export * from './PddlConstraintsParser';
 export * from './PddlInheritanceParser';
 export * from './VariablesParser';
+export * from './MetricParser';
+export * from './NumericExpressionParser';
 
 export * from './PddlSyntaxTreeBuilder';
 export * from './PddlSyntaxTree';

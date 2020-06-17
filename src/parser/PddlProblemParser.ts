@@ -11,7 +11,7 @@ import { PddlSyntaxTree } from "./PddlSyntaxTree";
 import { ParsingProblem, stripComments } from "../FileInfo";
 import { PreProcessingError, PreProcessor } from "../PreProcessors";
 import { PddlExtensionContext } from "../PddlExtensionContext";
-import { ProblemInfo, TimedVariableValue, VariableValue, SupplyDemand, UnsupportedVariableValue } from "../ProblemInfo";
+import { ProblemInfo, TimedVariableValue, VariableValue, SupplyDemand, UnsupportedVariableValue, Metric } from "../ProblemInfo";
 import { PddlDomainParser } from "./PddlDomainParser";
 import { PddlSyntaxNode } from "./PddlSyntaxNode";
 import { PddlTokenType, isOpenBracket } from "./PddlTokenizer";
@@ -20,6 +20,7 @@ import { PddlConstraintsParser } from "./PddlConstraintsParser";
 import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
 import { PddlFileParser } from "./PddlFileParser";
 import { URI } from "vscode-uri";
+import { MetricParser } from "./MetricParser";
 
 /**
  * Planning Problem parser.
@@ -113,6 +114,9 @@ export class PddlProblemParser extends PddlFileParser<ProblemInfo> {
             const constraints = new PddlConstraintsParser().parseConstraints(constraintsNode);
             problemInfo.setConstraints(constraints);
         }
+
+        const metrics = this.parseMetrics(defineNode, problemInfo.getDocumentPositionResolver());
+        problemInfo.setMetrics(metrics);
     }
 
     /**
@@ -204,4 +208,10 @@ export class PddlProblemParser extends PddlFileParser<ProblemInfo> {
         }
     }
 
+    parseMetrics(defineNode: PddlSyntaxNode, positionResolver: DocumentPositionResolver): Metric[] {
+        return defineNode.getChildrenOfType(PddlTokenType.OpenBracketOperator, new RegExp("\\(\\s*:metric$"))
+            .map(metricNode => new MetricParser(metricNode, positionResolver).getMetric())
+            .filter(metric => !!metric)
+            .map(metric => metric!);
+    }
 }

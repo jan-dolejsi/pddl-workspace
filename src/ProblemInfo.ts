@@ -6,11 +6,12 @@
 import { FileInfo } from "./FileInfo";
 import { PreProcessor } from "./PreProcessors";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
-import { DocumentPositionResolver } from "./DocumentPositionResolver";
+import { DocumentPositionResolver, PddlRange } from "./DocumentPositionResolver";
 import { TypeObjectMap } from "./DomainInfo";
 import { Constraint } from "./constraints";
 import { PddlLanguage } from "./language";
 import { URI } from "vscode-uri";
+import { NumericExpression } from "./NumericExpression";
 
 
 /**
@@ -33,7 +34,7 @@ export class VariableValue {
         return new VariableValue(this.variableName, !this.value);
     }
 
-    get isSupported(): boolean { 
+    get isSupported(): boolean {
         return true;
     }
 }
@@ -57,9 +58,34 @@ export class UnsupportedVariableValue extends VariableValue {
  */
 export class SupplyDemand {
     constructor(private name: string) { }
-    
+
     getName(): string {
         return this.name;
+    }
+}
+
+export enum MetricDirection {
+    MINIMIZE,
+    MAXIMIZE
+}
+
+export class Metric {
+    constructor(private direction: MetricDirection, private expression: NumericExpression, private location: PddlRange, private documentation: string[]) { }
+
+    getDirection(): MetricDirection {
+        return this.direction;
+    }
+
+    getExpression(): NumericExpression {
+        return this.expression;
+    }
+
+    getLocation(): PddlRange {
+        return this.location;
+    }
+
+    getDocumentation(): string[] {
+        return this.documentation;
     }
 }
 
@@ -71,6 +97,7 @@ export class ProblemInfo extends FileInfo {
     private inits: TimedVariableValue[] = [];
     private supplyDemands: SupplyDemand[] = [];
     private constraints: Constraint[] = [];
+    private metrics: Metric[] = [];
     private preParsingPreProcessor: PreProcessor | undefined;
 
     constructor(fileUri: URI, version: number, problemName: string, public domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
@@ -80,7 +107,7 @@ export class ProblemInfo extends FileInfo {
     setPreParsingPreProcessor(preProcessor: PreProcessor): void {
         this.preParsingPreProcessor = preProcessor;
     }
-    
+
     getPreParsingPreProcessor(): PreProcessor | undefined {
         return this.preParsingPreProcessor;
     }
@@ -130,6 +157,14 @@ export class ProblemInfo extends FileInfo {
 
     getConstraints(): Constraint[] {
         return this.constraints;
+    }
+
+    setMetrics(metrics: Metric[]): void {
+        this.metrics = metrics;
+    }
+
+    getMetrics(): Metric[] {
+        return this.metrics;
     }
 
     isProblem(): boolean {

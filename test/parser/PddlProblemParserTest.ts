@@ -135,6 +135,26 @@ describe('PddlProblemParser', () => {
 
             assert.equal(problemInfo.getSupplyDemands().length, 1, 'there should be 1 supply demand');
         });
+
+        it('parses problem with multiple metrics', () => {
+            // GIVEN
+            const problemPddl = `
+            (define (problem p1) (:domain d1)
+            (:requirements :strips)
+            
+            (:metric minimize (cost) )
+            (:metric minimize (risk) )
+            )
+            `;
+            const syntaxTree = new PddlSyntaxTreeBuilder(problemPddl).getTree();
+            const positionResolver = new SimpleDocumentPositionResolver(problemPddl);
+            const problemInfo = new ProblemInfo(uri, 1, "p1", "d1", syntaxTree, positionResolver);
+
+            // WHEN
+            new PddlProblemParser().getProblemStructure(problemInfo);
+
+            assert.equal(problemInfo.getMetrics().length, 2, 'there should be 2 metrics');
+        });
     });
 
     describe('#parseInit', () => {

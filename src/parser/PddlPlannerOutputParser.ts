@@ -30,7 +30,7 @@ export class PddlPlannerOutputParser {
     private endOfBufferToBeParsedNextTime = '';
     private xmlPlanBuilder: XmlPlanBuilder | undefined;
     private planTimeScale = 1;
-    
+
     constructor(private domain: DomainInfo, private problem: ProblemInfo, public readonly options: PddlPlanParserOptions, private onPlanReady?: (plans: Plan[]) => void) {
         this.planBuilder = new PddlPlanBuilder(options.epsilon);
     }
@@ -60,6 +60,19 @@ export class PddlPlannerOutputParser {
             this.endOfBufferToBeParsedNextTime = textString.substr(lastEndLine);
         }
     }
+
+    async appendXplan(planXml: string): Promise<Plan[]> {
+        if (this.xmlPlanBuilder) {
+            throw new Error("Mix of incremental XML parsing and full plan appending is not supported.");
+        }
+        const xmlPlanBuilder = new XmlPlanBuilder(this.planTimeScale);
+        xmlPlanBuilder.appendLine(planXml);
+        const steps = await xmlPlanBuilder.getPlanSteps();
+        steps.forEach(step => this.appendStep(step));
+        this.onPlanFinished();
+        return this.getPlans();
+    }
+
     /**
      * Parses one line of parser output.
      * @param outputLine one line of planner output

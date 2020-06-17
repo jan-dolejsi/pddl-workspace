@@ -1,8 +1,9 @@
 /* --------------------------------------------------------------------------------------------
- * Copyright (c) Jan Dolejsi 2020. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
+* Copyright (c) Jan Dolejsi 2020. All rights reserved.
+* Licensed under the MIT License. See License.txt in the project root for license information.
+* ------------------------------------------------------------------------------------------ */
 
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { PddlRange } from "./DocumentPositionResolver";
 
 // Language ID of Domain and Problem files
@@ -59,6 +60,19 @@ export class Variable {
     constructor(public readonly declaredName: string, public readonly parameters: Term[] = []) {
         this.declaredNameWithoutTypes = declaredName.replace(/\s+-\s+[\w-_]+/gi, '');
         this.name = declaredName.replace(/( .*)$/gi, '');
+    }
+
+    static fromGrounded(fullName: string): Variable {
+        const fragments = fullName.split(/\s+/);
+        const name = fragments.shift();
+        if (!name) {
+            throw new Error(`Illegal grounded variable name: ${fullName}`);
+        }
+
+        const terms = fragments
+            .map(o => new ObjectInstance(o, "object"));
+        
+        return new Variable(name, terms); 
     }
 
     bind(objects: ObjectInstance[]): Variable {
