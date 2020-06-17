@@ -34,6 +34,29 @@ const plan = PddlPlanParser.parseText(planText, epsilon);
 
 Many more usage scenarios are exercised in the unit tests in the `test` folder.
 
+### PDDL Numeric Expression Parser
+
+PDDL problem files support multiple `(:metric )` elements (because VAL does as well).
+The numeric expression inside the metric is parsed to a syntax tree. The parser is available:
+
+```typescript
+const expressionPddl = "(/ (- (cost) (minCost)) 2)";
+
+const expression = createNumericExpressionParser(expressionPddl).getExpression();
+
+const division = expression as Division;
+division.getVariableNames(); // returns ['cost', 'minCost']
+
+const context = new ValueMap("cost", 3, "minCost", 2);
+division.evaluate(context); // returns 0.5
+
+function createNumericExpressionParser(metricPddl: string): NumericExpressionParser {
+    const syntaxTree = new PddlSyntaxTreeBuilder(metricPddl).getTree();
+    return new NumericExpressionParser(
+        syntaxTree.getRootNode().getSingleNonWhitespaceChild());
+}
+```
+
 ## PDDL Workspace
 
 The _workspace_ groups features necessary for interactive authoring of PDDL files.
