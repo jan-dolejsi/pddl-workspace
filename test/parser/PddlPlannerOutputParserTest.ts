@@ -115,7 +115,7 @@ describe('PddlPlannerOutputParser', () => {
             expect(plan.steps, 'plan should have one action').to.have.lengthOf(1);
         });
 
-        it('parses multiple improving plans', () => {
+        it('parses multiple improving plans - popf', () => {
             // GIVEN
             const planText = `; All the ground actions in this problem are compression-safe
             ; Initial heuristic = 15.000
@@ -245,7 +245,7 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser.getPlans();
 
             // THEN
-            expect(plans, 'there should be one empty plan').to.have.lengthOf(9);
+            expect(plans, 'plans').to.have.lengthOf(9);
             {
                 const plan0 = plans[0];
                 expect(plan0.cost, 'plan0 cost').to.equal(515);
@@ -266,6 +266,146 @@ describe('PddlPlannerOutputParser', () => {
                 expect(plan8.statesEvaluated, 'plan8 states evaluated').to.equal(40250);
                 expect(plan8.makespan, 'plan8 makespan').to.equal(2150.002);
                 expect(plan8.steps, 'plan8 should have one action').to.have.lengthOf(8);
+            }
+        });
+
+        it('parses multiple improving plans - metis', () => {
+            // GIVEN
+            const planText = `Starting to plan...
+            Pre-processing domain and problem...
+            
+            Search started for 'circus-stage' and 'date_2020-04-22' using 'Enforced Hill Climbing' strategy...
+            46 Initial heuristic: 46.0
+            
+            45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 
+            Search started for 'circus-stage' and 'date_2020-04-22' using 'Best First Search (Parallel)' strategy...
+            46 45 Initial heuristic: 46.0
+            
+            44 43 43 42 42 43 41 41 41 40 40 39 39 38 38 37 37 36 35 35 35 34 35 33 33 34 32 34 30 28 29 29 27 27 26 28 26 25 27 24 26 24 25 25 25 24 26 21 22 20 19 20 19 18 17 17 16 15 15 14 15 13 12 11 10 9 8 7 7 6 5 6 4 3 2 1 0 
+            Printing plan for this domain and problem:
+            Domain: circus-stage
+            Problem: date_2020-04-22
+            Plan was found:
+            Metric: 264.006
+            States evaluated: 187
+              2.0010: (mob_mast qp-02 stage7 base)  [6.0000]
+              2.0020: (mob_staple f2 stage5 stage7)  [6.0000]
+              8.0010: (mob_swt swt3 stage11 stage5)  [6.0000]
+             14.0020: (clean stage5 swt3)  [48.0000]
+             60.0110: (staple stage7 f2)  [80.0000]
+             62.0030: (mob_swt swt3 stage5 stage7)  [6.0000]
+             68.0040: (clean stage7 swt3)  [120.0000]
+             68.0050: (rocking_chairs stage7)  [5.0000]
+            101.0010: (mob_mast je32 stage8 base)  [6.0000]
+            140.0120: (mob_staple f2 stage7 stage8)  [6.0000]
+            151.0080: (staple stage8 f2)  [48.0000]
+            188.0050: (mob_swt swt3 stage7 stage8)  [6.0000]
+            194.0060: (clean stage8 swt3)  [70.0000]
+            194.0070: (rocking_chairs stage8)  [5.0000]
+            199.0090: (mob_staple f2 stage8 stage1)  [6.0000]
+            199.0110: (mob_swt swt2 stage4 stage1)  [6.0000]
+            205.0100: (staple stage1 f2)  [36.0000]
+            205.0120: (clean stage1 swt2)  [48.0000]
+            End of plan print-out.
+            Makespan: 264.0060
+            Memory used (MB): 297
+            Time needed (sec): 1.37900
+            
+            5 4 3 2 4 2 3 2 3 2 1 0 1 0 1 0 1 1 0 1 1 3 4 4 3 4 3 4 5 4 7 6 7 6 16 14 14 15 13 12 12 11 10 10 9 9 8 7 10 6 5 4 5 8 4 7 6 6 6 5 4 6 6 6 5 5 4 6 7 6 5 8 7 8 7 10 8 7 9 8 8 7 9 8 8 8 9 8 10 8 9 8 10 7 6 6 5 4 5 7 6 6 5 8 6 7 6 6 7 7 9 11 10 8 9 8 7 6 8 7 6 5 5 4 6 5 7 6 6 6 6 5 8 10 7 6 7 11 9 8 7 6 6 8 7 10 9 9 9 9 11 10 9 11 10 9 11 9 8 7 6 5 8 7 9 12 10 9 10 9 10 8 8 10 9 9 8 7 9 11 9 8 7 6 5 7 9 10 13 11 10 9 11 10 11 9 8 7 6 5 7 10 9 11 14 10 11 10 13 12 11 11 11 11 12 12 13 13 13 13 14 13 12 11 10 9 8 7 6 5 4 3 2 4 2 3 2 3 2 1 0 1 0 1 0 0 1 2 1 3 3 3 4 3 4 3 4 5 4 4 5 6 5 6 8 5 8 7 6 6 6 6 6 5 4 6 7 6 5 5 4 7 6 5 7 6 5 8 7 8 7 8 7 10 8 7 11 8 9 8 8 10 8 8 9 8 9 8 10 7 6 6 5 6 4 7 6 6 5 8 6 7 6 6 7 7 9 11 9 11 8 10 11 9 8 7 6 8 7 9 8 7 6 6 5 4 6 5 6 6 6 5 8 10 7 6 7 9 9 8 7 6 6 11 10 9 9 9 11 9 9 10 9 9 8 7 6 5 7 7 9 10 11 9 9 8 9 8 10 9 9 9 9 8 7 6 5 8 7 10 14 13 11 10 9 11 10 13 11 10 9 11 10 11 9 8 7 6 5 8 7 12 11 11 11 14 12 12 13 14 16 13 12 12 11 11 10 10 11 9 8 10 7 8 6 5 6 4 5 4 6 6 7 6 7 6 5 6 6 7 6 6 7 10 7 9 9 10 8 7 10 8 9 7 10 8 7 10 8 10 7 9 8 7 10 8 8 7 10 9 9 8 8 9 7 6 6 5 4 3 2 1 0 
+            Printing plan for this domain and problem:
+            Domain: circus-stage
+            Problem: date_2020-04-22
+            Plan was found:
+            Metric: 258.017
+            States evaluated: 1193
+              2.0010: (mob_mast qp-02 stage7 base)  [6.0000]
+              2.0020: (mob_staple f2 stage5 stage7)  [6.0000]
+              8.0010: (mob_swt swt3 stage11 stage5)  [6.0000]
+             14.0020: (clean stage5 swt3)  [48.0000]
+             60.0110: (staple stage7 f2)  [80.0000]
+             62.0030: (mob_swt swt3 stage5 stage7)  [6.0000]
+             68.0040: (clean stage7 swt3)  [120.0000]
+             68.0050: (rocking_chairs stage7)  [5.0000]
+            101.0010: (mob_mast je32 stage8 base)  [6.0000]
+            140.0120: (mob_staple f2 stage7 stage1)  [6.0000]
+            140.0140: (mob_swt swt2 stage4 stage1)  [6.0000]
+            146.0130: (staple stage1 f2)  [36.0000]
+            182.0140: (mob_staple f2 stage1 stage8)  [6.0000]
+            182.0160: (mob_swt swt2 stage1 stage8)  [6.0000]
+            188.0050: (mob_swt swt3 stage7 stage1)  [6.0000]
+            188.0150: (staple stage8 f2)  [48.0000]
+            188.0170: (clean stage8 swt2)  [70.0000]
+            188.0180: (rocking_chairs stage8)  [5.0000]
+            194.0060: (clean stage1 swt3)  [48.0000]
+            End of plan print-out.
+            Makespan: 258.0170
+            Memory used (MB): 226
+            Time needed (sec): 5.67200
+            
+            1 1 0 1 0 0 1 1 2 1 2 4 3 2 4 3 4 3 4 3 4 3 4 4 5 4 3 4 3 4 5 4 5 5 5 4 4 6 6 10 6 5 8 6 7 6 5 6 7 6 7 7 7 6 6 7 7 10 8 11 11 9 10 8 8 8 9 8 8 8 10 8 8 7 10 9 12 10 8 9 8 7 6 6 9 8 10 9 8 11 9 8 7 10 9 12 8 7 10 8 7 10 9 10 8 8 9 9 9 10 9 11 9 10 9 10 9 10 9 11 10 10 12 9 10 8 8 8 9 8 8 10 8 8 9 9 9 13 9 10 10 9 9 8 7 6 5 8 7 9 11 10 9 8 8 11 14 10 11 11 10 10 10 9 8 7 6 6 9 10 8 7 6 8 7 6 6 9 9 9 9 8 7 6 5 8 7 10 10 13 11 12 10 9 9 10 9 10 8 8 9 10 9 8 9 8 10 9 9 10 9 10 8 8 8 10 11 10 11 9 9 10 9 9 10 9 9 11 10 11 12 10 11 14 10 11 10 14 13 11 10 10 11 10 9 10 10 9 11 12 10 12 11 14 11 11 14 10 9 8 12 7 10 8 7 10 9 10 8 8 10 9 9 11 8 11 7 9 8 10 9 12 8 7 8 7 10 9 10 8 8 9 11 9 14 10 11 12 10 9 12 10 8 9 12 8 10 9 9 11 14 10 11 12 10 10 14 10 11 10 10 13 12 11 12 11 14 11 12 11 11 11 11 11 12 10 9 10 9 8 9 8 10 9 9 14 10 12 11 14 12 12 11 11 11 11 11 11 11 14 13 11 12 14 13 11 12 12 13 11 13 12 11 14 12 10 11 11 12 14 11 12 12 11 14 10 9 12 8 10 9 8 10 9 10 11 10 9 10 11 11 11 13 11 12 14 12 14 12 11 14 13 12 12 11 11 10 9 8 8 8 9 10 9 10 9 8 8 11 12 12 11 11 12 11 10 9 9 12 12 11 11 11 10 10 9 8 8 8 9 9 10 9 8 12 11 10 9 13 13 12 11 13 11 10 9 8 8 8 9 12 11 10 9 8 8 11 13 12 11 11 13 14 12 12 11 15 14 12 13 12 11 13 12 11 13 12 16 12 13 12 11 10 9 10 9 13 14 13 14 12 13 12 13 12 13 14 13 13 12 12 14 13 13 12 12 11 11 10 9 10 9 10 11 9 11 12 10 10 13 12 11 10 9 10 14 12 11 12 13 12 13 15 14 13 14 12 12 11 13 11 12 10 9 10 9 10 9 10 9 11 9 9 11 11 12 10 11 10 12 10 10 14 11 12 11 11 12 10 9 10 9 10 9 10 9 12 15 13 12 12 12 13 13 14 14 13 12 13 12 13 16 14 13 14 13 14 13 12 12 13 12 13 15 14 13 13 14 13 12 11 10 11 10 14 13 12 11 12 10 12 10 12 11 16 15 14 13 12 11 13 14 12 12 11 14 13 14 14 13 15 14 12 12 11 12 11 14 13 13 14 13 15 14 16 15 14 15 16 15 17 16 14 15 15 16 15 15 15 15 15 15 15 16 15 17 14 13 13 12 11 14 10 10 11 9 8 7 6 5 8 7 8 12 11 9 8 11 10 9 11 8 7 6 5 6 5 9 9 11 10 11 10 10 9 9 11 11 12 14 11 10 11 10 9 10 11 10 9 12 10 10 11 11 12 15 15 13 16 14 12 13 13 13 13 14 14 14 15 14 13 13 15 16 16 17 16 16 18 17 16 15 15 17 18 16 16 17 17 17 22 25 24 25 24 23 25 25 23 22 21 21 22 20 20 19 21 20 18 17 19 18 16 18 17 15 16 14 13 14 12 11 11 10 9 8 8 7 8 6 5 6 4 4 6 10 7 6 5 4 6 6 5 4 6 6 6 5 7 6 5 4 3 2 1 0 
+            Printing plan for this domain and problem:
+            Domain: circus-stage
+            Problem: date_2020-04-22
+            Plan was found:
+            Metric: 227.008
+            States evaluated: 2983
+              2.0010: (mob_mast qp-02 stage7 base)  [6.0000]
+              2.0020: (mob_staple f2 stage5 stage7)  [6.0000]
+              8.0010: (mob_swt swt3 stage11 stage5)  [6.0000]
+             14.0020: (clean stage5 swt3)  [48.0000]
+             23.0010: (mob_staple f2 stage7 stage1)  [6.0000]
+             23.0030: (mob_swt swt2 stage4 stage1)  [6.0000]
+             29.0020: (staple stage1 f2)  [36.0000]
+             29.0040: (clean stage1 swt2)  [48.0000]
+             65.0030: (mob_staple f2 stage1 stage7)  [6.0000]
+             65.0050: (mob_swt swt3 stage5 stage7)  [6.0000]
+             71.0040: (staple stage7 f2)  [80.0000]
+             71.0060: (clean stage7 swt3)  [120.0000]
+             71.0070: (rocking_chairs stage7)  [5.0000]
+            101.0010: (mob_mast je32 stage8 base)  [6.0000]
+            151.0050: (mob_staple f2 stage7 stage8)  [6.0000]
+            151.0070: (mob_swt swt2 stage1 stage8)  [6.0000]
+            157.0060: (staple stage8 f2)  [48.0000]
+            157.0080: (clean stage8 swt2)  [70.0000]
+            157.0090: (rocking_chairs stage8)  [5.0000]
+            End of plan print-out.
+            Makespan: 227.0080
+            Memory used (MB): 238
+            Time needed (sec): 11.3700
+            
+            1 0 1 0 0 1 2 1 2 1 8 7 10 8 8 10 8 8 10 9 9 17 15 15 17 16 15 17 15 14 13 12 11 16 19 17 16 15 14 13 12 11 10 9 8 7 8 6 10 6 7 9 10 8 8 8 9 8 10 9 9 9 18 17 15 14 13 12 11 10 9 8 7 8 6 7 10 6 7 9 8 10 8 10 8 8 10 9 9 15 15 15 17 19 18 16 16 15 14 14 13 13 12 14 11 13 12 11 10 9 9 8 7 8 6 7 6 6 6 9 10 8 8 8 9 8 10 9 9 11 10 9 11 9 8 8 7 6 7 9 8 7 7 6 8 8 8 8 7 6 5 4 6 5 6 11 9 9 11 9 9 8 11 9 9 10 10 12 12 12 11 11 10 9 8 7 8 9 8 7 6 5 8 7 12 8 10 9 10 11 10 9 9 9 12 10 10 9 12 10 10 10 11 10 11 13 13 15 14 17 15 15 15 16 15 14 13 15 14 13 12 11 12 11 10 9 8 8 7 8 10 9 10 8 8 16 18 17 16 16 15 15 16 17 17 16 15 16 17 16 15 17 16 15 17 17 16 16 15 16 14 12 11 10 11 9 8 7 6 7 10 8 8 8 8 8 7 6 5 4 6 5 6 11 9 9 8 10 9 10 10 10 16 14 13 14 12 11 11 10 9 8 8 7 8 10 9 10 8 8 14 15 16 23 Process killing requested.
+            24 22 22 23 22 25 24 23 24 22 21 22 20 20 21 22 21 20 21 21 23 25 24 24 24 23 22 24 22 21 21 20 20 20 19 18 19 18 20 18 18 Planner found 3 plan(s) in 115.279secs.
+            
+            `;
+
+            // WHEN
+            const parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON });
+            parser.appendBuffer(planText);
+            parser.onPlanFinished();
+            const plans = parser.getPlans();
+
+            // THEN
+            expect(plans, 'plans').to.have.lengthOf(3);
+            {
+                const plan0 = plans[0];
+                expect(plan0.cost, 'plan0 cost').to.equal(264.006);
+                expect(plan0.statesEvaluated, 'plan0 states evaluated').to.equal(187);
+                expect(plan0.makespan, 'plan0 makespan').to.equal(264.006);
+                expect(plan0.steps, 'plan0 should have one action').to.have.lengthOf(18);
+            }
+            {
+                const plan1 = plans[1];
+                expect(plan1.cost, 'plan1 cost').to.equal(258.017);
+                expect(plan1.statesEvaluated, 'plan1 states evaluated').to.equal(1193);
+                expect(plan1.makespan, 'plan1 makespan').to.equal(258.017);
+                expect(plan1.steps, 'plan1 should have one action').to.have.lengthOf(19);
+            }
+            {
+                const plan2 = plans[2];
+                expect(plan2.cost, 'plan2 cost').to.equal(227.008);
+                expect(plan2.statesEvaluated, 'plan2 states evaluated').to.equal(2983);
+                expect(plan2.makespan, 'plan2 makespan').to.equal(227.008);
+                expect(plan2.steps, 'plan2 should have one action').to.have.lengthOf(19);
             }
         });
 

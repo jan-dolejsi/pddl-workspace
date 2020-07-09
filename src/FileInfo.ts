@@ -102,7 +102,7 @@ export abstract class FileInfo {
      * @param parsingProblems parsing problems
      */
     addProblems(parsingProblems: ParsingProblem[]): void {
-        this.parsingProblems = parsingProblems;
+        parsingProblems.forEach(pp => this.addProblem(pp));
     }
 
     getParsingProblems(): ParsingProblem[] {

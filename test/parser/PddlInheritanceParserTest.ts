@@ -94,6 +94,39 @@ describe('PddlInheritanceParser', () => {
             assert.ok(graph.getVerticesWithEdgesFrom(parent1)?.includes(PddlInheritanceParser.OBJECT), 'parent1 should inherit from object');
             assert.ok(graph.getVerticesWithEdgesFrom(parent2)?.includes(PddlInheritanceParser.OBJECT), 'parent2 should inherit from object');
         });
+
+        it('should parse 2 children of same parent separate declarations', () => {
+            const parent1 = 'parent1';
+            const child1 = 'child1';
+            const child2 = 'child2';
+            const graph = PddlInheritanceParser.parseInheritance(`${child1} - ${parent1} ${child2} - ${parent1}`);
+            assert.ok(graph.getVerticesWithEdgesFrom(child1)?.includes(parent1), 'child1 should have parent1');
+            assert.ok(graph.getVerticesWithEdgesFrom(child2)?.includes(parent1), 'child2 should have parent1');
+            assert.ok(graph.getVerticesWithEdgesFrom(parent1)?.includes(PddlInheritanceParser.OBJECT), 'parent1 should inherit from object');
+        });
+
+        it('should parse multiple children of the same parent', () => {
+            const parent1 = 'stage';
+            const child1 = 'stage8';
+            const child2 = 'stage11';
+            const graph = PddlInheritanceParser.parseInheritance(`stage1 - stage
+            stage11 - stage
+            stage4 - stage
+            stage5 - stage
+            stage7 - stage
+            stage8 - stage
+            stage9 - stage
+            qp-02 - mast
+            je32 - mast
+            d2 - drill
+            swt3 - swt
+            swt2 - swt
+            `);
+            assert.ok(graph.getVerticesWithEdgesFrom(child1)?.includes(parent1), 'child1 should have parent1');
+            assert.ok(graph.getVerticesWithEdgesFrom(child2)?.includes(parent1), 'child2 should have parent1');
+            assert.ok(graph.getVerticesWithEdgesFrom(parent1)?.includes(PddlInheritanceParser.OBJECT), 'parent1 should inherit from object');
+            assert.ok(graph.getVerticesWithEdgesTo(parent1).length == 7, '7 stages');
+        });
     });
 
     describe('#toTypeObjects', () => {
