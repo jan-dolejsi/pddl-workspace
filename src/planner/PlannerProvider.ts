@@ -31,6 +31,9 @@ export interface PlannerProvider {
 
     /** Custom `Planner` implementation. */
     createPlanner?(): Planner;
+
+    /** Command-line (or other) options specific to this `Planner` */
+    getPlannerOptions?(): PlannerOption[];
 }
 
 /** Planner configuration */
@@ -47,4 +50,13 @@ export interface PlannerConfiguration {
     url?: string;
     /**  user can configure this planner */
     canConfigure: boolean;
+}
+
+/** Planner options */
+export interface PlannerOption {
+    option: string;
+    /** Label to show instead of the `option` */
+    label?: string;
+    /** Documentation to show right from the label/option. */
+    description?: string;
 }
