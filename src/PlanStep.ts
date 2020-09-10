@@ -11,7 +11,8 @@ export class PlanStep {
 
     constructor(private readonly time: number, public readonly fullActionName: string,
         public readonly isDurative: boolean, private readonly duration: number | undefined,
-        public readonly lineIndex: number | undefined, public readonly commitment?: PlanStepCommitment) {
+        public readonly lineIndex: number | undefined, public readonly commitment?: PlanStepCommitment,
+        private readonly iterations?: number) {
         const nameFragments = fullActionName.split(' ');
         this.actionName = nameFragments[0];
         this.objects = nameFragments.slice(1);
@@ -39,6 +40,10 @@ export class PlanStep {
 
     getDuration(): number | undefined {
         return this.duration;
+    }
+
+    getIterations(): number {
+        return this.iterations ?? 1;
     }
 
     equals(other: PlanStep, epsilon: number): boolean {
