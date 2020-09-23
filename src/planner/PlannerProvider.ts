@@ -30,7 +30,7 @@ export interface PlannerProvider {
     showHelp?(output: OutputAdaptor): void;
 
     /** Custom `Planner` implementation. */
-    createPlanner?(): Planner;
+    createPlanner?(configuration: PlannerConfiguration, plannerOptions: string, workingDirectory: string): Planner;
 
     /** Command-line (or other) options specific to this `Planner` */
     getPlannerOptions?(): PlannerOption[];
