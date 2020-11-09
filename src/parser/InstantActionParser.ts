@@ -32,8 +32,10 @@ export class InstantActionParser {
         const parameters = parametersNode ? parseParameters(parametersNode.getNestedNonCommentText()) : [];
         const conditionNode = actionNode.getKeywordOpenBracket('precondition');
         const effectNode = actionNode.getKeywordOpenBracket('effect');
-        const location = PddlRange.from(positionResolver
-            .resolveToPosition(actionNode.getStart()), positionResolver.resolveToPosition(actionNode.getEnd()));
+        const location = new PddlRange({
+            start: positionResolver.resolveToPosition(actionNode.getStart()),
+            end: positionResolver.resolveToPosition(actionNode.getEnd())
+        });
         this.action = new InstantAction(actionName, parameters, location, conditionNode, effectNode);
         this.action.setDocumentation(DerivedVariablesParser.getDocumentationAbove(actionNode));
     }

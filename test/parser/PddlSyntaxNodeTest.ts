@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { PddlSyntaxTreeBuilder } from './src';
 import { PddlTokenType } from './src';
 import { PddlSyntaxNode } from './src';
@@ -82,7 +83,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket !== undefined);
+            expect(keywordBracket).to.not.be.undefined;;
             assert.strictEqual(keywordBracket?.getNestedChildren().length, 0);
         });
 
@@ -95,7 +96,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket !== undefined);
+            expect(keywordBracket).to.not.be.undefined;;
             assert.strictEqual(keywordBracket?.getNestedChildren().length, 1);
             assert.strictEqual(keywordBracket?.getText(), '(p)');
         });
@@ -109,7 +110,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket !== undefined);
+            expect(keywordBracket).to.not.be.undefined;;
             assert.strictEqual(keywordBracket?.getNestedChildren().length, 1);
             assert.strictEqual(keywordBracket?.getText(), '(p)');
         });
@@ -123,7 +124,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket !== undefined);
+            expect(keywordBracket).to.not.be.undefined;;
             assert.strictEqual(keywordBracket?.getNonWhitespaceChildren().length, 2);
             assert.strictEqual(keywordBracket?.getToken().tokenText, '(and');
         });
@@ -137,7 +138,7 @@ describe('PddlSyntaxNode', () => {
             const keywordBracket = action.getKeywordOpenBracket('keyword');
 
             // THEN
-            assert.ok(keywordBracket !== undefined);
+            expect(keywordBracket).to.not.be.undefined;;
             assert.strictEqual(keywordBracket?.getNestedChildren().length, 1);
             assert.strictEqual(keywordBracket?.getText(), '(p)');
         });
@@ -272,7 +273,7 @@ describe('PddlSyntaxNode', () => {
             defineNode.getChildrenRecursively(() => true, (node: PddlSyntaxNode) => children.push(node));
 
             // THEN
-            assert.strictEqual(children.length, 0, 'there should be zero matches');
+            expect(children).to.have.length(0, 'there should be zero matches');
         });
 
         it('it finds one whitespace', () => {
@@ -287,7 +288,7 @@ describe('PddlSyntaxNode', () => {
             defineNode.getChildrenRecursively(() => true, (node: PddlSyntaxNode) => children.push(node));
 
             // THEN
-            assert.strictEqual(children.length, 1, 'there should be one match');
+            expect(children).to.have.length(1, 'there should be one match');
             assert.strictEqual(children[0].getToken().type, PddlTokenType.Whitespace);
         });
 
@@ -305,7 +306,7 @@ describe('PddlSyntaxNode', () => {
                 (node: PddlSyntaxNode) => children.push(node));
 
             // THEN
-            assert.strictEqual(children.length, 0, 'there should be zero matches');
+            expect(children).to.have.length(0, 'there should be zero matches');
         });
 
 
@@ -323,7 +324,7 @@ describe('PddlSyntaxNode', () => {
                 (node: PddlSyntaxNode) => children.push(node));
 
             // THEN
-            assert.strictEqual(children.length, 2, 'there should be two matches');
+            expect(children).to.have.length(2, 'there should be two matches');
         });
 
     });
@@ -543,7 +544,7 @@ describe('PddlSyntaxNode', () => {
             const actual = paramNode.findParametrisableScope('p');
 
             // THEN
-            assert.ok(actual !== undefined);
+            expect(actual).to.not.be.undefined;;
             assert.strictEqual(actual?.getToken().type, PddlTokenType.OpenBracket);
         });
 
@@ -556,7 +557,7 @@ describe('PddlSyntaxNode', () => {
             const actual = paramNode.findParametrisableScope('p');
 
             // THEN
-            assert.ok(actual !== undefined);
+            expect(actual).to.not.be.undefined;;
             assert.strictEqual(actual?.getToken().tokenText, '(:action');
         });
 
@@ -569,7 +570,7 @@ describe('PddlSyntaxNode', () => {
             const actual = paramNode.findParametrisableScope('p');
 
             // THEN
-            assert.ok(actual !== undefined);
+            expect(actual).to.not.be.undefined;;
             assert.strictEqual(actual?.getToken().tokenText, '(:durative-action');
         });
 
@@ -582,7 +583,7 @@ describe('PddlSyntaxNode', () => {
             const actual = paramNode.findParametrisableScope('p');
 
             // THEN
-            assert.ok(actual !== undefined);
+            expect(actual).to.not.be.undefined;;
             assert.strictEqual(actual?.getToken().tokenText, '(forall');
         });
 
@@ -597,7 +598,7 @@ describe('PddlSyntaxNode', () => {
             const actual = paramNode.findParametrisableScope('p1');
 
             // THEN
-            assert.ok(actual !== undefined);
+            expect(actual).to.not.be.undefined;;
             assert.strictEqual(actual?.getToken().tokenText, '(:derived');
         });
 
@@ -610,7 +611,7 @@ describe('PddlSyntaxNode', () => {
             const actual = paramNode.findParametrisableScope('p1');
 
             // THEN
-            assert.ok(actual !== undefined);
+            expect(actual).to.not.be.undefined;;
             assert.strictEqual(actual?.getToken().tokenText, '(:action');
         });
     });
@@ -628,7 +629,7 @@ describe('PddlSyntaxNode', () => {
             const parameter = parameterDefinitionNode && parseParameters(parameterDefinitionNode.getText()).find(p => p.name === parameterName);
 
             // THEN
-            assert.ok(parameter !== undefined);
+            expect(parameter).to.not.be.undefined;;
             assert.strictEqual(parameter?.name, parameterName);
             assert.strictEqual(parameter?.type, 'some-type');
         });

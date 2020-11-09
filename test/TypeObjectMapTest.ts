@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { TypeObjectMap } from './src';
 
 describe('TypeObjectMap', () => {
@@ -15,9 +16,9 @@ describe('TypeObjectMap', () => {
             const actual = new TypeObjectMap();
 
             // THEN
-            assert.strictEqual(actual.length, 0, "size should be zero");
-            assert.strictEqual(actual.getTypeOf('fictitious'), undefined, "type of undefined object");
-            assert.strictEqual(actual.getTypeCaseInsensitive('fictitious'), undefined, "objects of undefined type");
+            expect(actual).to.have.length(0, "size should be zero");
+            expect(actual.getTypeOf('fictitious'), "type of undefined object").to.be.undefined;
+            expect(actual.getTypeCaseInsensitive('fictitious'), "objects of undefined type").to.be.undefined;
         });
     });
     
@@ -33,12 +34,12 @@ describe('TypeObjectMap', () => {
             map.add(typeName, objectName);// twice on purpose
 
             // THEN
-            assert.strictEqual(map.length, 1, "size should be one");
+            expect(map).to.have.length(1, "size should be one");
             const object1TypeObjects = map.getTypeOf(objectName);
-            assert.ok(object1TypeObjects, "there should be type for object1");
+            expect(object1TypeObjects, "there should be type for object1").to.not.be.undefined;
             assert.strictEqual(object1TypeObjects?.type, typeName, "type name matches");
             const type1TypeObjects = map.getTypeCaseInsensitive(typeName);
-            assert.ok(type1TypeObjects, "type objects for type1");
+            expect(type1TypeObjects, "type objects for type1").to.not.be.undefined;
             assert.deepStrictEqual(type1TypeObjects?.getObjects(), [objectName], "object names");
         });
 
@@ -54,7 +55,7 @@ describe('TypeObjectMap', () => {
             map.add(typeName, object2Name);
 
             // THEN
-            assert.strictEqual(map.length, 1, "size should be one");
+            expect(map).to.have.length(1, "size should be one");
 
             const object1TypeObjects = map.getTypeOf(object1Name);
             assert.ok(object1TypeObjects, "there should be type for object1");
@@ -81,22 +82,22 @@ describe('TypeObjectMap', () => {
             map.add(type2Name, object2Name);
 
             // THEN
-            assert.strictEqual(map.length, 2, "size should be two");
+            expect(map).to.have.length(2, "size should be two");
 
             const object1TypeObjects = map.getTypeOf(object1Name);
-            assert.ok(object1TypeObjects, "there should be type for object1");
+            expect(object1TypeObjects, "there should be type for object1").to.not.be.undefined;
             assert.strictEqual(object1TypeObjects?.type, type1Name, "object1 type name matches");
 
             const object2TypeObjects = map.getTypeOf(object2Name);
-            assert.ok(object2TypeObjects, "there should be type for object2");
+            expect(object2TypeObjects, "there should be type for object2").to.not.be.undefined;
             assert.strictEqual(object2TypeObjects?.type, type2Name, "object2 type name matches");
 
             const type1TypeObjects = map.getTypeCaseInsensitive(type1Name);
-            assert.ok(type1TypeObjects, "type objects for type1");
+            expect(type1TypeObjects, "type objects for type1").to.not.be.undefined;
             assert.deepStrictEqual(type1TypeObjects?.getObjects(), [object1Name], "object names");
 
             const type2TypeObjects = map.getTypeCaseInsensitive(type2Name);
-            assert.ok(type2TypeObjects, "type objects for type2");
+            expect(type2TypeObjects, "type objects for type2").to.not.be.undefined;
             assert.deepStrictEqual(type2TypeObjects?.getObjects(), [object2Name], "object names");
         });
     });
@@ -113,12 +114,12 @@ describe('TypeObjectMap', () => {
             map.addAll(typeName, [objectName]);// twice on purpose
 
             // THEN
-            assert.strictEqual(map.length, 1, "size should be one");
+            expect(map).to.have.length(1, "size should be one");
             const object1TypeObjects = map.getTypeOf(objectName);
-            assert.ok(object1TypeObjects, "there should be type for object1");
+            expect(object1TypeObjects, "there should be type for object1").to.not.be.undefined;
             assert.strictEqual(object1TypeObjects?.type, typeName, "type name matches");
             const type1TypeObjects = map.getTypeCaseInsensitive(typeName);
-            assert.ok(type1TypeObjects, "type objects for type1");
+            expect(type1TypeObjects, "type objects for type1").to.not.be.undefined;
             assert.deepStrictEqual(type1TypeObjects?.getObjects(), [objectName], "object names");
         });
 
@@ -133,17 +134,17 @@ describe('TypeObjectMap', () => {
             map.addAll(typeName, [object1Name, object2Name]);
 
             // THEN
-            assert.strictEqual(map.length, 1, "size should be one");
+            expect(map).to.have.length(1, "size should be one");
 
             const object1TypeObjects = map.getTypeOf(object1Name);
-            assert.ok(object1TypeObjects, "there should be type for object1");
+            expect(object1TypeObjects, "there should be type for object1").to.not.be.undefined;
             assert.strictEqual(object1TypeObjects?.type, typeName, "type name matches");
 
             const object2TypeObjects = map.getTypeOf(object2Name);
-            assert.ok(object2TypeObjects, "there should be type for object2");
+            expect(object2TypeObjects, "there should be type for object2").to.not.be.undefined;
 
             const type1TypeObjects = map.getTypeCaseInsensitive(typeName);
-            assert.ok(type1TypeObjects, "type objects for type1");
+            expect(type1TypeObjects, "type objects for type1").to.not.be.undefined;
             assert.deepStrictEqual(type1TypeObjects?.getObjects(), [object1Name, object2Name], "object names");
         });
         
@@ -160,22 +161,22 @@ describe('TypeObjectMap', () => {
             map.addAll(type2Name, [object2Name]);
 
             // THEN
-            assert.strictEqual(map.length, 2, "size should be two");
+            expect(map).to.have.length(2, "size should be two");
 
             const object1TypeObjects = map.getTypeOf(object1Name);
-            assert.ok(object1TypeObjects, "there should be type for object1");
+            expect(object1TypeObjects, "there should be type for object1").to.not.be.undefined;
             assert.strictEqual(object1TypeObjects?.type, type1Name, "object1 type name matches");
 
             const object2TypeObjects = map.getTypeOf(object2Name);
-            assert.ok(object2TypeObjects, "there should be type for object2");
+            expect(object2TypeObjects, "there should be type for object2").to.not.be.undefined;
             assert.strictEqual(object2TypeObjects?.type, type2Name, "object2 type name matches");
 
             const type1TypeObjects = map.getTypeCaseInsensitive(type1Name);
-            assert.ok(type1TypeObjects, "type objects for type1");
+            expect(type1TypeObjects, "type objects for type1").to.not.be.undefined;
             assert.deepStrictEqual(type1TypeObjects?.getObjects(), [object1Name], "object names");
 
             const type2TypeObjects = map.getTypeCaseInsensitive(type2Name);
-            assert.ok(type2TypeObjects, "type objects for type2");
+            expect(type2TypeObjects, "type objects for type2").to.not.be.undefined;
             assert.deepStrictEqual(type2TypeObjects?.getObjects(), [object2Name], "object names");
         });
     });
@@ -197,10 +198,10 @@ describe('TypeObjectMap', () => {
             const mergedMap = map1.merge(map2);
 
             // THEN
-            assert.strictEqual(map1.length, 1, "map1 should not be modified");
+            expect(map1).to.have.length(1, "map1 should not be modified");
             assert.deepStrictEqual(map1.getTypeCaseInsensitive(typeName1)?.getObjects(), [objectName1], "map1 should have the same content");
 
-            assert.strictEqual(map2.length, 1, "map1 should not be modified");
+            expect(map2).to.have.length(1, "map1 should not be modified");
             assert.deepStrictEqual(map2.getTypeCaseInsensitive(typeName2)?.getObjects(), [objectName2], "map2 should have the same content");
 
             assert.deepStrictEqual(mergedMap.getTypeCaseInsensitive(typeName1)?.getObjects(), [objectName1], "merged map should have type1");
@@ -222,10 +223,10 @@ describe('TypeObjectMap', () => {
             const mergedMap = map1.merge(map2);
 
             // THEN
-            assert.strictEqual(map1.length, 1, "map1 should not be modified");
+            expect(map1).to.have.length(1, "map1 should not be modified");
             assert.deepStrictEqual(map1.getTypeCaseInsensitive(typeName1)?.getObjects(), [objectName1], "map1 should have the same content");
 
-            assert.strictEqual(map2.length, 1, "map1 should not be modified");
+            expect(map2).to.have.length(1, "map1 should not be modified");
             assert.deepStrictEqual(map2.getTypeCaseInsensitive(typeName1)?.getObjects(), [objectName2], "map2 should have the same content");
 
             assert.deepStrictEqual(mergedMap.getTypeCaseInsensitive(typeName1)?.getObjects(), [objectName1, objectName2], "merged map should have type1");

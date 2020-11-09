@@ -1,5 +1,12 @@
+/* --------------------------------------------------------------------------------------------
+* Copyright (c) Jan Dolejsi. All rights reserved.
+* Licensed under the MIT License. See License.txt in the project root for license information.
+* ------------------------------------------------------------------------------------------ */
+
 import { ParsingProblem } from "../FileInfo";
 import { Happening, HappeningType } from "../HappeningsInfo";
+import { PddlRange } from "../DocumentPositionResolver";
+
 /**
  * Builds the list of happenings while validating the sequence.
  */
@@ -33,7 +40,9 @@ export class PlanHappeningsBuilder {
             this.add(happening);
         }
         else {
-            this.parsingProblems.push(new ParsingProblem(`Invalid happening syntax: ${planLine}`, lineIndex));
+            this.parsingProblems.push(
+                new ParsingProblem(`Invalid happening syntax: ${planLine}`, "error",
+                    PddlRange.createFullLineRange(lineIndex ?? 0)));
         }
     }
     /**
@@ -62,7 +71,9 @@ export class PlanHappeningsBuilder {
                 const alreadyExistingStart = this.openActions.concat(this.happenings).find(happening1 => happening1.getType() === HappeningType.START
                     && happening1.belongsTo(happening));
                 if (alreadyExistingStart) {
-                    this.parsingProblems.push(new ParsingProblem(`A happening matching ${happening.toString()} is already in the plan. Increase the #N counter.`, happening.lineIndex));
+                    this.parsingProblems.push(
+                        new ParsingProblem(`A happening matching ${happening.toString()} is already in the plan. Increase the #N counter.`, "error",
+                            PddlRange.createFullLineRange(happening.lineIndex ?? 0)));
                 }
                 this.openActions.push(happening);
                 break;
@@ -73,7 +84,9 @@ export class PlanHappeningsBuilder {
                     this.openActions.splice(this.openActions.indexOf(matchingStart), 1);
                 }
                 else {
-                    this.parsingProblems.push(new ParsingProblem(`There is no start corresponding to ${happening.toString()}`, happening.lineIndex));
+                    this.parsingProblems.push(
+                        new ParsingProblem(`There is no start corresponding to ${happening.toString()}`, "error",
+                            PddlRange.createFullLineRange(happening.lineIndex ?? 0)));
                 }
                 break;
         }
@@ -82,13 +95,16 @@ export class PlanHappeningsBuilder {
             this.makespan = happening.getTime();
         }
         else if (this.makespan > happening.getTime()) {
-            this.parsingProblems.push(new ParsingProblem(`Time must not go backwards.`, happening.lineIndex));
+            this.parsingProblems.push(
+                new ParsingProblem(`Time must not go backwards.`, "warning",
+                    PddlRange.createFullLineRange(happening.lineIndex ?? 0)));
         }
         this.happenings.push(happening);
     }
     validateOpenQueueIsEmpty(): void {
         const problems = this.openActions
-            .map(start => new ParsingProblem(`Missing end of ${start.toString()}`, start.lineIndex));
+            .map(start => new ParsingProblem(`Missing end of ${start.toString()}`, "error",
+                PddlRange.createFullLineRange(start.lineIndex ?? 0)));
         this.parsingProblems.push(...problems);
     }
     getHappenings(): Happening[] {

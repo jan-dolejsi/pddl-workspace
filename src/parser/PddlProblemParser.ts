@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* --------------------------------------------------------------------------------------------
 * Copyright (c) Jan Dolejsi. All rights reserved.
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ProblemParserPreProcessor } from "../ProblemParserPreProcessor";
 import { dirname } from "path";
-import { DocumentPositionResolver, SimpleDocumentPositionResolver } from "../DocumentPositionResolver";
+import { DocumentPositionResolver, SimpleDocumentPositionResolver, PddlRange } from "../DocumentPositionResolver";
 import { PddlSyntaxTree } from "./PddlSyntaxTree";
 import { ParsingProblem, stripComments } from "../FileInfo";
 import { PreProcessingError, PreProcessor } from "../PreProcessors";
@@ -61,11 +61,11 @@ export class PddlProblemParser extends PddlFileParser<ProblemInfo> {
                 problemInfo.setText(fileText);
                 if (ex instanceof PreProcessingError) {
                     const parsingError = ex as PreProcessingError;
-                    problemInfo.addProblems([new ParsingProblem(parsingError.message, parsingError.line, parsingError.column)]);
+                    problemInfo.addProblems([new ParsingProblem(parsingError.message, "error", PddlRange.createSingleCharacterRange({ line: parsingError.line, character: parsingError.column }))]);
                 }
                 else {
                     const line = positionResolver.resolveToPosition(preProcessor?.metaDataLineOffset || 0).line;
-                    problemInfo.addProblems([new ParsingProblem(ex.message || ex, line, 0)]);
+                    problemInfo.addProblems([new ParsingProblem(ex.message || ex, "error", PddlRange.createFullLineRange(line))]);
                 }
                 if (preProcessor) { problemInfo.setPreParsingPreProcessor(preProcessor); }
                 return problemInfo;

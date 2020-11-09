@@ -11,7 +11,7 @@ import { dirname, basename } from 'path';
 import { PddlExtensionContext } from './PddlExtensionContext';
 import { EventEmitter } from 'events';
 import { PddlSyntaxTreeBuilder } from './parser/PddlSyntaxTreeBuilder';
-import { DocumentPositionResolver } from './DocumentPositionResolver';
+import { DocumentPositionResolver, PddlRange } from './DocumentPositionResolver';
 import { DomainInfo } from './DomainInfo';
 import { URI } from 'vscode-uri';
 import { PlanInfo } from './PlanInfo';
@@ -279,7 +279,7 @@ export class PddlWorkspace extends EventEmitter {
     private appendOffendingTokenToParsingProblems(fileInfo: FileInfo, parser: PddlSyntaxTreeBuilder, positionResolver: DocumentPositionResolver): void {
         fileInfo.addProblems(parser.getOffendingTokens().map(token => {
             const offendingPosition = positionResolver.resolveToPosition(token.getStart());
-            return new ParsingProblem(`Unexpected token: ${token.toString()}`, offendingPosition.line, offendingPosition.character);
+            return new ParsingProblem(`Unexpected token: ${token.toString()}`, "error", PddlRange.createSingleCharacterRange({ line: offendingPosition.line, character: offendingPosition.character }));
         }));
     }
 

@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai'
 import { PddlRange } from './src';
 import { createPddlDomainParser } from './parser/PddlDomainParserTest';
 
@@ -29,11 +30,8 @@ describe('DomainInfo', () => {
             const range = domainInfo.getTypeLocation('tank');
 
             // THEN
-            assert.notStrictEqual(range, undefined, "range should not be null");
-            assert.equal(range?.startLine, 5);
-            assert.equal(range?.endLine, 5);
-            assert.equal(range?.startCharacter, 12);
-            assert.equal(range?.endCharacter, 16);
+            expect(range, "range should not be null").to.not.be.undefined;
+            expect(range).to.deep.equal(PddlRange.createSingleLineRange({ line: 5, start: 12, end: 16 }));
         });
 
         it('finds type location in single line declaration', () => {
@@ -46,11 +44,8 @@ describe('DomainInfo', () => {
             const range = domainInfo.getTypeLocation('tank');
 
             // THEN
-            assert.notStrictEqual(range, undefined, "range should not be null");
-            assert.equal(range?.startLine, 0);
-            assert.equal(range?.endLine, 0);
-            assert.equal(range?.startCharacter, 56);
-            assert.equal(range?.endCharacter, 56 + 4);
+            expect(range, "range should not be null").to.not.be.undefined;
+            expect(range).to.deep.equal(PddlRange.createSingleLineRange({ line: 0, start: 56, length: 4 }));
         });
     });
 
@@ -89,16 +84,15 @@ describe('DomainInfo', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
             if (domainInfo === undefined) { assert.fail('should parse'); }
 
+            const typeName = 'generator';
+
             // WHEN
-            const ranges = domainInfo.getTypeReferences('generator');
+            const ranges = domainInfo.getTypeReferences(typeName);
 
             // THEN
-            assert.equal(ranges.length, 5, "there should be N hits");
+            expect(ranges).to.have.length(5, "there should be N hits");
             const range = ranges[0];
-            assert.equal(range.startLine, 4);
-            assert.equal(range.endLine, 4);
-            assert.equal(range.startCharacter, 27);
-            assert.equal(range.endCharacter, 36);
+            expect(range).to.deep.equal(PddlRange.createSingleLineRange({ line: 4, start: 27, length: typeName.length }));
         });
     });
 
@@ -142,8 +136,8 @@ describe('DomainInfo', () => {
             const p3ReferenceRanges = domainInfo.getVariableReferences(p3);
 
             // THEN
-            assert.strictEqual(p3ReferenceRanges.length, 4, 'there should be 3 references to predicate p3');
-            assert.deepStrictEqual(p3ReferenceRanges[0], new PddlRange(13, 4, 13, 14), "the first reference location should be");
+            expect(p3ReferenceRanges).to.have.length(4, 'there should be 3 references to predicate p3');
+            expect(p3ReferenceRanges[0]).to.deep.equal(PddlRange.createSingleLineRange({ line: 13, start: 4, end: 14 }), "the first reference location should be");
         });
 
         it('find no predicate references', () => {
@@ -173,7 +167,7 @@ describe('DomainInfo', () => {
             const p0ReferenceRanges = domainInfo.getVariableReferences(p0);
 
             // THEN
-            assert.strictEqual(p0ReferenceRanges.length, 1, 'there should be ONE references to predicate p0 - its declaration');
+            expect(p0ReferenceRanges).to.have.length(1, 'there should be ONE references to predicate p0 - its declaration');
         });
 
     });

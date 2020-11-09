@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 
 import { PlanValuesParser } from './src';
 import { PlanStep } from '../src';
@@ -26,7 +27,7 @@ describe('PlanValuesParser', () => {
             const parser = new PlanValuesParser(planSteps, [function1], [actionRow]);
             
             // THEN
-            assert.equal(parser.stateValues.length, 2, "one durative action plan should generate 2 states (before/after");
+            expect(parser.stateValues).to.have.length(2, "one durative action plan should generate 2 states (before/after");
             assert.equal(parser.stateValues[0].time, 1);
             assert.equal(parser.stateValues[0].getValue(functionName), 1, "expected value before");
             assert.equal(parser.stateValues[1].time, 3);
@@ -48,7 +49,7 @@ describe('PlanValuesParser', () => {
             const parser = new PlanValuesParser(planSteps, functions, [actionRow]);
             
             // THEN
-            assert.equal(parser.stateValues.length, 2, "one durative action plan should generate 2 states (before/after");
+            expect(parser.stateValues).to.have.length(2, "one durative action plan should generate 2 states (before/after");
             assert.equal(parser.stateValues[0].time, 1);
             assert.equal(parser.stateValues[0].getValue(functionNames[0]), 1, "expected function1 value before");
             assert.equal(parser.stateValues[0].getValue(functionNames[1]), 11, "expected function2 value before");
@@ -77,7 +78,7 @@ describe('PlanValuesParser', () => {
             const parser = new PlanValuesParser(planSteps, functions, [actionRow]);
             
             // THEN
-            assert.equal(parser.stateValues.length, 2, "one durative action plan should generate 2 states (before and after)");
+            expect(parser.stateValues).to.have.length(2, "one durative action plan should generate 2 states (before and after)");
 
             assert.deepEqual(parser.getValues(functionName), [[1, 1, 11], [3, 2, 12]], "Values vector for function1");
         });
@@ -96,7 +97,7 @@ describe('PlanValuesParser', () => {
             const parser = new PlanValuesParser(planSteps, [function1], [actionRow]);
             
             // THEN
-            assert.equal(parser.stateValues.length, 1, "one instantaneous action plan should generate 1 state (after the action)");
+            expect(parser.stateValues).to.have.length(1, "one instantaneous action plan should generate 1 state (after the action)");
             assert.equal(parser.stateValues[0].time, 1);
             assert.equal(parser.stateValues[0].getValue(functionName), 13, "expected value after the action");
             assert.deepEqual(parser.getValues(functionName), [[1, 13]], "Values vector for function");

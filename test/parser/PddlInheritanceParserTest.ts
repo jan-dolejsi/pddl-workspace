@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { DirectionalGraph } from '../utils/src';
 import { PddlInheritanceParser } from './src';
 
@@ -138,10 +139,10 @@ describe('PddlInheritanceParser', () => {
 
             const typeObjects = PddlInheritanceParser.toTypeObjects(graph);
 
-            assert.strictEqual(typeObjects.length, 1, 'there should be 1 type');
+            expect(typeObjects).to.have.length(1, 'there should be 1 type');
             const type1ObjectsMap = typeObjects.getTypeCaseInsensitive(type1);
-            assert.ok(type1ObjectsMap !== undefined, 'the type should be type1');
-            assert.strictEqual(type1ObjectsMap?.getObjects().length, 1, 'the # of objects should be 1');
+            expect(type1ObjectsMap, 'the type should be type1').to.not.be.undefined;
+            expect(type1ObjectsMap?.getObjects()).to.have.length(1, 'the # of objects should be 1');
             assert.strictEqual(type1ObjectsMap?.getObjects()[0], object1, 'the object should be object1');
         });
 
@@ -155,9 +156,9 @@ describe('PddlInheritanceParser', () => {
 
             const typeObjects = PddlInheritanceParser.toTypeObjects(graph);
 
-            assert.strictEqual(typeObjects.length, 1, 'there should be 1 type');
+            expect(typeObjects).to.have.length(1, 'there should be 1 type');
             const type1ObjectsMap = typeObjects.getTypeCaseInsensitive(type1);
-            assert.ok(type1ObjectsMap !== undefined, 'the type should be type1');
+            expect(type1ObjectsMap, 'the type should be type1').to.not.be.undefined;
             assert.ok(type1ObjectsMap?.hasObject(object1), 'the object should be object1');
             assert.ok(type1ObjectsMap?.hasObject(object2), 'the object should be object2');
         });

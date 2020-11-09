@@ -17,6 +17,10 @@ export class PddlPosition {
             return this.line < other.line;
         }
     }
+
+    toString(): string {
+        return `${this.line}:${this.character}`;
+    }
 }
 
 /**
@@ -25,13 +29,45 @@ export class PddlPosition {
  * which is converted to the VS Code class specific to the two distinct client/server environment. 
  */
 export class PddlRange {
-    constructor(public readonly startLine: number, public readonly startCharacter: number,
-        public readonly endLine: number, public readonly endCharacter: number) {
-
+    private _start: PddlPosition;
+    private _end: PddlPosition;
+    constructor(details: { start: PddlPosition; end: PddlPosition }) {
+        this._start = details.start;
+        this._end = details.end;
     }
 
-    static from(start: PddlPosition, end: PddlPosition): PddlRange {
-        return new PddlRange(start.line, start.character, end.line, end.character);
+    static createRange(details: {
+        startLine: number; startCharacter: number;
+        endLine: number; endCharacter: number;
+    }): PddlRange {
+        return new PddlRange({
+            start: new PddlPosition(details.startLine, details.startCharacter),
+            end: new PddlPosition(details.endLine, details.endCharacter)
+        });
+    }
+
+    static createSingleCharacterRange(details: { line: number; character: number }): PddlRange {
+        const position = new PddlPosition(details.line, details.character);
+        return new PddlRange({ start: position, end: position });
+    }
+
+    static createSingleLineRange(details: {
+        line: number;
+        /** Start character */ start: number;
+        /** End character */end?: number;
+        /** Length */length?: number;
+    }): PddlRange {
+        if ((details.end ?? details.length) === undefined) {
+            throw new Error("Either 'end' or 'length' must be specified.");
+        }
+
+        const start = new PddlPosition(details.line, details.start);
+        const end = new PddlPosition(details.line, details.end ?? details.start + (details.length ?? 0));
+        return new PddlRange({ start, end});
+    }
+
+    static createFullLineRange(line: number): PddlRange {
+        return new PddlRange({ start: new PddlPosition(line, 0), end: new PddlPosition(line, Number.MAX_VALUE) });
     }
 
     includes(positionAtOffset: PddlPosition): boolean {
@@ -39,11 +75,15 @@ export class PddlRange {
     }
 
     get start(): PddlPosition {
-        return new PddlPosition(this.startLine, this.startCharacter);
+        return this._start;
     }
 
     get end(): PddlPosition {
-        return new PddlPosition(this.endLine, this.endCharacter);
+        return this._end;
+    }
+
+    toString(): string {
+        return `${this.start.toString()}~${this.end.toString()}`
     }
 }
 
@@ -54,7 +94,7 @@ export abstract class DocumentPositionResolver {
     abstract resolveToPosition(offset: number): PddlPosition;
 
     resolveToRange(start: number, end: number): PddlRange {
-        return PddlRange.from(this.resolveToPosition(start), this.resolveToPosition(end));
+        return new PddlRange({ start: this.resolveToPosition(start), end: this.resolveToPosition(end) });
     }
 
     rangeIncludesOffset(range: PddlRange, offset: number): boolean {

@@ -5,6 +5,7 @@
 'use strict';
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { Variable, Parameter, ObjectInstance } from './src';
 
 describe('Variable', () => {
@@ -24,7 +25,7 @@ describe('Variable', () => {
             assert.equal(variable.name, "predicate1");
             assert.equal(variable.declaredNameWithoutTypes, "predicate1 ?p1");
             assert.equal(variable.isGrounded(), false, "should NOT be grounded");
-            assert.equal(variable.parameters.length, 1);
+            expect(variable.parameters).to.have.length(1);
         });
     
         it('constructs-grounded', () => {
@@ -39,7 +40,7 @@ describe('Variable', () => {
             assert.equal(variable.declaredNameWithoutTypes, "predicate1 ?p1", "declared name without types should be...");
             assert.equal(variable.declaredName, variableName, "declared name should be...");
             assert.equal(variable.name, "predicate1");
-            assert.equal(variable.parameters.length, 1);
+            expect(variable.parameters).to.have.length(1);
             assert.equal(variable.isGrounded(), true, "should be grounded");
         });
 
@@ -55,7 +56,7 @@ describe('Variable', () => {
             assert.equal(variable.declaredName, variableName, "declared name should be...");
             assert.equal(variable.name, variableName, "the short un-parameterised name should be...");
             assert.equal(variable.declaredNameWithoutTypes, variableName, "the declared name without types should be...");
-            assert.equal(variable.parameters.length, 0);
+            expect(variable.parameters).to.have.length(0);
             assert.equal(variable.isGrounded(), true, "should be grounded");
         });
     });

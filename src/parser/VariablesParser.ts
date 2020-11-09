@@ -105,7 +105,7 @@ export class VariablesParser {
         variable.setDocumentation(documentation);
         const startPosition = this.positionResolver.resolveToPosition(node.getStart());
         const endPosition = this.positionResolver.resolveToPosition(node.getEnd());
-        variable.setLocation(PddlRange.from(startPosition, endPosition));
+        variable.setLocation(new PddlRange({ start: startPosition, end: endPosition }));
 
         return variable;
     }

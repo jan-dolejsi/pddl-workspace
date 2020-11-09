@@ -3,7 +3,9 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as assert from 'assert';
+import { expect, use } from 'chai';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+use(require('chai-string'));
 import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver, PddlRange } from '../src';
 import { InstantActionParser } from './src';
@@ -27,13 +29,13 @@ describe('InstantActionParser', () => {
             const action = createActionParser(actionPddl).getAction();
 
             // THEN
-            assert.ok(action, 'there should be an action parsed');
-            assert.strictEqual(action.name, undefined);
-            assert.strictEqual(action.parameters.length, 0);
-            assert.strictEqual(action.preCondition, undefined);
-            assert.strictEqual(action.effect, undefined);
-            assert.ok(action.getDocumentation().join('\n').startsWith('can lift'));
-            assert.deepStrictEqual(action.getLocation(), new PddlRange(2, 0, 2, 9));
+            expect(action, 'there should be an action parsed').to.not.be.undefined;
+            expect(action.name).to.be.undefined;
+            expect(action.parameters).to.have.length(0);
+            expect(action.preCondition).to.be.undefined;
+            expect(action.effect).to.be.undefined;
+            expect(action.getDocumentation().join('\n')).to.startsWith('can lift');
+            expect(action.getLocation()).to.deep.equal(PddlRange.createSingleLineRange({ line: 2, start: 0, end: 9 }));
         });
 
         it('extracts action with a name and a parameter', () => {
@@ -44,10 +46,10 @@ describe('InstantActionParser', () => {
             const action = createActionParser(actionPddl).getAction();
 
             // THEN
-            assert.ok(action, 'there should be an action parsed');
-            assert.strictEqual(action.name, 'action1');
-            assert.strictEqual(action.parameters.length, 1, 'parameters');
-            assert.deepStrictEqual(action.getLocation(), new PddlRange(0, 0, 0, 42));
+            expect(action, 'there should be an action parsed').to.not.be.undefined;
+            expect(action.name).to.equal('action1', 'action name');
+            expect(action.parameters).to.have.length(1, 'parameters');
+            expect(action.getLocation()).to.deep.equal(PddlRange.createSingleLineRange({ line: 0, start: 0, end: 42 }));
         });
 
         it('extracts action with single predicate pre-condition', () => {
@@ -58,10 +60,10 @@ describe('InstantActionParser', () => {
             const action = createActionParser(actionPddl).getAction();
 
             // THEN
-            assert.ok(action, 'there should be an action parsed');
-            assert.strictEqual(action.name, 'action1');
-            assert.strictEqual(action.preCondition?.getText(), '(p)');
-            assert.deepStrictEqual(action.getLocation(), new PddlRange(0, 0, 0, 34));
+            expect(action, 'there should be an action parsed').to.not.be.undefined;
+            expect(action.name).to.equal('action1', 'action name');
+            expect(action.preCondition?.getText()).to.equal('(p)');
+            expect(action.getLocation()).to.deep.equal(PddlRange.createSingleLineRange({ line: 0, start: 0, end: 34 }));
         });
 
         it('extracts action with simple conjunction effect', () => {
@@ -72,9 +74,9 @@ describe('InstantActionParser', () => {
             const action = createActionParser(actionPddl).getAction();
 
             // THEN
-            assert.ok(action, 'there should be an action parsed');
-            assert.strictEqual(action.name, 'action1');
-            assert.strictEqual(action.effect?.getText(), '(and (p))');
+            expect(action, 'there should be an action parsed').to.not.be.undefined;
+            expect(action.name).to.equal('action1', 'action name');
+            expect(action.effect?.getText()).to.equal('(and (p))');
         });
     });
 });

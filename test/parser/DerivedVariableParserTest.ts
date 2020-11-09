@@ -3,10 +3,16 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as assert from 'assert';
 import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver, PddlRange } from '../src';
 import { DerivedVariablesParser } from './src';
+
+import { expect, use } from 'chai';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+use(require('chai-string'));
+use(function(_chai,utils) {
+    utils.objDisplay = function(obj: unknown): string { return obj+''; };
+});
 
 describe('DerivedVariableParser', () => {
     describe('#getVariable', () => {
@@ -27,11 +33,11 @@ describe('DerivedVariableParser', () => {
             const derivedPredicate = parser.getVariable();
 
             // THEN
-            assert.ok(derivedPredicate !== undefined, 'there should be one derived predicate');
-            assert.strictEqual(derivedPredicate?.name, 'can-lift');
-            assert.equal(derivedPredicate?.parameters.length, 2);
-            assert.ok(derivedPredicate?.getDocumentation().join('\n').startsWith('can lift'));
-            assert.deepStrictEqual(derivedPredicate?.getLocation(), new PddlRange(2, 12, 3, 43));
+            expect(derivedPredicate, 'there should be one derived predicate').to.not.be.undefined;
+            expect(derivedPredicate?.name).equal('can-lift');
+            expect(derivedPredicate?.parameters).to.have.length(2);
+            expect(derivedPredicate?.getDocumentation().join('\n')).to.startWith('can lift');
+            expect(derivedPredicate?.getLocation()).to.deep.equal(PddlRange.createRange({ startLine: 2, startCharacter: 12, endLine: 3, endCharacter: 43 }));
         });
 
         it('parses derived function', () => {
@@ -46,10 +52,10 @@ describe('DerivedVariableParser', () => {
             const derivedFunction = parser.getVariable();
 
             // THEN
-            assert.ok(derivedFunction, 'there should be one derived function');
-            assert.strictEqual(derivedFunction?.name, 'c');
-            assert.equal(derivedFunction?.parameters.length, 0);
-            assert.deepStrictEqual(derivedFunction?.getLocation(), new PddlRange(0, 8, 0, 33));
+            expect(derivedFunction, 'there should be one derived function').to.not.be.undefined;
+            expect(derivedFunction?.name).to.equal('c');
+            expect(derivedFunction?.parameters).to.have.length(0);
+            expect(derivedFunction?.getLocation()).to.deep.equal(PddlRange.createSingleLineRange({ line: 0, start: 8, end: 33 }));
         });
     });
 });

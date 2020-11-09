@@ -4,7 +4,7 @@
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
-import { PddlRange, DocumentPositionResolver } from "./DocumentPositionResolver";
+import { PddlRange, PddlPosition, DocumentPositionResolver } from "./DocumentPositionResolver";
 import { PddlSyntaxNode } from "./parser/PddlSyntaxNode";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { PddlTokenType } from "./parser/PddlTokenizer";
@@ -148,7 +148,10 @@ export abstract class FileInfo {
             regexp.lastIndex = 0;
             const match = regexp.exec(line);
             if (match) {
-                const range = new PddlRange(lineIdx, match.index + 2, lineIdx, match.index + match[0].length);
+                const range = new PddlRange({
+                    start: new PddlPosition(lineIdx, match.index + 2),
+                    end: new PddlPosition(lineIdx, match.index + match[0].length)
+                });
                 referenceLocations.push(range);
             }
         }
@@ -178,6 +181,8 @@ export abstract class FileInfo {
     }
 }
 
+export type ParsingProblemSeverity = "error" | "warning" | "info" | "hint";
+
 /**
  * Parsing problem.
  */
@@ -185,10 +190,10 @@ export class ParsingProblem {
     /**
      * Constructs parsing problem.
      * @param problem problem description to display
-     * @param lineIndex zero-based line index, where this problem was found.
-     * @param columnIndex zero-based column index, where this problem was found. Default is zero.
+     * @param severity problem severity
+     * @param range range where the problem is
      */
-    constructor(public problem: string, public lineIndex?: number, public columnIndex: number = 0) { }
+    constructor(public readonly problem: string, public readonly severity: ParsingProblemSeverity, public readonly range: PddlRange) { }
 }
 
 export class UnknownFileInfo extends FileInfo {
