@@ -62,6 +62,11 @@ export abstract class StringifyingMap<K, V> {
     size(): number {
         return this.map.size;
     }
+
+    public get length(): number {
+        return this.size();
+    }
+
     forEach(callbackfn: (value: V, key: string, map: Map<string, V>) => void, thisArg?: unknown): void {
         this.map.forEach(callbackfn, thisArg);
     }

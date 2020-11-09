@@ -109,7 +109,7 @@ describe('PddlProblemParser', () => {
             // WHEN
             new PddlProblemParser().getProblemStructure(problemInfo);
 
-            assert.strictEqual(problemInfo.getInits().length, 2, 'there should be 2 initial values');
+            expect(problemInfo.getInits()).to.have.length(2, 'there should be 2 initial values');
             assert.deepStrictEqual(problemInfo.getInits()[0], new TimedVariableValue(0, "p1", true));
             assert.deepStrictEqual(problemInfo.getInits()[1], new TimedVariableValue(0, "f1", 1));
         });
@@ -133,7 +133,7 @@ describe('PddlProblemParser', () => {
             // WHEN
             new PddlProblemParser().getProblemStructure(problemInfo);
 
-            assert.equal(problemInfo.getSupplyDemands().length, 1, 'there should be 1 supply demand');
+            expect(problemInfo.getSupplyDemands()).to.have.length(1, 'there should be 1 supply demand');
         });
 
         it('parses problem with multiple metrics', () => {
@@ -153,7 +153,7 @@ describe('PddlProblemParser', () => {
             // WHEN
             new PddlProblemParser().getProblemStructure(problemInfo);
 
-            assert.equal(problemInfo.getMetrics().length, 2, 'there should be 2 metrics');
+            expect(problemInfo.getMetrics()).to.have.length(2, 'there should be 2 metrics');
         });
     });
 

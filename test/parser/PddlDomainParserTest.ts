@@ -57,11 +57,11 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
+            expect(domainInfo).to.not.be.undefined;;
             assert.strictEqual(domainInfo?.name, 'domain_name');
             assert.ok(domainInfo?.getRequirements().length ?? 0 > 0, 'there should be requirements');
             assert.deepStrictEqual(domainInfo?.getTypes(), [], 'there should be no types');
-            assert.strictEqual(domainInfo?.getConstants().length, 0, 'there should be no constants');
+            expect(domainInfo?.getConstants()).to.have.length(0, 'there should be no constants');
             assert.deepStrictEqual(domainInfo?.getPredicates(), [], 'there should be no predicates');
             assert.deepStrictEqual(domainInfo?.getFunctions(), [], 'there should be no functions');
             assert.deepStrictEqual(domainInfo?.getActions(), [], 'there should be no actions');
@@ -136,7 +136,7 @@ describe('PddlDomainParser', () => {
             const derived = PddlDomainParser.parseDerived(defineNode, new SimpleDocumentPositionResolver(domainPddl));
 
             // THEN
-            assert.equal(derived.length, 2, 'there should be 2 derived variables');
+            expect(derived).to.have.length(2, 'there should be 2 derived variables');
             assert.equal(derived[0].name, 'can-lift');
             assert.equal(derived[0].parameters.length, 2);
             assert.ok(derived[0].getDocumentation().join('\n').startsWith('can lift'));
@@ -158,10 +158,10 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
-            assert.equal(1, domainInfo?.getPredicates().length, 'there should be 1 predicate');
-            assert.equal(0, domainInfo?.getTypes().length, 'there should be 0 types');
-            assert.equal(0, domainInfo?.getFunctions().length, 'there should be 0 functions');
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo?.getPredicates()).to.have.length(1, 'there should be 1 predicate');
+            expect(domainInfo?.getTypes()).to.have.length(0, 'there should be 0 types');
+            expect(domainInfo?.getFunctions()).to.have.length(0, 'there should be 0 functions');
         });
 
         it('extracts predicate', () => {
@@ -177,9 +177,9 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
-            assert.equal(domainInfo?.getPredicates().length, 1, 'there should be 1 predicate');
-            assert.equal(domainInfo?.getPredicates()[0].getFullName(), "said_hello", 'the predicate should be "said_hello"');
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo?.getPredicates()).to.have.length(1, 'there should be 1 predicate');
+            expect(domainInfo?.getPredicates()[0].getFullName()).to.equal("said_hello", 'the predicate should be "said_hello"');
         });
 
         it('extracts 2 predicates without whitespace', () => {
@@ -195,8 +195,8 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
-            assert.equal(domainInfo?.getPredicates().length, 2, 'there should be 2 predicate');
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo?.getPredicates()).to.have.length(2, 'there should be 2 predicate');
             assert.equal(domainInfo?.getPredicates()[0].getFullName(), "p1", 'the predicate should be "p1"');
             assert.equal(domainInfo?.getPredicates()[1].getFullName(), "p2", 'the predicate should be "p2"');
         });
@@ -214,8 +214,8 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
-            assert.equal(domainInfo?.getFunctions().length, 1, 'there should be 1 function');
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo?.getFunctions()).to.have.length(1, 'there should be 1 function');
             assert.equal(domainInfo?.getFunctions()[0].getFullName(), "count", 'the function should be "count"');
         });
 
@@ -232,10 +232,10 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
-            assert.equal(domainInfo?.getTypes().length, 1, 'there should be 1 type');
-            assert.equal(domainInfo?.getTypes()[0], "type1", 'the function should be "count"');
-            assert.deepStrictEqual(domainInfo?.getTypeLocation('type1'), new PddlRange(3, 16, 3, 16 + 'type1'.length));
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo?.getTypes()).to.have.length(1, 'there should be 1 type');
+            expect(domainInfo?.getTypes()[0]).to.equal("type1", 'the function should be "count"');
+            expect(domainInfo?.getTypeLocation('type1')).to.deep.equal(PddlRange.createSingleLineRange({ line: 3, start: 16, length: 'type1'.length }));
         });
 
         it('extracts types with dashes', () => {
@@ -251,9 +251,9 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
-            assert.equal(domainInfo?.getTypes().length, 1, 'there should be 1 type');
-            assert.equal(domainInfo?.getTypes()[0], "some-type1", 'the function should be "count"');
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo?.getTypes()).to.have.length(1, 'there should be 1 type');
+            expect(domainInfo?.getTypes()[0]).to.equal("some-type1", 'the function should be "count"');
         });
 
         it('extracts action', () => {
@@ -270,8 +270,8 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
-            assert.equal(domainInfo?.getActions().length, 1, 'there should be 1 action');
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo?.getActions()).to.have.length(1, 'there should be 1 action');
             assert.equal(domainInfo?.getActions()[0].name, "action1", 'action name');
             assert.ok(!domainInfo?.getActions()[0].isDurative(), 'action should be durative');
         });
@@ -291,8 +291,8 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            assert.ok(domainInfo !== undefined);
-            assert.equal(domainInfo?.getActions().length, 1, 'there should be 1 action');
+            expect(domainInfo).to.not.be.undefined;;
+            expect(domainInfo?.getActions()).to.have.length(1, 'there should be 1 action');
             assert.equal(domainInfo?.getActions()[0].name, "action1", 'action name');
             assert.ok(domainInfo?.getActions()[0].isDurative(), 'action should be durative');
         });

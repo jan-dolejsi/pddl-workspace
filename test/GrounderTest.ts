@@ -6,6 +6,7 @@
 import { ProblemInfo, DocumentPositionResolver } from './src';
 import { Variable, Parameter, ObjectInstance } from './src';
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { Grounder } from './src';
 import { PddlSyntaxTree } from './parser/src';
 import { SimpleDocumentPositionResolver } from './src';
@@ -29,7 +30,7 @@ describe('Grounder', () => {
             // WHEN
             const groundedVariables = new Grounder(domain, problem).ground(liftedVariable);
 
-            assert.equal(groundedVariables.length, 1);
+            expect(groundedVariables).to.have.length(1);
         });
 
         it('grounds 1-parameterized variable with no objects', () => {
@@ -42,7 +43,7 @@ describe('Grounder', () => {
             // WHEN
             const groundedVariables = new Grounder(domain, problem).ground(liftedVariable);
 
-            assert.equal(groundedVariables.length, 0);
+            expect(groundedVariables).to.have.length(0);
         });
 
         it('grounds 1-parameterized variable with one object', () => {
@@ -57,7 +58,7 @@ describe('Grounder', () => {
             // WHEN
             const groundedVariables = new Grounder(domain, problem).ground(liftedVariable);
 
-            assert.equal(groundedVariables.length, 1, "there should be 1 grounded variable");
+            expect(groundedVariables).to.have.length(1, "there should be 1 grounded variable");
             assert.equal(groundedVariables[0].parameters.length, 1, "the grounded variable should have 1 parameter");
             assert.equal((groundedVariables[0].parameters[0] as ObjectInstance).name, object1);
         });
@@ -76,7 +77,7 @@ describe('Grounder', () => {
             // WHEN
             const groundedVariables = new Grounder(domain, problem).ground(liftedVariable);
 
-            assert.equal(groundedVariables.length, 1, "there should be 1 grounded variable");
+            expect(groundedVariables).to.have.length(1, "there should be 1 grounded variable");
             assert.equal(groundedVariables[0].parameters.length, 1, "the grounded variable should have 1 parameter");
             assert.equal((groundedVariables[0].parameters[0] as ObjectInstance).name, object1);
         });
@@ -94,7 +95,7 @@ describe('Grounder', () => {
             // WHEN
             const groundedVariables = new Grounder(domain, problem).ground(liftedVariable);
 
-            assert.equal(groundedVariables.length, 2, "there should be 2 grounded variables");
+            expect(groundedVariables).to.have.length(2, "there should be 2 grounded variables");
         });
 
         it('grounds 2-parameterized variable with two objects', () => {
@@ -110,7 +111,7 @@ describe('Grounder', () => {
             // WHEN
             const groundedVariables = new Grounder(domain, problem).ground(liftedVariable);
 
-            assert.equal(groundedVariables.length, 4, "there should be N grounded variables");
+            expect(groundedVariables).to.have.length(4, "there should be N grounded variables");
         });
     });
 
@@ -129,7 +130,7 @@ describe('Grounder', () => {
             const objects = new Grounder(domain, problem).getObjects([type1]);
 
             // THEN
-            assert.strictEqual(objects.length, 1, "there should be 1 set of objects for 1 type");
+            expect(objects).to.have.length(1, "there should be 1 set of objects for 1 type");
             assert.deepStrictEqual(objects[0], [object1, object2], "there should be 2 objects for 1 type");
         });
 
@@ -154,7 +155,7 @@ describe('Grounder', () => {
             // WHEN
             const objects = new Grounder(domain, problem).getObjects([type1, type2]);
 
-            assert.equal(objects.length, 2, "there should be 2 sets of objects for 2 types");
+            expect(objects).to.have.length(2, "there should be 2 sets of objects for 2 types");
             assert.deepEqual(objects[0], [type1object1, type1object2], "there should be 2 objects for type1");
             assert.deepEqual(objects[1], [type2object1, type2object2], "there should be 2 objects for type2");
         });
@@ -173,7 +174,7 @@ describe('Grounder', () => {
             // WHEN
             const objects = new Grounder(domain, problem).getObjectPermutations([type1]);
 
-            assert.equal(objects.length, 2, "there should be 2 permutations");
+            expect(objects).to.have.length(2, "there should be 2 permutations");
             assert.deepEqual(objects, [[object1], [object2]]);
         });
 
@@ -199,7 +200,7 @@ describe('Grounder', () => {
             assert.throws(() => {
                 const objects = new Grounder(domain, problem).getObjectPermutations([type1, type2]);
 
-                assert.equal(objects.length, 2, "there should be 2 sets of objects for 2 types");
+                expect(objects).to.have.length(2, "there should be 2 sets of objects for 2 types");
                 assert.deepEqual(objects[0], [type1object1, type1object2], "there should be 2 objects for type1");
                 assert.deepEqual(objects[1], [type2object1, type2object2], "there should be 2 objects for type2");
             });

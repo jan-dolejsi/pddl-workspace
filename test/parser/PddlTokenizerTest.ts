@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { PddlToken, PddlTokenizer, PddlTokenType } from './src';
 
 describe('PddlTokenizer', () => {
@@ -58,7 +59,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 1, 'there should be one whitespace');
+            expect(fragments).to.have.length(1, 'there should be one whitespace');
             const fragment0 = fragments[0];
             assert.strictEqual(fragment0.type, PddlTokenType.Whitespace);
             assert.strictEqual(fragment0.tokenText, domainPddl);
@@ -77,7 +78,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 1, 'there should be one whitespace');
+            expect(fragments).to.have.length(1, 'there should be one whitespace');
             const fragment0 = fragments[0];
             assert.strictEqual(fragment0.type, PddlTokenType.Whitespace);
             assert.strictEqual(fragment0.tokenText, domainPddl);
@@ -93,7 +94,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 1, 'there should be one comment');
+            expect(fragments).to.have.length(1, 'there should be one comment');
             const fragment0 = fragments[0];
             assert.strictEqual(fragment0.type, PddlTokenType.Comment);
             assert.strictEqual(fragment0.tokenText, domainPddl);
@@ -112,7 +113,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 3, 'there should tokens');
+            expect(fragments).to.have.length(3, 'there should tokens');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.Comment,
@@ -140,7 +141,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 5, 'there should tokens');
+            expect(fragments).to.have.length(5, 'there should tokens');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.Comment,
@@ -168,7 +169,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 2, 'there should be two fragments');
+            expect(fragments).to.have.length(2, 'there should be two fragments');
             assert.strictEqual(fragments[0].type, PddlTokenType.Comment);
             assert.strictEqual(fragments[0].tokenText, ';X');
             assert.strictEqual(fragments[0].getStart(), 0, 'comment start');
@@ -190,7 +191,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 1, 'there should be one open bracket');
+            expect(fragments).to.have.length(1, 'there should be one open bracket');
             const fragment0 = fragments[0];
             assert.strictEqual(fragment0.type, PddlTokenType.OpenBracketOperator);
             assert.strictEqual(fragment0.tokenText, domainPddl);
@@ -207,7 +208,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(predicatePddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 2, 'there should be one open bracket and identifier');
+            expect(fragments).to.have.length(2, 'there should be one open bracket and identifier');
             const fragment0 = fragments[0];
             assert.strictEqual(fragment0.type, PddlTokenType.OpenBracket);
             assert.strictEqual(fragment0.tokenText, '(');
@@ -227,7 +228,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 7, 'there should be fragments');
+            expect(fragments).to.have.length(7, 'there should be fragments');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.OpenBracketOperator,
@@ -253,7 +254,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 4, 'there should be fragments');
+            expect(fragments).to.have.length(4, 'there should be fragments');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.OpenBracketOperator,
@@ -273,7 +274,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 8, 'there should be fragments');
+            expect(fragments).to.have.length(8, 'there should be fragments');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.OpenBracket,
@@ -297,7 +298,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 6, 'there should be # of fragments');
+            expect(fragments).to.have.length(6, 'there should be # of fragments');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.OpenBracket,
@@ -318,7 +319,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 1, 'there should be one fragment');
+            expect(fragments).to.have.length(1, 'there should be one fragment');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.Other, // -3.14
@@ -335,7 +336,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 6, 'there should be fragments');
+            expect(fragments).to.have.length(6, 'there should be fragments');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.OpenBracketOperator,
@@ -357,7 +358,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 15, 'there should be fragments');
+            expect(fragments).to.have.length(15, 'there should be fragments');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.OpenBracketOperator, //(increase
@@ -388,7 +389,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 7, 'there should be fragments');
+            expect(fragments).to.have.length(7, 'there should be fragments');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.OpenBracket, //(
@@ -413,7 +414,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, fragment => fragments.push(fragment));
 
             // THEN
-            assert.strictEqual(fragments.length, 15, 'there should be fragments');
+            expect(fragments).to.have.length(15, 'there should be fragments');
             const fragmentTypes = fragments.map(f => f.type);
             assert.deepStrictEqual(fragmentTypes, [
                 PddlTokenType.OpenBracketOperator,             //(:action
@@ -444,7 +445,7 @@ describe('PddlTokenizer', () => {
             new PddlTokenizer(domainPddl, token => tokens.push(token));
 
             // THEN
-            assert.strictEqual(tokens.length, 12, 'there should be tokens');
+            expect(tokens).to.have.length(12, 'there should be tokens');
             const tokenTypes = tokens.map(f => f.type);
 
             assert.deepStrictEqual(tokenTypes, [

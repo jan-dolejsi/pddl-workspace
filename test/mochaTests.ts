@@ -1,5 +1,9 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 describe("MyClass", () => {
-    expect(true).to.be.equal(true);
+	describe("#member()", () => {
+		it('simple assertion should pass', () => {
+			expect(true).to.be.equal(true);
+		});
+	});
 });

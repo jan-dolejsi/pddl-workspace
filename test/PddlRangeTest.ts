@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as assert from 'assert';
+import { expect } from 'chai';
 import { PddlPosition, PddlRange } from './src';
 
 describe('PddlPosition', () => {
@@ -12,13 +12,12 @@ describe('PddlPosition', () => {
         it('is at or before itself', () => {
             // GIVEN
             const first = new PddlPosition(1, 1);
-            const expected = true;
 
             // WHEN
             const actual = first.atOrBefore(first);
 
             // THEN
-            assert.strictEqual(actual, expected, "should be atOrBefore itself");
+            expect(actual, "should be atOrBefore itself").to.be.true;
         });
 
         it('on the same line', () => {
@@ -31,8 +30,8 @@ describe('PddlPosition', () => {
             const secondBeforeFirst = second.atOrBefore(first);
 
             // THEN
-            assert.strictEqual(firstBeforeSecond, true, "1 should be before 10");
-            assert.strictEqual(secondBeforeFirst, false, "10 should NOT be before 1");
+            expect(firstBeforeSecond, "1 should be before 10").to.be.true;
+            expect(secondBeforeFirst, "10 should NOT be before 1").to.be.false;
         });
 
         it('on the different lines', () => {
@@ -45,8 +44,8 @@ describe('PddlPosition', () => {
             const secondBeforeFirst = second.atOrBefore(first);
 
             // THEN
-            assert.strictEqual(firstBeforeSecond, true, "1.10 should be before 10.1");
-            assert.strictEqual(secondBeforeFirst, false, "10.1 should NOT be before 1.10");
+            expect(firstBeforeSecond, "1.10 should be before 10.1").to.be.true ;
+            expect(secondBeforeFirst, "10.1 should NOT be before 1.10").to.be.false;
         });
     });
 });
@@ -56,28 +55,32 @@ describe('PddlRange', () => {
     describe('#includes', () => {
         it('is at or before itself', () => {
             // GIVEN
-            const range1 = new PddlRange(1, 1, 1, 1);
+            const range1 = PddlRange.createRange({
+                startLine: 1, startCharacter: 1,
+                endLine: 1, endCharacter: 1
+            });
             const position1 = new PddlPosition(1, 1);
-            const expected = true;
 
             // WHEN
             const actual = range1.includes(position1);
 
             // THEN
-            assert.strictEqual(actual, expected, "range 1.1-1.1 should include position 1.1");
+            expect(actual, "range 1.1-1.1 should include position 1.1").to.be.true;
         });
 
         it('is outside range', () => {
             // GIVEN
-            const range1 = new PddlRange(1, 1, 1, 1);
+            const range1 = PddlRange.createRange({
+                startLine: 1, startCharacter: 1,
+                endLine: 1, endCharacter: 1
+            });
             const position1 = new PddlPosition(10, 10);
-            const expected = false;
 
             // WHEN
             const actual = range1.includes(position1);
 
             // THEN
-            assert.strictEqual(actual, expected, "range 1.1-1.1 should NOT  include position 10.10");
+            expect(actual, "range 1.1-1.1 should NOT  include position 10.10").to.be.false;
         });
     });
 });

@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import { DirectionalGraph } from './src';
-import * as assert from 'assert';
+import { expect } from 'chai';
 
 describe('DirectionalGraph', () => {
     let graph: DirectionalGraph;
@@ -22,12 +22,12 @@ describe('DirectionalGraph', () => {
             graph.addEdge(origin, target);
 
             // then
-            assert.equal(graph.getEdges().length, 1);
-            assert.equal(graph.getVertices().length, 2);
-            assert.ok(graph.getVertices().includes(origin));
-            assert.ok(graph.getVertices().includes(target));
-            assert.equal(graph.getEdges()[0][0], origin, "the edge should originate from the origin vertex");
-            assert.equal(graph.getEdges()[0][1], [target], "the edge should target the target vertex");
+            expect(graph.getEdges()).to.have.length(1);
+            expect(graph.getVertices()).to.have.length(2);
+            expect(graph.getVertices()).to.includes(origin);
+            expect(graph.getVertices()).to.include(target);
+            expect(graph.getEdges()[0][0]).to.equal(origin, "the edge should originate from the origin vertex");
+            expect(graph.getEdges()[0][1]).to.equal(target, "the edge should target the target vertex");
         });
 
         it('should add two edges from the same origin', () => {
@@ -41,14 +41,14 @@ describe('DirectionalGraph', () => {
             graph.addEdge(origin, target2);
             
             // then
-            assert.equal(graph.getEdges().length, 2);
-            assert.equal(graph.getVertices().length, 3);
-            assert.ok(graph.getVertices().includes(origin));
-            assert.ok(graph.getVertices().includes(target1));
-            assert.ok(graph.getVertices().includes(target1));
-            assert.deepEqual(graph.getEdges().map(e => e[0]), [origin, origin], "the edges should originate from the origin vertex");
-            assert.ok(graph.getEdges().map(e => e[1]).includes(target1), "the edge should target the target1 vertex");
-            assert.ok(graph.getEdges().map(e => e[1]).includes(target2), "the edge should target the target2 vertex");
+            expect(graph.getEdges()).to.have.length(2);
+            expect(graph.getVertices()).to.have.length(3);
+            expect(graph.getVertices()).to.include(origin);
+            expect(graph.getVertices()).to.include(target1);
+            expect(graph.getVertices()).to.include(target1);
+            expect(graph.getEdges().map(e => e[0])).to.deep.equal([origin, origin], "the edges should originate from the origin vertex");
+            expect(graph.getEdges().map(e => e[1])).to.include(target1, "the edge should target the target1 vertex");
+            expect(graph.getEdges().map(e => e[1])).to.include(target2, "the edge should target the target2 vertex");
         });
 
         it('should add two edges to the same target', () => {
@@ -62,14 +62,14 @@ describe('DirectionalGraph', () => {
             graph.addEdge(origin2, target);
             
             // then
-            assert.equal(graph.getEdges().length, 2);
-            assert.equal(graph.getVertices().length, 3);
-            assert.ok(graph.getVertices().includes(origin1));
-            assert.ok(graph.getVertices().includes(origin2));
-            assert.ok(graph.getVertices().includes(target));
-            assert.ok(graph.getEdges().map(e => e[0]).includes(origin1), "an edge should originate from the origin1 vertex");
-            assert.ok(graph.getEdges().map(e => e[0]).includes(origin2), "an edge should originate from the origin2 vertex");
-            assert.deepEqual(graph.getEdges().map(e => e[1]), [target, target], "the edges should target the target vertex");
+            expect(graph.getEdges()).to.have.length(2);
+            expect(graph.getVertices()).to.have.length(3);
+            expect(graph.getVertices()).to.include(origin1);
+            expect(graph.getVertices()).to.include(origin2);
+            expect(graph.getVertices()).to.include(target);
+            expect(graph.getEdges().map(e => e[0])).to.include(origin1, "an edge should originate from the origin1 vertex");
+            expect(graph.getEdges().map(e => e[0])).to.include(origin2, "an edge should originate from the origin2 vertex");
+            expect(graph.getEdges().map(e => e[1])).to.deep.equal([target, target], "the edges should target the target vertex");
         });
     });
     
@@ -84,9 +84,9 @@ describe('DirectionalGraph', () => {
             const targets = graph.getVerticesWithEdgesFrom(origin);
 
             // then
-            assert.ok(targets !== undefined);
-            assert.equal(targets?.length, 1);
-            assert.equal(targets?.[0], target);
+            expect(targets).to.not.be.undefined;;
+            expect(targets).to.have.length(1);
+            expect(targets?.[0]).to.equal(target);
         });
 
         it('should return no vertices with edge from target', () => {
@@ -99,7 +99,7 @@ describe('DirectionalGraph', () => {
             const targets = graph.getVerticesWithEdgesFrom(target);
 
             // then
-            assert.equal(targets?.length, 0);
+            expect(targets).to.have.length(0);
         });
     });
 
@@ -114,8 +114,8 @@ describe('DirectionalGraph', () => {
             const origins = graph.getVerticesWithEdgesTo(target);
 
             // then
-            assert.equal(origins.length, 1);
-            assert.equal(origins[0], origin);
+            expect(origins).to.have.length(1);
+            expect(origins[0]).to.equal(origin);
         });
 
         it('should return no vertices with edge to origin', () => {
@@ -128,7 +128,7 @@ describe('DirectionalGraph', () => {
             const targets = graph.getVerticesWithEdgesTo(origin);
 
             // then
-            assert.equal(targets.length, 0);
+            expect(targets).to.have.length(0);
         });
     });
     
@@ -143,8 +143,8 @@ describe('DirectionalGraph', () => {
             const originSubTree = graph.getSubtreePointingTo(target);
 
             // then
-            assert.equal(originSubTree.length, 1);
-            assert.equal(originSubTree[0], origin);
+            expect(originSubTree).to.have.length(1);
+            expect(originSubTree[0]).to.equal(origin);
         });
 
         it('should return child as subtree pointing to parent', () => {
@@ -159,8 +159,8 @@ describe('DirectionalGraph', () => {
             const originSubTree = graph.getSubtreePointingTo(parent);
 
             // then
-            assert.equal(originSubTree.length, 1);
-            assert.equal(originSubTree[0], child);
+            expect(originSubTree).to.have.length(1);
+            expect(originSubTree[0]).to.equal(child);
         });
 
         it('should return child and parent as subtree pointing to grandparent', () => {
@@ -175,9 +175,9 @@ describe('DirectionalGraph', () => {
             const originSubTree = graph.getSubtreePointingTo(grandparent);
 
             // then
-            assert.equal(originSubTree.length, 2);
-            assert.ok(originSubTree.includes(child), "should include child");
-            assert.ok(originSubTree.includes(parent), "should include parent");
+            expect(originSubTree).to.have.length(2);
+            expect(originSubTree).to.include(child, "should include child");
+            expect(originSubTree).to.include(parent, "should include parent");
         });
     });
     
@@ -192,8 +192,8 @@ describe('DirectionalGraph', () => {
             const targetSubTree = graph.getSubtreePointingFrom(origin);
 
             // then
-            assert.equal(targetSubTree.length, 1);
-            assert.equal(targetSubTree[0], target);
+            expect(targetSubTree).to.have.length(1);
+            expect(targetSubTree[0]).to.equal(target);
         });
 
         it('should return grandparent as subtree pointing from parent', () => {
@@ -208,8 +208,8 @@ describe('DirectionalGraph', () => {
             const originSubTree = graph.getSubtreePointingFrom(parent);
 
             // then
-            assert.equal(originSubTree.length, 1);
-            assert.equal(originSubTree[0], grandparent);
+            expect(originSubTree).to.have.length(1);
+            expect(originSubTree[0]).to.equal(grandparent);
         });
 
         it('should return parent and grandparent as subtree pointing from child', () => {
@@ -224,9 +224,9 @@ describe('DirectionalGraph', () => {
             const originSubTree = graph.getSubtreePointingFrom(child);
 
             // then
-            assert.equal(originSubTree.length, 2);
-            assert.ok(originSubTree.includes(grandparent), "should include grandparent");
-            assert.ok(originSubTree.includes(parent), "should include parent");
+            expect(originSubTree).to.have.length(2);
+            expect(originSubTree).to.include(grandparent, "should include grandparent");
+            expect(originSubTree).to.include(parent, "should include parent");
         });
     });
 });

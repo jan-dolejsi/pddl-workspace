@@ -7,6 +7,7 @@ import * as assert from 'assert';
 import { PddlSyntaxTreeBuilder } from './src';
 import { PddlConstraintsParser } from './src';
 import { NamedConditionConstraint, AfterConstraint, StrictlyAfterConstraint } from '../src';
+import { expect } from 'chai';
 
 describe('PddlConstraintsParser', () => {
 
@@ -41,7 +42,7 @@ describe('PddlConstraintsParser', () => {
             const actual = new PddlConstraintsParser().parseConstraints(syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':constraints'));
 
             // THEN
-            assert.strictEqual(actual.length, 1, "there should be one constraint");
+            expect(actual).to.have.length(1, "there should be one constraint");
             assert.ok(actual.every(c => c instanceof NamedConditionConstraint), 'constraint type');
             assert.deepStrictEqual(
                 actual
@@ -66,7 +67,7 @@ describe('PddlConstraintsParser', () => {
             const actual = new PddlConstraintsParser().parseConstraints(syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':constraints'));
 
             // THEN
-            assert.strictEqual(actual.length, 1, "there should be one constraint");
+            expect(actual).to.have.length(1, "there should be one constraint");
             assert.ok(actual.every(c => c instanceof NamedConditionConstraint), 'constraint type');
             assert.deepStrictEqual(
                 actual
@@ -91,7 +92,7 @@ describe('PddlConstraintsParser', () => {
             const actual = new PddlConstraintsParser().parseConstraints(syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':constraints'));
 
             // THEN
-            assert.strictEqual(actual.length, 1, "there should be one constraint");
+            expect(actual).to.have.length(1, "there should be one constraint");
             assert.ok(actual.every(c => c instanceof NamedConditionConstraint), 'constraint type');
             assert.deepStrictEqual(
                 actual
@@ -116,7 +117,7 @@ describe('PddlConstraintsParser', () => {
             const actual = new PddlConstraintsParser().parseConstraints(syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':constraints'));
 
             // THEN
-            assert.strictEqual(actual.length, 1, "there should be one constraint");
+            expect(actual).to.have.length(1, "there should be one constraint");
             assert.ok(actual.every(c => c instanceof AfterConstraint), 'constraint type');
 
             assert.deepStrictEqual(
@@ -142,7 +143,7 @@ describe('PddlConstraintsParser', () => {
             const actual = new PddlConstraintsParser().parseConstraints(syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':constraints'));
 
             // THEN
-            assert.strictEqual(actual.length, 1, "there should be one constraint");
+            expect(actual).to.have.length(1, "there should be one constraint");
             assert.ok(actual.every(c => c instanceof AfterConstraint), 'constraint type');
             assert.deepStrictEqual(
                 actual
@@ -171,7 +172,7 @@ describe('PddlConstraintsParser', () => {
             const actual = new PddlConstraintsParser().parseConstraints(syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':constraints'));
 
             // THEN
-            assert.strictEqual(actual.length, 3, "there should be N constraints");
+            expect(actual).to.have.length(3, "there should be N constraints");
             assert.ok(actual[0] instanceof NamedConditionConstraint, 'constraint0 type');
             assert.ok(actual[1] instanceof NamedConditionConstraint, 'constraint1 type');
             assert.ok(actual[2] instanceof AfterConstraint, 'constraint2 type');
@@ -194,7 +195,7 @@ describe('PddlConstraintsParser', () => {
             const actual = new PddlConstraintsParser().parseConstraints(syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':constraints'));
 
             // THEN
-            assert.strictEqual(actual.length, 2, "there should be N constraints");
+            expect(actual).to.have.length(2, "there should be N constraints");
             assert.ok(actual[0] instanceof AfterConstraint, 'constraint0 type');
             assert.ok(actual[1] instanceof AfterConstraint, 'constraint1 type');
         });
@@ -214,7 +215,7 @@ describe('PddlConstraintsParser', () => {
             const actual = new PddlConstraintsParser().parseConstraints(syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':constraints'));
 
             // THEN
-            assert.strictEqual(actual.length, 1, "there should be one constraint");
+            expect(actual).to.have.length(1, "there should be one constraint");
             assert.ok(actual.every(c => c instanceof StrictlyAfterConstraint), 'constraint type');
             assert.deepStrictEqual(
                 actual

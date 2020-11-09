@@ -33,8 +33,10 @@ export class DerivedVariablesParser {
 
         this.conditionNode = children[1];
         this.variable = new Variable(fullName, parameters);
-        const location = PddlRange.from(positionResolver
-            .resolveToPosition(derivedNode.getStart()), positionResolver.resolveToPosition(derivedNode.getEnd()));
+        const location = new PddlRange({
+            start: positionResolver.resolveToPosition(derivedNode.getStart()),
+            end: positionResolver.resolveToPosition(derivedNode.getEnd())
+        });
         this.variable.setLocation(location);
         this.variable.setDocumentation(DerivedVariablesParser.getDocumentationAbove(derivedNode));
     }

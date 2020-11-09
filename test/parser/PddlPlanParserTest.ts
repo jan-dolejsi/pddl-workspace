@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { PddlPlanParser } from './src';
 import { PlanStep, Happening, HappeningType, PddlLanguage } from '../src';
 import { URI } from 'vscode-uri';
@@ -29,7 +30,7 @@ describe('PddlPlanParser', () => {
             const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);
 
             // THEN
-            assert.ok(planInfo !== undefined);
+            expect(planInfo).to.not.be.undefined;;
             assert.strictEqual(planInfo?.fileUri, fileUri);
             const expectedHappening = new Happening(0.001, HappeningType.INSTANTANEOUS, 'a', 0, 0);
             assert.deepStrictEqual(planInfo?.getHappenings(), [expectedHappening], 'there should be 1 happening');
@@ -58,7 +59,7 @@ describe('PddlPlanParser', () => {
             const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);
 
             // THEN
-            assert.ok(planInfo !== undefined);
+            expect(planInfo).to.not.be.undefined;;
             assert.strictEqual(planInfo?.fileUri, fileUri);
             const expectedHappenings = [
                 new Happening(0.001, HappeningType.START, 'a p1 p2', 0, 0),

@@ -32,10 +32,10 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
+            expect(plans).to.have.length(1, 'there should be one empty plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, 21, 'plan makespan');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
+            expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), 1, 'start time');
             assert.strictEqual(plan.steps[0].getActionName(), 'action', 'action name');
             assert.strictEqual(plan.steps[0].getFullActionName(), 'action', 'full action name');
@@ -59,11 +59,11 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
+            expect(plans).to.have.length(1, 'there should be one empty plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, duration + startTime, 'plan makespan');
             assert.strictEqual(plan.cost, metricNumber, 'plan cost');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
+            expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), startTime, 'start time');
             assert.strictEqual(plan.steps[0].getActionName(), actionName, 'action name');
             assert.strictEqual(plan.steps[0].getFullActionName(), actionName, 'full action name');
@@ -87,10 +87,10 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one plan');
+            expect(plans).to.have.length(1, 'there should be one plan');
             const plan = plans[0];
             assert.strictEqual(plan.cost, metricNumber, 'plan cost');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
+            expect(plan.steps).to.have.length(1, 'plan should have one action');
         });
 
         it('parses improving plan cost', () => {
@@ -429,7 +429,7 @@ describe('PddlPlannerOutputParser', () => {
             const plan = plans[0];
             expect(plan.makespan, 'plan makespan').to.equal(duration + startTime);
             expect(plan.cost, 'plan cost').to.be.closeTo(metricNumber, 1e-40);
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
+            expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), startTime, 'start time');
             assert.strictEqual(plan.steps[0].getActionName(), actionName, 'action name');
             assert.strictEqual(plan.steps[0].getFullActionName(), actionName, 'full action name');
@@ -448,7 +448,7 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
+            expect(plans).to.have.length(1, 'there should be one empty plan');
         });
 
         it('parses empty plan with only meta-data', () => {
@@ -467,7 +467,7 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one empty plan');
+            expect(plans).to.have.length(1, 'there should be one empty plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, 0, 'plan makespan');
             assert.strictEqual(plan.cost, 0, 'plan metric');
@@ -516,12 +516,12 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser!.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one plan');
+            expect(plans).to.have.length(1, 'there should be one plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, 10807.2, 'plan makespan');
             assert.strictEqual(plan.cost, 10807.2, 'plan metric');
             assert.strictEqual(plan.statesEvaluated, 51, 'states evaluated');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
+            expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), 10807.2, 'start time');
             assert.strictEqual(plan.steps[0].getActionName(), 'action1', 'action name');
             assert.strictEqual(plan.steps[0].getFullActionName(), 'action1 c a', 'full action name');
@@ -586,12 +586,12 @@ describe('PddlPlannerOutputParser', () => {
             const plans = parser!.getPlans();
 
             // THEN
-            assert.strictEqual(plans.length, 1, 'there should be one plan');
+            expect(plans).to.have.length(1, 'there should be one plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, 60+60*60, 'plan makespan');
             assert.strictEqual(plan.cost, 60+60*60, 'plan metric');
             assert.strictEqual(plan.statesEvaluated, 51, 'states evaluated');
-            assert.strictEqual(plan.steps.length, 1, 'plan should have one action');
+            expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), 60, 'start time');
             assert.strictEqual(plan.steps[0].getActionName(), 'action1', 'action name');
             assert.strictEqual(plan.steps[0].getFullActionName(), 'action1 c a', 'full action name');

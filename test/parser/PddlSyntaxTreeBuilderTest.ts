@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { PddlSyntaxTreeBuilder } from './src';
 import { PddlTokenType } from './src';
 
@@ -19,7 +20,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const breadcrumbs = new PddlSyntaxTreeBuilder(domainPddl).getBreadcrumbs(0);
 
             // THEN
-            assert.strictEqual(breadcrumbs.length, 1, 'there should be one - document tree node');
+            expect(breadcrumbs).to.have.length(1, 'there should be one - document tree node');
             const breadcrumb0 = breadcrumbs[0];
             assert.strictEqual(breadcrumb0.type, PddlTokenType.Document);
         });
@@ -32,7 +33,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const breadcrumbs = new PddlSyntaxTreeBuilder(domainPddl).getBreadcrumbs(1);
 
             // THEN
-            assert.strictEqual(breadcrumbs.length, 2, 'there should be one whitespace');
+            expect(breadcrumbs).to.have.length(2, 'there should be one whitespace');
             const breadcrumb0 = breadcrumbs[1];
             assert.strictEqual(breadcrumb0.type, PddlTokenType.Whitespace);
         });
@@ -45,7 +46,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const breadcrumbs = new PddlSyntaxTreeBuilder(domainPddl).getBreadcrumbs(1);
 
             // THEN
-            assert.strictEqual(breadcrumbs.length, 2, 'there should be one document and one comment');
+            expect(breadcrumbs).to.have.length(2, 'there should be one document and one comment');
             const breadcrumb0 = breadcrumbs[1];
             assert.strictEqual(breadcrumb0.type, PddlTokenType.Comment);
         });
@@ -58,7 +59,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const breadcrumbs = new PddlSyntaxTreeBuilder(domainPddl).getBreadcrumbs(3);
 
             // THEN
-            assert.strictEqual(breadcrumbs.length, 2, 'there should be one document and one whitespace');
+            expect(breadcrumbs).to.have.length(2, 'there should be one document and one whitespace');
             const breadcrumb0 = breadcrumbs[1];
             assert.strictEqual(breadcrumb0.type, PddlTokenType.Whitespace);
         });
@@ -71,7 +72,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const breadcrumbs = new PddlSyntaxTreeBuilder(domainPddl).getBreadcrumbs(3);
 
             // THEN
-            assert.strictEqual(breadcrumbs.length, 2, 'there should be one document and one open bracket');
+            expect(breadcrumbs).to.have.length(2, 'there should be one document and one open bracket');
             const breadcrumb0 = breadcrumbs[1];
             assert.strictEqual(breadcrumb0.type, PddlTokenType.OpenBracketOperator);
             assert.strictEqual(breadcrumb0.tokenText, domainPddl);
@@ -85,7 +86,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const breadcrumbs = new PddlSyntaxTreeBuilder(domainPddl).getBreadcrumbs(domainPddl.length-1);
 
             // THEN
-            assert.strictEqual(breadcrumbs.length, 3, 'there should be # of breadcrumbs');
+            expect(breadcrumbs).to.have.length(3, 'there should be # of breadcrumbs');
             const tokenTypes = breadcrumbs.map(f => f.type);
             assert.deepStrictEqual(tokenTypes, [
                 PddlTokenType.Document,
@@ -103,7 +104,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const breadcrumbs = new PddlSyntaxTreeBuilder(domainPddl).getBreadcrumbs(position);
 
             // THEN
-            assert.strictEqual(breadcrumbs.length, 4, 'there should be 4 nodes');
+            expect(breadcrumbs).to.have.length(4, 'there should be 4 nodes');
             const tokenTypes = breadcrumbs.map(f => f.type);
             assert.deepStrictEqual(tokenTypes, [
                 PddlTokenType.Document,
@@ -125,7 +126,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const breadcrumbs = new PddlSyntaxTreeBuilder(domainPddl).getBreadcrumbs(position);
 
             // THEN
-            assert.strictEqual(breadcrumbs.length, 3, 'there should be 3 nodes');
+            expect(breadcrumbs).to.have.length(3, 'there should be 3 nodes');
             const tokenTypes = breadcrumbs.map(f => f.type);
             assert.deepStrictEqual(tokenTypes, [
                 PddlTokenType.Document,
@@ -148,7 +149,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const tree = new PddlSyntaxTreeBuilder(domainPddl).getTree();
 
             // THEN
-            assert.strictEqual(tree.getRootNode().getChildren().length, 0, 'there should be one 0 tree nodes');
+            expect(tree.getRootNode().getChildren()).to.have.length(0, 'there should be one 0 tree nodes');
             assert.strictEqual(tree.getNodeAt(0).getToken().type, PddlTokenType.Document);
         });
 
@@ -182,7 +183,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const tree = new PddlSyntaxTreeBuilder(domainPddl).getTree();
 
             // THEN
-            assert.strictEqual(tree.getRootNode().getChildren().length, 2, 'there should be one comment and one whitespace');
+            expect(tree.getRootNode().getChildren()).to.have.length(2, 'there should be one comment and one whitespace');
             assert.deepStrictEqual(tree.getRootNode().getChildren().map(c => c.getToken().type), [
                 PddlTokenType.Comment,
                 PddlTokenType.Whitespace
@@ -200,7 +201,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const tree = new PddlSyntaxTreeBuilder(domainPddl).getTree();
 
             // THEN
-            assert.strictEqual(tree.getRootNode().getChildren().length, 1, 'there should be one open bracket');
+            expect(tree.getRootNode().getChildren()).to.have.length(1, 'there should be one open bracket');
             const node0 = tree.getNodeAt(1);
             assert.strictEqual(node0.getToken().type, PddlTokenType.OpenBracketOperator);
             assert.strictEqual(node0.getToken().tokenText, domainPddl);
@@ -242,7 +243,7 @@ describe('PddlSyntaxTreeBuilder', () => {
             const reqs = tree.getNodeAt(position);
 
             // THEN
-            assert.strictEqual(reqs.getNonWhitespaceChildren().length, 2, 'there should be 2 reqs');
+            expect(reqs.getNonWhitespaceChildren()).to.have.length(2, 'there should be 2 reqs');
             const tokenTypes = reqs.getNestedChildren().map(f => f.getToken().type);
             assert.deepStrictEqual(tokenTypes, [
                 PddlTokenType.Whitespace,

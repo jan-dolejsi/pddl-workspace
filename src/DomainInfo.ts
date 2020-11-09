@@ -193,7 +193,10 @@ export class DomainInfo extends FileInfo {
             this.getTypes().forEach(typeName => {
                 const typeNode = typesNode.getFirstChild(PddlTokenType.Other, new RegExp("^" + typeName + "$"));
                 if (typeNode) {
-                    const range = PddlRange.from(positionResolver.resolveToPosition(typeNode.getStart()), positionResolver.resolveToPosition(typeNode.getEnd()));
+                    const range = new PddlRange({
+                        start: positionResolver.resolveToPosition(typeNode.getStart()),
+                        end: positionResolver.resolveToPosition(typeNode.getEnd())
+                    });
                     this.typeLocations.set(typeName, range);
                 }
             });

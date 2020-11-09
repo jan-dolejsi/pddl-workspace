@@ -46,8 +46,10 @@ export class MetricParser {
         });
 
         if (direction !== undefined && expression !== undefined) {
-            const location = PddlRange.from(positionResolver
-                .resolveToPosition(metricNode.getStart()), positionResolver.resolveToPosition(metricNode.getEnd()));
+            const location = new PddlRange({
+                start: positionResolver.resolveToPosition(metricNode.getStart()),
+                end: positionResolver.resolveToPosition(metricNode.getEnd())
+            });
             const documentation = DerivedVariablesParser.getDocumentationAbove(metricNode);
             this.metric = new Metric(direction, expression, location, documentation);
         }
