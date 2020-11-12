@@ -34,6 +34,16 @@ const plan = PddlPlanParser.parseText(planText, epsilon);
 
 Many more usage scenarios are exercised in the unit tests in the `test` folder.
 
+Plans may appear in number of different formats. Following forms are supported:
+
+```text
+(action)
+(action objects)
+time: (action)
+time: (action) [duration]
+time: (action) [D:<duration>; C:<actionCost>]
+```
+
 ### PDDL Numeric Expression Parser
 
 PDDL problem files support multiple `(:metric )` elements (because VAL does as well).

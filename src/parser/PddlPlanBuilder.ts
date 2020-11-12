@@ -49,8 +49,9 @@ export class PddlPlanBuilder {
     build(domain: DomainInfo, problem: ProblemInfo): Plan {
         const plan = new Plan(this.steps, domain, problem);
         plan.statesEvaluated = this.statesEvaluated;
-        // if cost was not output by the planning engine, use the plan makespan
-        plan.cost = this.metric ?? this.getMakespan();
+        if (this.metric !== undefined) {
+            plan.cost = this.metric;
+        }
         return plan;
     }
     getMakespan(): number {

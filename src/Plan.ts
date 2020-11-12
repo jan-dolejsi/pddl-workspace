@@ -11,13 +11,26 @@ import { DomainInfo } from './DomainInfo';
 export class Plan {
     makespan: number;
     statesEvaluated?: number;
-    cost?: number;
+    private _cost?: number;
 
     constructor(public readonly steps: PlanStep[], public readonly domain?: DomainInfo,
         public readonly problem?: ProblemInfo,
         public readonly now?: number,
         public readonly helpfulActions?: HelpfulAction[]) {
         this.makespan = steps.length ? Math.max(...steps.map(step => step.getEndTime())) : 0;
+    }
+
+    get cost(): number {
+        // if cost was not output by the planning engine, use the plan makespan
+        return this._cost ?? this.makespan;
+    }
+
+    set cost(cost: number) {
+        this._cost = cost;
+    }
+
+    isCostDefined(): boolean {
+        return this._cost !== undefined;
     }
 
     /**

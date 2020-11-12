@@ -409,6 +409,79 @@ describe('PddlPlannerOutputParser', () => {
             }
         });
 
+        it('parses multiple improving plans - lpg', () => {
+            // GIVEN
+            const planText = `Parsing domain file:  domain 'DEPOT' defined ... done.
+            Parsing problem file:  problem 'DEPOTPROB1818' defined ... done.
+            
+            
+            
+            Modality: Fast Planner
+            
+            Number of actions             :      90
+            Number of conditional actions :       0
+            Number of facts               :      40
+            
+            
+            Analyzing Planning Problem:
+                    Temporal Planning Problem: NO
+                    Numeric Planning Problem: NO
+                    Problem with Timed Initial Litearals: NO
+                    Problem with Derived Predicates: NO
+            
+            Evaluation function weights:
+                 Action duration 0.00; Action cost 1.00
+            
+            
+            Computing mutex... done
+            
+            Preprocessing total time: 0.02 seconds
+            
+            Searching ('.' = every 50 search steps):
+             solution found: 
+            
+            Plan computed:
+               Time: (ACTION) [action Duration; action Cost]
+             0.0000: (DRIVE TRUCK0 DISTRIBUTOR1 DISTRIBUTOR0) [D:1.0000; C:1.0000]
+             0.0000: (LIFT HOIST1 CRATE0 PALLET1 DISTRIBUTOR0) [D:1.0000; C:1.0000]
+             0.0000: (LIFT HOIST0 CRATE1 PALLET0 DEPOT0) [D:1.0000; C:1.0000]
+             1.0000: (LOAD HOIST1 CRATE0 TRUCK0 DISTRIBUTOR0) [D:1.0000; C:1.0000]
+             1.0000: (LOAD HOIST0 CRATE1 TRUCK1 DEPOT0) [D:1.0000; C:1.0000]
+             2.0000: (DRIVE TRUCK1 DEPOT0 DISTRIBUTOR0) [D:1.0000; C:1.0000]
+             2.0000: (DRIVE TRUCK0 DISTRIBUTOR0 DISTRIBUTOR1) [D:1.0000; C:1.0000]
+             3.0000: (UNLOAD HOIST1 CRATE1 TRUCK1 DISTRIBUTOR0) [D:1.0000; C:1.0000]
+             3.0000: (UNLOAD HOIST2 CRATE0 TRUCK0 DISTRIBUTOR1) [D:1.0000; C:1.0000]
+             4.0000: (DROP HOIST1 CRATE1 PALLET1 DISTRIBUTOR0) [D:1.0000; C:1.0000]
+             4.0000: (DROP HOIST2 CRATE0 PALLET2 DISTRIBUTOR1) [D:1.0000; C:1.0000]
+            
+            
+            Solution found:
+            Total time:      0.03
+            Search time:     0.02
+            Actions:         11
+            Execution cost:  11.00
+            Duration:        5.000
+            Plan quality:    11.000
+            Plan file:       plan_problem-9288Xc4FTm2tFa3I.pddl_1.SOL
+            `;
+
+            // WHEN
+            const parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON });
+            parser.appendBuffer(planText);
+            parser.onPlanFinished();
+            const plans = parser.getPlans();
+
+            // THEN
+            expect(plans, 'plans').to.have.lengthOf(1);
+            {
+                const plan0 = plans[0];
+                expect(plan0.cost, 'plan0 cost').to.equal(11);
+                // expect(plan0.statesEvaluated, 'plan0 states evaluated').to.equal(10);
+                expect(plan0.makespan, 'plan0 makespan').to.equal(5);
+                expect(plan0.steps, 'plan0 should have N actions').to.have.lengthOf(11);
+            }
+        });
+
         it('parses plan metrics in scientific notation', () => {
             // GIVEN
             const metricNumber = -1.23456e-30;

@@ -23,7 +23,7 @@ export interface PddlPlanParserOptions {
  */
 export class PddlPlannerOutputParser {
     private readonly plans: Plan[] = [];
-    public static readonly planStepPattern = /^\s*((\d+|\d+\.\d+)\s*:)?\s*\((.*)\)\s*(\[\s*(\d+|\d+\.\d+)\s*\])?\s*$/gim;
+    public static readonly planStepPattern = /^\s*((\d+|\d+\.\d+)\s*:)?\s*\((.*)\)\s*(\[(?:D:)?\s*(\d+|\d+\.\d+)\s*(?:;\s*C:[\d.]+)?\])?\s*$/gim;
     private readonly planStatesEvaluatedPattern = /^\s*;?\s*States evaluated[\w ]*:[ ]*(\d*)\s*$/i;
     private readonly planCostPattern = /[\w ]*(cost|metric)[^-\w]*:?\s*([+-]?\d*(\.\d+)?|[+-]?\d(\.\d+)?[Ee][+-]?\d+)\s*$/i;
     private planBuilder: PddlPlanBuilder;
@@ -52,7 +52,7 @@ export class PddlPlannerOutputParser {
         while ((nextEndLine = textString.indexOf('\n', lastEndLine)) > -1) {
             const nextLine = textString.substring(lastEndLine, nextEndLine + 1);
             if (nextLine.trim()) {
-                this.appendLine(nextLine);
+                this.appendLine(nextLine.trim());
             }
             lastEndLine = nextEndLine + 1;
         }
@@ -111,8 +111,11 @@ export class PddlPlannerOutputParser {
             if (group = this.planStatesEvaluatedPattern.exec(outputLine)) {
                 this.planBuilder.setStatesEvaluated(parseInt(group[1]));
             }
-            else if (group = this.planCostPattern.exec(outputLine)) {
-                this.planBuilder.setMetric(parseFloat(group[2]));
+            else if (!outputLine.match(/action/i) &&
+                (group = this.planCostPattern.exec(outputLine))) {
+                if (group[2]?.length > 0) {
+                    this.planBuilder.setMetric(parseFloat(group[2]));
+                }
             }
         }
         this.planBuilder.outputText += outputLine;
@@ -132,14 +135,24 @@ export class PddlPlannerOutputParser {
      * and adds the last plan to the collection of plans.
      */
     onPlanFinished(): void {
-        if (this.endOfBufferToBeParsedNextTime.length) {
-            this.appendLine(this.endOfBufferToBeParsedNextTime);
+        if (this.endOfBufferToBeParsedNextTime.trim().length) {
+            this.appendLine(this.endOfBufferToBeParsedNextTime.trim());
             this.endOfBufferToBeParsedNextTime = '';
         }
         if (this.planBuilder.getSteps().length > 0 ||
             this.plans.length < (this.options.minimumPlansExpected ?? 1)) {
             this.plans.push(this.planBuilder.build(this.domain, this.problem));
             this.planBuilder = new PddlPlanBuilder(this.options.epsilon);
+        } else {
+            // patch the previous plan metric and makespan if printed after the plan
+            if (this.plans.length > 0) {
+                const lastPlan = this.plans[this.plans.length - 1];
+                if (this.planBuilder.getMetric() !== undefined 
+                    && !lastPlan.isCostDefined()) {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    lastPlan.cost = this.planBuilder.getMetric()!;
+                }
+            }
         }
         if (this.onPlanReady) {
             this.onPlanReady.apply(this, [this.plans]);
