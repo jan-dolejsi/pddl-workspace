@@ -10,7 +10,7 @@ import { PddlRange, DocumentPositionResolver } from "../DocumentPositionResolver
 import { Util } from "../utils/util";
 
 export function parseParameters(fullSymbolName: string): Parameter[] {
-    const parameterPattern = /((\?[\w]+\s+)+)-\s+([\w][\w-]*)/g;
+    const parameterPattern = /((\?[\w][\w-]*\s+)+)-\s+([\w][\w-]*)/g;
 
     const parameters: Parameter[] = [];
 
