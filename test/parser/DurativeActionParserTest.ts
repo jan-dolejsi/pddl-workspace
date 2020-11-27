@@ -90,5 +90,31 @@ describe('DurativeActionParser', () => {
             expect(action.name).to.equal('action1', 'action name');
             expect(action.effect?.getText()).to.equal('(and (at end (p)))');
         });
+
+        it('parses action parameters with dashes', () => {
+            // GIVEN
+            const actionPddl = `(:durative-action DRIVE-TRUCK
+                :parameters
+                    (?truck - truck
+                    ?loc-from - location
+                    ?loc-to - location
+                    ?driver - driver)
+                :duration (= ?duration 10)
+                :condition
+                    (and (at start (at ?truck ?loc-from))
+                    (over all (driving ?driver ?truck)) (at start (link ?loc-from ?loc-to)))
+                :effect
+                    (and (at start (not (at ?truck ?loc-from))) 
+                    (at end (at ?truck ?loc-to))))
+                `;
+
+            // WHEN
+            const action = createActionParser(actionPddl).getAction();
+
+            // THEN
+            expect(action, 'there should be an action parsed').to.not.be.undefined;
+            expect(action.name).to.equal('DRIVE-TRUCK', 'action name');
+            expect(action.parameters, 'parameters').to.have.length(4);
+        })
     });
 });

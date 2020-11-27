@@ -239,5 +239,18 @@ describe('VariableParser', () => {
             assert.equal(parameters[1].name, 'p2', 'the parameter name should be...');
             assert.equal(parameters[1].type, 'type2', 'the parameter name should be...');
         });
+
+        it('accepts parameter with a dash ?loc-from - location', () => {
+            // GIVEN
+            const predicatePddl = `predicate1 ?loc-from - location`;
+
+            // WHEN
+            const parameters = parseParameters(predicatePddl);
+
+            // THEN
+            expect(parameters, 'parameters').to.have.length(1);
+            expect(parameters[0].name).to.equal('loc-from', 'the parameter name should be...');
+            expect(parameters[0].type).to.equal('location', 'the parameter name should be...');
+        });
     });
 });

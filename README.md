@@ -29,7 +29,7 @@ const planText = `
 ; Cost: 123.456
 ; States evaluated: 2`;
 
-const plan = PddlPlanParser.parseText(planText, epsilon);
+const plan = parser.PddlPlanParser.parseText(planText, epsilon);
 ```
 
 Many more usage scenarios are exercised in the unit tests in the `test` folder.
