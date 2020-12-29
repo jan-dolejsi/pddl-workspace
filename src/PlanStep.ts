@@ -18,6 +18,18 @@ export class PlanStep {
         this.objects = nameFragments.slice(1);
     }
 
+    static clone(planStep: PlanStep): PlanStep {
+        return new PlanStep(
+            planStep.time,
+            planStep.fullActionName,
+            planStep.isDurative,
+            planStep.duration,
+            planStep.lineIndex,
+            planStep.commitment,
+            planStep.iterations
+        );
+    }
+
     getActionName(): string {
         return this.actionName;
     }

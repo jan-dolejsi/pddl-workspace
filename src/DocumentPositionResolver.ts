@@ -70,6 +70,10 @@ export class PddlRange {
         return new PddlRange({ start: new PddlPosition(line, 0), end: new PddlPosition(line, Number.MAX_VALUE) });
     }
 
+    static createUnknown(): PddlRange {
+        return this.createFullLineRange(Number.NaN);
+    }
+
     includes(positionAtOffset: PddlPosition): boolean {
         return this.start.atOrBefore(positionAtOffset) && positionAtOffset.atOrBefore(this.end);
     }

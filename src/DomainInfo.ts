@@ -3,11 +3,14 @@
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
+/* eslint-disable @typescript-eslint/no-use-before-define */
+
 import { DirectionalGraph } from "./utils/DirectionalGraph";
+import { asSerializable, objToStrMap } from "./utils/serializationUtils";
 import { FileInfo } from "./FileInfo";
 import { Variable, PddlLanguage, ObjectInstance, Parameter } from "./language";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
-import { PddlRange, DocumentPositionResolver } from "./DocumentPositionResolver";
+import { PddlRange, DocumentPositionResolver, SimpleDocumentPositionResolver } from "./DocumentPositionResolver";
 import { PddlBracketNode } from "./parser/PddlSyntaxNode";
 import { PddlTokenType } from "./parser/PddlTokenizer";
 import { Constraint } from "./constraints";
@@ -50,6 +53,25 @@ export class TypeObjects {
 export class TypeObjectMap {
     private typeNameToTypeObjectMap = new Map<string, TypeObjects>();
     private objectNameToTypeObjectMap = new Map<string, TypeObjects>();
+
+    /**
+     * Re-hydrates de-serialized type-object map
+     * @param other de-serialized
+     */
+    static clone(other: unknown): TypeObjectMap {
+        const map = new TypeObjectMap();
+        const otherMap = objToStrMap(other);
+        otherMap.forEach((typeObjects: { type: string; objects: string[]}) => {
+            map.addAll(typeObjects.type, typeObjects.objects);
+        });
+
+        return map;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    toJSON(_key: string): unknown {
+        return asSerializable(this.typeNameToTypeObjectMap);
+    }
 
     get length(): number {
         return this.typeNameToTypeObjectMap.size;
@@ -122,6 +144,38 @@ export class DomainInfo extends FileInfo {
 
     constructor(fileUri: URI, version: number, domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
         super(fileUri, version, domainName, syntaxTree, positionResolver);
+    }
+
+    /**
+     * Copy constructor for re-constructing the domain from a serialized form.
+     * @param domain de-serialized domain
+     */
+    static clone(domain: DomainInfo): DomainInfo {
+        const clonedDomain = new DomainInfo(domain.fileUri, Number.NaN, domain.name,
+            PddlSyntaxTree.EMPTY, new SimpleDocumentPositionResolver(''))
+        
+        clonedDomain.setActions(domain.actions.map(a => this.cloneAction(a)));
+        clonedDomain.setConstants(TypeObjectMap.clone(domain.constants));
+        clonedDomain.setConstraints(domain.constraints);
+        clonedDomain.setDerived(domain.derived);
+        domain.events && clonedDomain.setEvents(domain.events);
+        clonedDomain.setFunctions(domain.functions);
+        clonedDomain.setPredicates(domain.predicates);
+        domain.processes && clonedDomain.setProcesses(domain.processes);
+        // todo: domain.requirements && clonedDomain.setRequirements(domain.getRequirements());
+        clonedDomain.setTypeInheritance(DirectionalGraph.fromGraph(domain.typeInheritance));
+
+        return clonedDomain;
+    }
+
+    static cloneAction(action: Action): Action {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const actionAny = action as any;
+        if (actionAny.hasOwnPropery('duration')) {
+            return new DurativeAction(action.name, action.parameters, PddlRange.createUnknown());
+        } else {
+            return new InstantAction(action.name, action.parameters, PddlRange.createUnknown());
+        }
     }
 
     getLanguage(): PddlLanguage {

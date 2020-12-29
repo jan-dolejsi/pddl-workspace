@@ -9,7 +9,7 @@ import { HappeningType } from './HappeningsInfo';
 import { DomainInfo } from './DomainInfo';
 
 export class Plan {
-    makespan: number;
+    private _makespan: number;
     statesEvaluated?: number;
     private _cost?: number;
 
@@ -17,16 +17,42 @@ export class Plan {
         public readonly problem?: ProblemInfo,
         public readonly now?: number,
         public readonly helpfulActions?: HelpfulAction[]) {
-        this.makespan = steps.length ? Math.max(...steps.map(step => step.getEndTime())) : 0;
+        this._makespan = steps.length ? Math.max(...steps.map(step => step.getEndTime())) : 0;
+    }
+
+    /**
+     * Copy constructor for re-constructing the plan from a serialized form.
+     * @param plan serialized plan
+     */
+    public static clone(plan: Plan): Plan {
+        const clonedDomain = plan.domain && DomainInfo.clone(plan.domain);
+        const clonedProblem = plan.problem && ProblemInfo.clone(plan.problem, plan.domain?.name ?? 'unknown-domain');
+
+        const clonedPlan = new Plan(
+            plan.steps.map(s => PlanStep.clone(s)),
+            clonedDomain,
+            clonedProblem,
+            plan.now,
+            plan.helpfulActions
+        );
+
+        plan._cost && (clonedPlan.cost = plan._cost);
+        clonedPlan.statesEvaluated = plan.statesEvaluated;
+
+        return clonedPlan;
     }
 
     get cost(): number {
         // if cost was not output by the planning engine, use the plan makespan
-        return this._cost ?? this.makespan;
+        return this._cost ?? this._makespan;
     }
 
     set cost(cost: number) {
         this._cost = cost;
+    }
+
+    get makespan(): number {
+        return this._makespan;
     }
 
     isCostDefined(): boolean {

@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "mocha -- out/test/**/*.js",
+    "test": "mocha -- out/test/**/*Test.js",
     "pretest": "eslint ./src/**/*.ts && npm run compile",
     "build": "tsc",
     "compile": "tsc && npm run copyToDist",
