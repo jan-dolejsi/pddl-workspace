@@ -171,7 +171,7 @@ export class DomainInfo extends FileInfo {
     static cloneAction(action: Action): Action {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const actionAny = action as any;
-        if (actionAny.hasOwnPropery('duration')) {
+        if ('duration' in actionAny) {
             return new DurativeAction(action.name, action.parameters, PddlRange.createUnknown());
         } else {
             return new InstantAction(action.name, action.parameters, PddlRange.createUnknown());
