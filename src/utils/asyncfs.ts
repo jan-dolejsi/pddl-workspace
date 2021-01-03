@@ -5,17 +5,6 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import util = require('util');
-
-export const readFile = util.promisify(fs.readFile);
-export const writeFile = util.promisify(fs.writeFile);
-export const write = util.promisify(fs.write);
-export const exists = util.promisify(fs.exists);
-export const readdir = util.promisify(fs.readdir);
-export const unlink = util.promisify(fs.unlink);
-export const rmdir = util.promisify(fs.rmdir);
-export const stat = util.promisify(fs.stat);
-export const copyFile = util.promisify(fs.copyFile);
 
 /**
  * Creates directory (optionally recursively) 
@@ -41,7 +30,7 @@ export async function mkdirIfDoesNotExist(path: fs.PathLike, options: fs.MakeDir
  * @returns file name array with absolute path
  */
 export async function getFiles(dir: string): Promise<string[]> {
-    const dirents = await readdir(dir, { withFileTypes: true });
+    const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
     const childrenFilePromises = dirents.map(dirent => {
         const res = path.resolve(dir, dirent.name);
         return dirent.isDirectory() ? getFiles(res) : Promise.resolve([res]);
@@ -55,11 +44,25 @@ export async function getFiles(dir: string): Promise<string[]> {
  * @param directory directory to test
  */
 export async function isEmpty(directory: string): Promise<boolean> {
-    const stats = await stat(directory);
+    const stats = await fs.promises.stat(directory);
     if (!stats.isDirectory()) {
         throw new Error("Not a directory: " + directory);
     }
 
-    const dirContent = await readdir(directory);
+    const dirContent = await fs.promises.readdir(directory);
     return dirContent.length === 0;
+}
+
+export async function exists(path: fs.PathLike): Promise<boolean> {
+    try {
+        await fs.promises.stat(path);
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            return false;
+        } else {
+            throw err;
+        }
+    }
+
+    return true;
 }

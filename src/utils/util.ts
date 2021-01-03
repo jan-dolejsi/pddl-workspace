@@ -3,11 +3,6 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as tmp from 'tmp-promise';
-import fs = require('fs');
-import * as afs from './asyncfs';
-
-
 export class Util {
 
     /**
@@ -25,26 +20,6 @@ export class Util {
             && !path.includes(" -jar ")
             && !path.includes(" -javaagent:")
             && !path.startsWith("node ");
-    }
-
-    static toFileSync(prefix: string, suffix: string, text: string): string {
-        const tempFile = tmp.fileSync({ mode: 0o644, prefix: prefix + '-', postfix: suffix });
-        fs.writeSync(tempFile.fd, text, 0, 'utf8');
-        return tempFile.name;
-    }
-
-    static async toFile(prefix: string, suffix: string, text: string): Promise<string> {
-        const tempFile = await tmp.file({ mode: 0o644, prefix: prefix + '-', postfix: suffix });
-        await afs.write(tempFile.fd, text, 0, 'utf8');
-        return tempFile.path;
-    }
-
-    static toPddlFileSync(prefix: string, text: string): string {
-        return Util.toFileSync(prefix, '.pddl', text);
-    }
-
-    static async toPddlFile(prefix: string, text: string): Promise<string> {
-        return Util.toFile(prefix, '.pddl', text);
     }
 
     /**

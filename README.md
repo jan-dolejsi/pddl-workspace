@@ -205,3 +205,7 @@ Starting from version 3.5.0, the `PlannerProvider` may optionally also implement
         return new PlannerExecutable(`java -jar ${configuration.path}`, plannerOptions, configuration.syntax, workingDirectory);
     }
 ```
+
+## Compiling and contributing
+
+Install node.js 12.14.1.

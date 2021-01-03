@@ -10,6 +10,9 @@ import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { DocumentPositionResolver } from "./DocumentPositionResolver";
 import { PddlLanguage } from "./language";
 import { URI } from "vscode-uri";
+import { ProblemInfo } from "./ProblemInfo";
+import { Plan } from "./Plan";
+import { DomainInfo } from "./DomainInfo";
 /**
  * Plan file.
  */
@@ -49,5 +52,8 @@ export class PlanInfo extends FileInfo {
     }
     getHappenings(): Happening[] {
         return PlanInfo.getHappenings(this.getSteps());
+    }
+    getPlan(domain: DomainInfo, problem: ProblemInfo): Plan {
+        return new Plan(this.getSteps(), domain, problem);
     }
 }

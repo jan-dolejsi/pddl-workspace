@@ -6,7 +6,7 @@
 import * as process from 'child_process';
 import * as path from 'path';
 import * as nunjucks from 'nunjucks';
-import * as afs from './utils/asyncfs';
+import * as fs from 'fs';
 
 export interface OutputAdaptor {
     appendLine(text: string): void;
@@ -204,7 +204,7 @@ export class NunjucksPreProcessor extends PreProcessor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async transform(input: string, workingDirectory: string, _outputWindow: OutputAdaptor): Promise<string> {
         const dataPath = path.join(workingDirectory, this.dataFileName);
-        const dataText = await afs.readFile(dataPath);
+        const dataText = await fs.promises.readFile(dataPath);
         let data: unknown;
 
         try {
