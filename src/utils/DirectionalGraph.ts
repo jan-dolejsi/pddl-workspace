@@ -8,7 +8,22 @@
  */
 export class DirectionalGraph {
     // vertices and edges stemming from them
-    verticesAndEdges: [string, string[]][] = [];
+    private verticesAndEdges: [string, string[]][] = [];
+
+    /**
+     * Constructor, optionally copy-constructor.
+     * @param verticesAndEdges optional list of vertex-edges tuples - use as a copy constructor to re-hydrate from de-serialized object
+     */
+    constructor(verticesAndEdges?: [string, string[]][]) {
+        if (verticesAndEdges) {
+            this.verticesAndEdges = verticesAndEdges;
+        }
+    }
+
+    static fromGraph(graph: DirectionalGraph): DirectionalGraph {
+        return new DirectionalGraph(graph.verticesAndEdges);
+    }
+
     /**
      * Get all vertices.
      */

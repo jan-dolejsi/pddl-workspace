@@ -9,5 +9,5 @@
 			]
 		}
 	},
-    "mocha.files.glob": "out/test/**/*.js"
+	"mocha.files.glob": "out/test/**/*Test.js"
 }

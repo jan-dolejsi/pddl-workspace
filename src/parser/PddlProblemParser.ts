@@ -48,13 +48,13 @@ export class PddlProblemParser extends PddlFileParser<ProblemInfo> {
     }
 
     async tryParse(fileUri: URI, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<ProblemInfo | undefined> {
-        const filePath = fileUri.fsPath;
-        const workingDirectory = dirname(filePath);
         let preProcessor: PreProcessor | undefined;
 
         if (this.problemPreParser) {
             try {
                 preProcessor = this.problemPreParser.createPreProcessor(fileText);
+                const filePath = fileUri.fsPath;
+                const workingDirectory = dirname(filePath);
                 fileText = await this.problemPreParser.process(preProcessor!, fileText, workingDirectory);
             } catch (ex) {
                 const problemInfo = new ProblemInfo(fileUri, fileVersion, "unknown", "unknown", PddlSyntaxTree.EMPTY, positionResolver);

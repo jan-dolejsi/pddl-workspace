@@ -18,6 +18,9 @@ import { DomainInfo } from "./DomainInfo";
  */
 export class PlanInfo extends FileInfo {
     steps: PlanStep[] = [];
+    private _metric: number | undefined;
+    private _statesEvaluated: number | undefined;
+
     constructor(fileUri: URI, version: number, public problemName: string, public domainName: string, text: string, positionResolver: DocumentPositionResolver) {
         // note we use the `problemName` as the plan name as the plan does not have any declared name
         super(fileUri, version, problemName, PddlSyntaxTree.EMPTY, positionResolver);
@@ -32,6 +35,21 @@ export class PlanInfo extends FileInfo {
     getSteps(): PlanStep[] {
         return this.steps;
     }
+
+    get metric(): number | undefined {
+        return this._metric;
+    }
+    set metric(metric: number | undefined){
+        this._metric = metric;
+    }
+
+    get statesEvaluated(): number | undefined {
+        return this._statesEvaluated;
+    }
+    set statesEvaluated(statesEvaluated: number | undefined){
+        this._statesEvaluated = statesEvaluated;
+    }
+    
     isPlan(): boolean {
         return true;
     }

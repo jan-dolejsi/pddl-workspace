@@ -9,28 +9,69 @@ import { HappeningType } from './HappeningsInfo';
 import { DomainInfo } from './DomainInfo';
 
 export class Plan {
-    makespan: number;
+    private _makespan: number;
     statesEvaluated?: number;
-    private _cost?: number;
+    private _metric?: number;
 
     constructor(public readonly steps: PlanStep[], public readonly domain?: DomainInfo,
         public readonly problem?: ProblemInfo,
         public readonly now?: number,
         public readonly helpfulActions?: HelpfulAction[]) {
-        this.makespan = steps.length ? Math.max(...steps.map(step => step.getEndTime())) : 0;
+        this._makespan = steps.length ? Math.max(...steps.map(step => step.getEndTime())) : 0;
     }
 
+    /**
+     * Copy constructor for re-constructing the plan from a serialized form.
+     * @param plan serialized plan
+     */
+    public static clone(plan: Plan): Plan {
+        const clonedDomain = plan.domain && DomainInfo.clone(plan.domain);
+        const clonedProblem = plan.problem && ProblemInfo.clone(plan.problem, plan.domain?.name ?? 'unknown-domain');
+
+        const clonedPlan = new Plan(
+            plan.steps.map(s => PlanStep.clone(s)),
+            clonedDomain,
+            clonedProblem,
+            plan.now,
+            plan.helpfulActions
+        );
+
+        plan._metric && (clonedPlan.metric = plan._metric);
+        clonedPlan.statesEvaluated = plan.statesEvaluated;
+
+        return clonedPlan;
+    }
+
+    /** @deprecated use `metric` */
     get cost(): number {
+        return this.metric;
+    }
+
+    /** @deprecated use `metric` */
+    set cost(metric: number) {
+        this.metric = metric;
+    }
+
+    get metric(): number {
         // if cost was not output by the planning engine, use the plan makespan
-        return this._cost ?? this.makespan;
+        return this._metric ?? this._makespan;
     }
 
-    set cost(cost: number) {
-        this._cost = cost;
+    set metric(metric: number) {
+        this._metric = metric;
     }
 
+    get makespan(): number {
+        return this._makespan;
+    }
+
+    isMetricDefined(): boolean {
+        return this._metric !== undefined;
+    }
+
+    /** @deprecated use isMetricDefined */
     isCostDefined(): boolean {
-        return this._cost !== undefined;
+        return this.isMetricDefined();
     }
 
     /**

@@ -6,7 +6,7 @@
 import { FileInfo } from "./FileInfo";
 import { PreProcessor } from "./PreProcessors";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
-import { DocumentPositionResolver, PddlRange } from "./DocumentPositionResolver";
+import { DocumentPositionResolver, PddlRange, SimpleDocumentPositionResolver } from "./DocumentPositionResolver";
 import { TypeObjectMap } from "./DomainInfo";
 import { Constraint } from "./constraints";
 import { PddlLanguage } from "./language";
@@ -102,6 +102,24 @@ export class ProblemInfo extends FileInfo {
 
     constructor(fileUri: URI, version: number, problemName: string, public domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
         super(fileUri, version, problemName, syntaxTree, positionResolver);
+    }
+
+    /**
+     * Copy constructor for re-constructing the problem from a serialized form.
+     * @param problem de-serialized problem
+     * @param domainName domain name
+     */
+    static clone(problem: ProblemInfo, domainName: string): ProblemInfo {
+        const clonedProblem = new ProblemInfo(problem.fileUri, Number.NaN, problem.name, domainName,
+            PddlSyntaxTree.EMPTY, new SimpleDocumentPositionResolver(''));
+
+        clonedProblem.setConstraints(problem.constraints);
+        clonedProblem.setInits(problem.inits);
+        clonedProblem.setMetrics(problem.metrics);
+        clonedProblem.setObjects(TypeObjectMap.clone(problem.objects));
+        clonedProblem.setSupplyDemands(problem.supplyDemands);
+        
+        return clonedProblem;
     }
 
     setPreParsingPreProcessor(preProcessor: PreProcessor): void {

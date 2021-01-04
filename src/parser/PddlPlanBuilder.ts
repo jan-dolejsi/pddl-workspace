@@ -7,7 +7,6 @@ import { Plan } from '../Plan';
 import { PlanStep } from '../PlanStep';
 import { ProblemInfo } from '../ProblemInfo';
 import { DomainInfo } from '../DomainInfo';
-import { PddlPlannerOutputParser } from './PddlPlannerOutputParser';
 
 /**
  * Utility for incremental plan building as it is being parsed.
@@ -19,24 +18,8 @@ export class PddlPlanBuilder {
     outputText = ""; // for information only
     parsingPlan = false;
     private makespan = 0;
-    constructor(private epsilon: number) { }
-    parse(planLine: string, lineIndex: number | undefined): PlanStep | undefined {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        PddlPlannerOutputParser.planStepPattern.lastIndex = 0;
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        const group = PddlPlannerOutputParser.planStepPattern.exec(planLine);
-        if (group) {
-            // this line is a valid plan step
-            const time = group[2] ? parseFloat(group[2]) : this.getMakespan();
-            const action = group[3];
-            const isDurative = group[5] ? true : false;
-            const duration = isDurative ? parseFloat(group[5]) : this.epsilon;
-            return new PlanStep(time, action, isDurative, duration, lineIndex);
-        }
-        else {
-            return undefined;
-        }
-    }
+    constructor(public readonly epsilon: number) { }
+
     add(step: PlanStep): void {
         if (this.makespan < step.getEndTime()) {
             this.makespan = step.getEndTime();
@@ -50,7 +33,7 @@ export class PddlPlanBuilder {
         const plan = new Plan(this.steps, domain, problem);
         plan.statesEvaluated = this.statesEvaluated;
         if (this.metric !== undefined) {
-            plan.cost = this.metric;
+            plan.metric = this.metric;
         }
         return plan;
     }

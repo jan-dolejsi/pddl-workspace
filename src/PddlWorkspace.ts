@@ -266,7 +266,7 @@ export class PddlWorkspace extends EventEmitter {
             return unknownFile;
         }
         else if (language === PddlLanguage.PLAN) {
-            return PddlPlanParser.parseText(fileText, this.epsilon, fileUri, fileVersion, positionResolver);
+            return new PddlPlanParser().parseText(fileText, this.epsilon, fileUri, fileVersion, positionResolver);
         }
         else if (language === PddlLanguage.HAPPENINGS) {
             return new HappeningsParser().parseHappenings(fileUri, fileVersion, fileText, this.epsilon, positionResolver);
