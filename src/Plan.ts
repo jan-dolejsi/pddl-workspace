@@ -11,7 +11,7 @@ import { DomainInfo } from './DomainInfo';
 export class Plan {
     private _makespan: number;
     statesEvaluated?: number;
-    private _cost?: number;
+    private _metric?: number;
 
     constructor(public readonly steps: PlanStep[], public readonly domain?: DomainInfo,
         public readonly problem?: ProblemInfo,
@@ -36,27 +36,42 @@ export class Plan {
             plan.helpfulActions
         );
 
-        plan._cost && (clonedPlan.cost = plan._cost);
+        plan._metric && (clonedPlan.metric = plan._metric);
         clonedPlan.statesEvaluated = plan.statesEvaluated;
 
         return clonedPlan;
     }
 
+    /** @deprecated use `metric` */
     get cost(): number {
-        // if cost was not output by the planning engine, use the plan makespan
-        return this._cost ?? this._makespan;
+        return this.metric;
     }
 
-    set cost(cost: number) {
-        this._cost = cost;
+    /** @deprecated use `metric` */
+    set cost(metric: number) {
+        this.metric = metric;
+    }
+
+    get metric(): number {
+        // if cost was not output by the planning engine, use the plan makespan
+        return this._metric ?? this._makespan;
+    }
+
+    set metric(metric: number) {
+        this._metric = metric;
     }
 
     get makespan(): number {
         return this._makespan;
     }
 
+    isMetricDefined(): boolean {
+        return this._metric !== undefined;
+    }
+
+    /** @deprecated use isMetricDefined */
     isCostDefined(): boolean {
-        return this._cost !== undefined;
+        return this.isMetricDefined();
     }
 
     /**

@@ -18,8 +18,10 @@ export * from './PddlStructure';
 export * from './PddlTokenizer';
 
 export * from './PddlPlanParser';
+export * from './PddlPlanBuilder';
 export * from './PddlPlannerOutputParser';
 export * from './PlanValuesParser';
+export * from './NormalizingPddlPlanParser';
 
 export * from './HappeningsParser';
 export * from './PlanHappeningsBuilder';

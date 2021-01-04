@@ -15,31 +15,38 @@ describe('PddlPlanParser', () => {
 
         it('parses non-temporal plan', () => {
             // GIVEN
+            const makespan = 0.001;
+            const cost = 0.12345;
+            const states = 1;
+
             const planText = `;;!domain: domain1
             ;;!problem: problem1
             
             0.00100: (a)
             
-            ; Makespan: 0.001
-            ; Cost: 0.001
-            ; States evaluated: 1`;
+            ; Makespan: ${makespan}
+            ; Cost: ${cost}
+            ; States evaluated: ${states}`;
 
             const fileUri = URI.parse('file://directory/file1.plan');
             const epsilon = 0.1;
             // WHEN
-            const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);
+            const version = 33;
+            const planInfo = new PddlPlanParser().parseText(planText, epsilon, fileUri, version);
 
             // THEN
             expect(planInfo).to.not.be.undefined;;
-            assert.strictEqual(planInfo?.fileUri, fileUri);
+            expect(planInfo?.fileUri).to.equal(fileUri);
             const expectedHappening = new Happening(0.001, HappeningType.INSTANTANEOUS, 'a', 0, 0);
-            assert.deepStrictEqual(planInfo?.getHappenings(), [expectedHappening], 'there should be 1 happening');
-            assert.strictEqual(planInfo?.getLanguage(), PddlLanguage.PLAN, 'the language should be plan');
-            assert.deepStrictEqual(planInfo?.isPlan(), true, 'this should be a plan');
-            assert.deepStrictEqual(planInfo?.getParsingProblems(), [], 'there should be no parsing issues');
-            assert.deepStrictEqual(planInfo?.getVersion(), 33, 'version');
+            expect(planInfo?.getHappenings()).to.deep.equal([expectedHappening], 'there should be 1 happening');
+            expect(planInfo?.getLanguage()).to.equal(PddlLanguage.PLAN, 'the language should be plan');
+            expect(planInfo?.isPlan()).to.equal(true, 'this should be a plan');
+            expect(planInfo?.getParsingProblems()).to.deep.equal([], 'there should be no parsing issues');
+            expect(planInfo?.getVersion()).to.equal(version, 'version');
             const expectedStep = new PlanStep(0.001, 'a', false, epsilon, 3);
-            assert.deepStrictEqual(planInfo?.getSteps(), [expectedStep], 'this should be a plan');
+            expect(planInfo?.getSteps()).to.deep.equal([expectedStep], 'this should be a plan');
+            expect(planInfo?.metric).to.equal(cost, "cost");
+            expect(planInfo?.statesEvaluated).to.equal(states, "states evaluated");
         });
 
         it('parses temporal plan', () => {
@@ -56,7 +63,7 @@ describe('PddlPlanParser', () => {
             const fileUri = URI.parse('file://directory/file1.plan');
             const epsilon = 0.1;
             // WHEN
-            const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);
+            const planInfo = new PddlPlanParser().parseText(planText, epsilon, fileUri, 33);
 
             // THEN
             expect(planInfo).to.not.be.undefined;;
@@ -122,7 +129,7 @@ describe('PddlPlanParser', () => {
             const fileUri = URI.parse('file://directory/file1.plan');
             const epsilon = 0.1;
             // WHEN
-            const planInfo = PddlPlanParser.parseText(planText, epsilon, fileUri, 33);
+            const planInfo = new PddlPlanParser().parseText(planText, epsilon, fileUri, 33);
 
             // THEN
             expect(planInfo).to.not.be.undefined;;

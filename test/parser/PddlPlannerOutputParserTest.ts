@@ -62,7 +62,7 @@ describe('PddlPlannerOutputParser', () => {
             expect(plans).to.have.length(1, 'there should be one empty plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, duration + startTime, 'plan makespan');
-            assert.strictEqual(plan.cost, metricNumber, 'plan cost');
+            assert.strictEqual(plan.metric, metricNumber, 'plan cost');
             expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), startTime, 'start time');
             assert.strictEqual(plan.steps[0].getActionName(), actionName, 'action name');
@@ -89,7 +89,7 @@ describe('PddlPlannerOutputParser', () => {
             // THEN
             expect(plans).to.have.length(1, 'there should be one plan');
             const plan = plans[0];
-            assert.strictEqual(plan.cost, metricNumber, 'plan cost');
+            assert.strictEqual(plan.metric, metricNumber, 'plan cost');
             expect(plan.steps).to.have.length(1, 'plan should have one action');
         });
 
@@ -111,7 +111,7 @@ describe('PddlPlannerOutputParser', () => {
             // THEN
             expect(plans, 'there should be one empty plan').to.have.lengthOf(1);
             const plan = plans[0];
-            expect(plan.cost, 'plan cost').to.equal(metricNumber);
+            expect(plan.metric, 'plan cost').to.equal(metricNumber);
             expect(plan.steps, 'plan should have one action').to.have.lengthOf(1);
         });
 
@@ -248,21 +248,21 @@ describe('PddlPlannerOutputParser', () => {
             expect(plans, 'plans').to.have.lengthOf(9);
             {
                 const plan0 = plans[0];
-                expect(plan0.cost, 'plan0 cost').to.equal(515);
+                expect(plan0.metric, 'plan0 cost').to.equal(515);
                 expect(plan0.statesEvaluated, 'plan0 states evaluated').to.equal(10);
                 expect(plan0.makespan, 'plan0 makespan').to.equal(260.002);
                 expect(plan0.steps, 'plan0 should have one action').to.have.lengthOf(9);
             }
             {
                 const plan1 = plans[1];
-                expect(plan1.cost, 'plan1 cost').to.equal(490);
+                expect(plan1.metric, 'plan1 cost').to.equal(490);
                 expect(plan1.statesEvaluated, 'plan1 states evaluated').to.equal(413);
                 expect(plan1.makespan, 'plan1 makespan').to.equal(2150.002);
                 expect(plan1.steps, 'plan1 should have one action').to.have.lengthOf(9);
             }
             {
                 const plan8 = plans[8];
-                expect(plan8.cost, 'plan8 cost').to.equal(50);
+                expect(plan8.metric, 'plan8 cost').to.equal(50);
                 expect(plan8.statesEvaluated, 'plan8 states evaluated').to.equal(40250);
                 expect(plan8.makespan, 'plan8 makespan').to.equal(2150.002);
                 expect(plan8.steps, 'plan8 should have one action').to.have.lengthOf(8);
@@ -388,21 +388,21 @@ describe('PddlPlannerOutputParser', () => {
             expect(plans, 'plans').to.have.lengthOf(3);
             {
                 const plan0 = plans[0];
-                expect(plan0.cost, 'plan0 cost').to.equal(264.006);
+                expect(plan0.metric, 'plan0 cost').to.equal(264.006);
                 expect(plan0.statesEvaluated, 'plan0 states evaluated').to.equal(187);
                 expect(plan0.makespan, 'plan0 makespan').to.equal(264.006);
                 expect(plan0.steps, 'plan0 should have one action').to.have.lengthOf(18);
             }
             {
                 const plan1 = plans[1];
-                expect(plan1.cost, 'plan1 cost').to.equal(258.017);
+                expect(plan1.metric, 'plan1 cost').to.equal(258.017);
                 expect(plan1.statesEvaluated, 'plan1 states evaluated').to.equal(1193);
                 expect(plan1.makespan, 'plan1 makespan').to.equal(258.017);
                 expect(plan1.steps, 'plan1 should have one action').to.have.lengthOf(19);
             }
             {
                 const plan2 = plans[2];
-                expect(plan2.cost, 'plan2 cost').to.equal(227.008);
+                expect(plan2.metric, 'plan2 cost').to.equal(227.008);
                 expect(plan2.statesEvaluated, 'plan2 states evaluated').to.equal(2983);
                 expect(plan2.makespan, 'plan2 makespan').to.equal(227.008);
                 expect(plan2.steps, 'plan2 should have one action').to.have.lengthOf(19);
@@ -475,7 +475,7 @@ describe('PddlPlannerOutputParser', () => {
             expect(plans, 'plans').to.have.lengthOf(1);
             {
                 const plan0 = plans[0];
-                expect(plan0.cost, 'plan0 cost').to.equal(11);
+                expect(plan0.metric, 'plan0 cost').to.equal(11);
                 // expect(plan0.statesEvaluated, 'plan0 states evaluated').to.equal(10);
                 expect(plan0.makespan, 'plan0 makespan').to.equal(5);
                 expect(plan0.steps, 'plan0 should have N actions').to.have.lengthOf(11);
@@ -501,7 +501,7 @@ describe('PddlPlannerOutputParser', () => {
             expect(plans, 'there should be one plan').to.have.lengthOf(1);
             const plan = plans[0];
             expect(plan.makespan, 'plan makespan').to.equal(duration + startTime);
-            expect(plan.cost, 'plan cost').to.be.closeTo(metricNumber, 1e-40);
+            expect(plan.metric, 'plan cost').to.be.closeTo(metricNumber, 1e-40);
             expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), startTime, 'start time');
             assert.strictEqual(plan.steps[0].getActionName(), actionName, 'action name');
@@ -543,7 +543,7 @@ describe('PddlPlannerOutputParser', () => {
             expect(plans).to.have.length(1, 'there should be one empty plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, 0, 'plan makespan');
-            assert.strictEqual(plan.cost, 0, 'plan metric');
+            assert.strictEqual(plan.metric, 0, 'plan metric');
             assert.strictEqual(plan.statesEvaluated, 10, 'states evaluated');
         });
 
@@ -592,7 +592,7 @@ describe('PddlPlannerOutputParser', () => {
             expect(plans).to.have.length(1, 'there should be one plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, 10807.2, 'plan makespan');
-            assert.strictEqual(plan.cost, 10807.2, 'plan metric');
+            assert.strictEqual(plan.metric, 10807.2, 'plan metric');
             assert.strictEqual(plan.statesEvaluated, 51, 'states evaluated');
             expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), 10807.2, 'start time');
@@ -662,7 +662,7 @@ describe('PddlPlannerOutputParser', () => {
             expect(plans).to.have.length(1, 'there should be one plan');
             const plan = plans[0];
             assert.strictEqual(plan.makespan, 60+60*60, 'plan makespan');
-            assert.strictEqual(plan.cost, 60+60*60, 'plan metric');
+            assert.strictEqual(plan.metric, 60+60*60, 'plan metric');
             assert.strictEqual(plan.statesEvaluated, 51, 'states evaluated');
             expect(plan.steps).to.have.length(1, 'plan should have one action');
             assert.strictEqual(plan.steps[0].getStartTime(), 60, 'start time');

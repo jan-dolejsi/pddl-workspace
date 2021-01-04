@@ -11,6 +11,7 @@ import { SimpleDocumentPositionResolver } from '../DocumentPositionResolver';
 import { XmlPlanBuilder } from "./XmlPlanBuilder";
 import { PddlPlanBuilder } from "./PddlPlanBuilder";
 import { URI } from 'vscode-uri';
+import { PddlPlanParser } from './PddlPlanParser';
 
 export interface PddlPlanParserOptions {
     epsilon: number;
@@ -23,9 +24,7 @@ export interface PddlPlanParserOptions {
  */
 export class PddlPlannerOutputParser {
     private readonly plans: Plan[] = [];
-    public static readonly planStepPattern = /^\s*((\d+|\d+\.\d+)\s*:)?\s*\((.*)\)\s*(\[(?:D:)?\s*(\d+|\d+\.\d+)\s*(?:;\s*C:[\d.]+)?\])?\s*$/gim;
-    private readonly planStatesEvaluatedPattern = /^\s*;?\s*States evaluated[\w ]*:[ ]*(\d*)\s*$/i;
-    private readonly planCostPattern = /[\w ]*(cost|metric)[^-\w]*:?\s*([+-]?\d*(\.\d+)?|[+-]?\d(\.\d+)?[Ee][+-]?\d+)\s*$/i;
+    private pddlPlanParser: PddlPlanParser;
     private planBuilder: PddlPlanBuilder;
     private endOfBufferToBeParsedNextTime = '';
     private xmlPlanBuilder: XmlPlanBuilder | undefined;
@@ -33,6 +32,7 @@ export class PddlPlannerOutputParser {
 
     constructor(private domain: DomainInfo, private problem: ProblemInfo, public readonly options: PddlPlanParserOptions, private onPlanReady?: (plans: Plan[]) => void) {
         this.planBuilder = new PddlPlanBuilder(options.epsilon);
+        this.pddlPlanParser = new PddlPlanParser();
     }
     setPlanMetaData(makespan: number, metric: number, statesEvaluated: number, _elapsedTimeInSeconds: number, planTimeScale: number): void {
         this.planBuilder.setMakespan(makespan);
@@ -94,7 +94,7 @@ export class PddlPlannerOutputParser {
             }
             return;
         }
-        const planStep = this.planBuilder.parse(outputLine, undefined);
+        const planStep = this.pddlPlanParser.parse(outputLine, undefined, this.planBuilder);
         if (planStep) {
             // this line is a plan step
             this.appendStep(planStep);
@@ -105,18 +105,7 @@ export class PddlPlannerOutputParser {
                 this.planBuilder.parsingPlan = false;
                 this.onPlanFinished();
             }
-            let group: RegExpExecArray | null;
-            this.planStatesEvaluatedPattern.lastIndex = 0;
-            this.planCostPattern.lastIndex = 0;
-            if (group = this.planStatesEvaluatedPattern.exec(outputLine)) {
-                this.planBuilder.setStatesEvaluated(parseInt(group[1]));
-            }
-            else if (!outputLine.match(/action/i) &&
-                (group = this.planCostPattern.exec(outputLine))) {
-                if (group[2]?.length > 0) {
-                    this.planBuilder.setMetric(parseFloat(group[2]));
-                }
-            }
+            this.pddlPlanParser.parsePlanQuality(outputLine, this.planBuilder);
         }
         this.planBuilder.outputText += outputLine;
     }
@@ -148,9 +137,9 @@ export class PddlPlannerOutputParser {
             if (this.plans.length > 0) {
                 const lastPlan = this.plans[this.plans.length - 1];
                 if (this.planBuilder.getMetric() !== undefined 
-                    && !lastPlan.isCostDefined()) {
+                    && !lastPlan.isMetricDefined()) {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    lastPlan.cost = this.planBuilder.getMetric()!;
+                    lastPlan.metric = this.planBuilder.getMetric()!;
                 }
             }
         }

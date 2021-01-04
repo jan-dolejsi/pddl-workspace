@@ -31,11 +31,11 @@ describe("Plan", () => {
             const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
             problem.setObjects(new TypeObjectMap().add("type1", "obj1"));
 
-            const cost = 123.456;
+            const metric = 123.456;
             const statesEvaluated = 111;
 
             const plan = new Plan([planStep], domain, problem, 13, [helpfulAction]);
-            plan.cost = cost;
+            plan.metric = metric;
             plan.statesEvaluated = statesEvaluated;
 
             const wiredPlan = JSON.parse(JSON.stringify(plan));
@@ -46,7 +46,7 @@ describe("Plan", () => {
 
             // THEN
             expect(actual).to.not.be.undefined;
-            expect(actual.cost).to.equal(cost);
+            expect(actual.metric).to.equal(metric);
             expect(actual.steps).to.be.deep.equal([planStep]);
             expect(actual.helpfulActions).to.be.deep.equal([helpfulAction]);
             expect(actual.makespan).to.be.equal(plan.makespan);
