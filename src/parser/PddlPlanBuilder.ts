@@ -16,7 +16,7 @@ export class PddlPlanBuilder {
     private metric: number | undefined;
     private steps: PlanStep[] = [];
     outputText = ""; // for information only
-    parsingPlan = false; // todo: move to PddlPlannerOutputParser
+    parsingPlan = false;
     private makespan = 0;
     constructor(public readonly epsilon: number) { }
 
