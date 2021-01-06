@@ -26,6 +26,10 @@ export { parser }; // until Typescript 3.8
 import * as planner from './planner/index';
 export { planner }; // until Typescript 3.8
 
+// search
+import * as search from './search/index';
+export { search }; // until Typescript 3.8
+    
 // utils
 import * as utils from './utils/index';
 export { utils }; // until Typescript 3.8

@@ -65,3 +65,7 @@ export class Util {
     }
 }
 
+/** @returns `true` if `text1` and `text2` are equal ignoring case. */
+export function equalsCaseInsensitive(text1: string, text2: string): boolean {
+    return text1.toLowerCase() === text2.toLowerCase();
+}
