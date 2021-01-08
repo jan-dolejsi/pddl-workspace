@@ -2,6 +2,7 @@
 * Copyright (c) Jan Dolejsi. All rights reserved.
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 
 import { FileInfo } from "./FileInfo";
 import { PreProcessor } from "./PreProcessors";
@@ -100,7 +101,7 @@ export class ProblemInfo extends FileInfo {
     private metrics: Metric[] = [];
     private preParsingPreProcessor: PreProcessor | undefined;
 
-    constructor(fileUri: URI, version: number, problemName: string, public domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
+    constructor(fileUri: URI, version: number, problemName: string, public readonly domainName: string, readonly syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver) {
         super(fileUri, version, problemName, syntaxTree, positionResolver);
     }
 
@@ -109,12 +110,12 @@ export class ProblemInfo extends FileInfo {
      * @param problem de-serialized problem
      * @param domainName domain name
      */
-    static clone(problem: ProblemInfo, domainName: string): ProblemInfo {
-        const clonedProblem = new ProblemInfo(problem.fileUri, Number.NaN, problem.name, domainName,
+    static clone(problem: ProblemInfo, domainName?: string): ProblemInfo {
+        const clonedProblem = new ProblemInfo(problem.fileUri, Number.NaN, problem.name, domainName ?? problem.domainName,
             PddlSyntaxTree.EMPTY, new SimpleDocumentPositionResolver(''));
 
         clonedProblem.setConstraints(problem.constraints);
-        clonedProblem.setInits(problem.inits);
+        clonedProblem.setInits(problem.inits.map(i => TimedVariableValue.copy(i)));
         clonedProblem.setMetrics(problem.metrics);
         clonedProblem.setObjects(TypeObjectMap.clone(problem.objects));
         clonedProblem.setSupplyDemands(problem.supplyDemands);

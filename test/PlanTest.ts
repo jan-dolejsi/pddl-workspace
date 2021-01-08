@@ -56,7 +56,7 @@ describe("Plan", () => {
             // expect(actual.problem?.getObjectsTypeMap()).to.be.deep.equal(plan.problem?.getObjectsTypeMap());
             expect(actual.problem?.getObjects("type1")).to.deep.equal(["obj1"]);
 
-            const allTypeObjects = plan.problem && actual.domain?.getConstants().merge(plan.problem?.getObjectsTypeMap());
+            const allTypeObjects = actual.problem && actual.domain?.getConstants().merge(actual.problem.getObjectsTypeMap());
             expect(allTypeObjects).to.not.be.undefined;
             expect(allTypeObjects?.getTypeOf("obj1")?.type).to.equal('type1');
         });
