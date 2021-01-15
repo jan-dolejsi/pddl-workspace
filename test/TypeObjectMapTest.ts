@@ -100,6 +100,44 @@ describe('TypeObjectMap', () => {
             expect(type2TypeObjects, "type objects for type2").to.not.be.undefined;
             assert.deepStrictEqual(type2TypeObjects?.getObjects(), [object2Name], "object names");
         });
+
+        it('should add two types with two case-sensitive objects', () => {
+            // GIVEN
+            const map = new TypeObjectMap();
+            const type1Name = "type1";
+            const type2Name = "type2";
+            const object1Name = "object1";
+            const object2Name = "OBJECT1";
+
+            // WHEN
+            map.add(type1Name, object1Name);
+            map.add(type2Name, object2Name);
+
+            // THEN
+            expect(map).to.have.length(2, "number of types");
+
+            const object1TypeObjects = map.getTypeOf(object1Name);
+            expect(object1TypeObjects, "there should be type for object1").to.not.be.undefined;
+            expect(object1TypeObjects?.hasObject(object1Name)).is.true;
+            expect(object1TypeObjects?.hasObject(object2Name)).is.false;
+            expect(object1TypeObjects?.type).to.equal(type1Name, "object1's type name matches");
+            expect(object1TypeObjects?.getObjects()).to.deep.equal([object1Name], "object names");
+
+            const object2TypeObjects = map.getTypeOf(object2Name);
+            expect(object2TypeObjects, "there should be type for object2").to.not.be.undefined;
+            expect(object2TypeObjects?.hasObject(object2Name)).is.true;
+            expect(object2TypeObjects?.hasObject(object1Name)).is.false;
+            expect(object2TypeObjects?.type).to.equal(type2Name, "object2's type name matches");
+            expect(object2TypeObjects?.getObjects()).to.deep.equal([object2Name], "object names");
+
+            const type1TypeObjects = map.getTypeCaseInsensitive(type1Name);
+            expect(type1TypeObjects, "type objects for type1").to.not.be.undefined;
+            expect(type1TypeObjects?.getObjects()).to.deep.equal([object1Name], "object names");
+
+            const type2TypeObjects = map.getTypeCaseInsensitive(type2Name);
+            expect(type2TypeObjects, "type objects for type2").to.not.be.undefined;
+            expect(type2TypeObjects?.getObjects()).to.deep.equal([object2Name], "object names");
+        });
     });
 
     describe('#addAll', () => {

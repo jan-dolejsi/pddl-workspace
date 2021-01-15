@@ -40,9 +40,13 @@ export class TypeObjects {
         return this;
     }
 
-    hasObject(objectName: string): boolean {
+    hasObjectCaseInsensitive(objectName: string): boolean {
         return [...this.objects.keys()]
             .some(o => o.toLowerCase() === objectName.toLowerCase());
+    }
+
+    hasObject(objectName: string): boolean {
+        return this.objects.has(objectName);
     }
 
     getObjectInstance(objectName: string): ObjectInstance {
@@ -53,6 +57,7 @@ export class TypeObjects {
 export class TypeObjectMap {
     private typeNameToTypeObjectMap = new Map<string, TypeObjects>();
     private objectNameToTypeObjectMap = new Map<string, TypeObjects>();
+    private objectNameCaseInsensitiveToTypeObjectMap = new Map<string, TypeObjects>();
 
     /**
      * Re-hydrates de-serialized type-object map
@@ -84,11 +89,17 @@ export class TypeObjectMap {
         return mergedMap;
     }
 
+    /**
+     * Adds object to type.
+     * @param type type name (currently case insensitive)
+     * @param objectName object name (currently case sensitive)
+     */
     add(type: string, objectName: string): TypeObjectMap {
         this._upsert(type, typeObjects => {
             typeObjects.addObject(objectName);
             // store map of object-to-type
-            this.objectNameToTypeObjectMap.set(objectName.toLowerCase(), typeObjects);
+            this.objectNameCaseInsensitiveToTypeObjectMap.set(objectName.toLowerCase(), typeObjects);
+            this.objectNameToTypeObjectMap.set(objectName, typeObjects);
         });
         return this;
     }
@@ -98,7 +109,8 @@ export class TypeObjectMap {
             typeObjects.addAllObjects(objects);
             // store map of object-to-type
             objects.forEach(objName => {
-                this.objectNameToTypeObjectMap.set(objName.toLowerCase(), typeObjects);
+                this.objectNameCaseInsensitiveToTypeObjectMap.set(objName.toLowerCase(), typeObjects);
+                this.objectNameToTypeObjectMap.set(objName, typeObjects);
             });
         });
 
@@ -117,12 +129,28 @@ export class TypeObjectMap {
         return [...this.typeNameToTypeObjectMap.values()];
     }
 
+    /**
+     * Returns the `TypeObjects` structure for the lower-cased `type` supplied.
+     * @param type case-insensitive type name
+     */
     getTypeCaseInsensitive(type: string): TypeObjects | undefined {
         return this.typeNameToTypeObjectMap.get(type.toLowerCase());
     }
 
+    /**
+     * Returns the `TypeObjects` structure for a type that has the `objectName` supplied.
+     * @param objectName case-sensitive object name
+     */
     getTypeOf(objectName: string): TypeObjects | undefined {
-        return this.objectNameToTypeObjectMap.get(objectName.toLowerCase());
+        return this.objectNameToTypeObjectMap.get(objectName);
+    }
+
+    /**
+     * Returns the `TypeObjects` structure for a type that has lower-cased `objectName` supplied.
+     * @param objectName case-insensitive object name
+     */
+    getTypeOfCaseInsensitive(objectName: string): TypeObjects | undefined {
+        return this.objectNameCaseInsensitiveToTypeObjectMap.get(objectName.toLowerCase());
     }
 }
 
