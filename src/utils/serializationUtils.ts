@@ -7,7 +7,10 @@
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asSerializable(obj: any): any {
-    if (obj instanceof Map) {
+    if (obj === undefined || obj === null) {
+        return obj;
+    }
+    else if (obj instanceof Map) {
         return strMapToObj(obj);
     }
     else if (obj instanceof Array) {

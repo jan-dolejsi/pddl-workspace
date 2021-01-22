@@ -207,6 +207,11 @@ export class PddlSyntaxNode extends TextRange {
         return this.maxChildEnd;
     }
 
+    /** @returns number of characters in this node (including its children) */
+    get length(): number {
+        return this.getEnd() - this.getStart();
+    }
+
     findAncestor(type: PddlTokenType, pattern: RegExp): PddlSyntaxNode | undefined {
         let parent = this.parent;
 
@@ -218,6 +223,20 @@ export class PddlSyntaxNode extends TextRange {
         }
 
         return undefined;
+    }
+
+    getAncestors(includeTypes: PddlTokenType[], pattern = /.*/): PddlSyntaxNode[] {
+        const ancestors: PddlSyntaxNode[] = [];
+        let parent = this.parent;
+
+        while (parent && parent.isNotType(PddlTokenType.Document)) {
+            if (parent.isAnyOf(includeTypes) && pattern.test(parent.getToken().tokenText)) {
+                ancestors.push(parent);
+            }
+            parent = parent.parent;
+        }
+
+        return ancestors;
     }
 
     findParametrisableScope(parameterName: string): PddlSyntaxNode | undefined {
@@ -278,6 +297,9 @@ export class PddlSyntaxNode extends TextRange {
         return (parameterDefinition !== undefined) && pattern.test(parameterDefinition);
     }
 
+    /**
+     * Expands to the encompassing bracket pair, unless this node is the top level Document node.
+     */
     expand(): PddlSyntaxNode {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         let node: PddlSyntaxNode = this;
@@ -294,23 +316,71 @@ export class PddlSyntaxNode extends TextRange {
         return node;
     }
 
-    getPrecedingSiblings(type: PddlTokenType, centralNode?: PddlSyntaxNode): PddlSyntaxNode[] {
-        const siblings = this.getSiblings(type, /.*/);
+    /**
+     * Gets all preceding siblings (in order of appearance, not backwards)
+     * @param type node type filter
+     * @param centralNode optional node from which the siblings are split to preceding/following (by default this node is `this` node)
+     */
+    getPrecedingSiblings(type?: PddlTokenType, centralNode?: PddlSyntaxNode): PddlSyntaxNode[] {
+        const siblings = this.getSiblings(type);
         const centralNodeStart = (centralNode ?? this).getStart();
         const precedingSiblings = siblings.filter(sibling => sibling.getStart() < centralNodeStart);
         return precedingSiblings;
     }
 
-    getFollowingSiblings(type: PddlTokenType, centralNode?: PddlSyntaxNode): PddlSyntaxNode[] {
-        const siblings = this.getSiblings(type, /.*/);
+    /**
+     * Gets all following siblings
+     * @param type node type filter
+     * @param centralNode optional node from which the siblings are split to preceding/following (by default this node is `this` node)
+     */
+    getFollowingSiblings(type?: PddlTokenType, centralNode?: PddlSyntaxNode): PddlSyntaxNode[] {
+        const siblings = this.getSiblings(type);
         const centralNodeStart = (centralNode ?? this).getStart();
         const followingSiblings = siblings.filter(sibling => sibling.getStart() > centralNodeStart);
         return followingSiblings;
     }
 
-    private getSiblings(type: PddlTokenType, pattern: RegExp): PddlSyntaxNode[] {
+    /**
+     * Gets the just preceding sibling, or `undefined`, if none.
+     * @param type node type filter
+     * @param centralNode optional node from which the siblings are split to preceding/following (by default this node is `this` node)
+     */
+    getPrecedingSibling(type?: PddlTokenType, centralNode?: PddlSyntaxNode): PddlSyntaxNode | undefined {
+        const precedingSiblings = this.getPrecedingSiblings(type, centralNode);
+        if (precedingSiblings.length > 0) {
+            return precedingSiblings[precedingSiblings.length - 1];
+        } else {
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets the just following sibling, or `undefined`, if none.
+     * @param type node type filter
+     * @param centralNode optional node from which the siblings are split to preceding/following (by default this node is `this` node)
+     */
+    getFollowingSibling(type?: PddlTokenType, centralNode?: PddlSyntaxNode): PddlSyntaxNode | undefined {
+        const followingSiblings = this.getFollowingSiblings(type, centralNode);
+        if (followingSiblings.length > 0) {
+            return followingSiblings[0];
+        } else {
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets the siblings of this node.
+     * @param type optional node type filter
+     * @param centralNode optional node from which the siblings are split to preceding/following (by default this node is `this` node)
+     */
+    private getSiblings(type?: PddlTokenType, pattern = /.*/): PddlSyntaxNode[] {
         if (this.isRoot()) { return []; }
-        return this.getParent()?.getChildrenOfType(type, pattern) ?? [];
+        if (type) {
+            return this.getParent()?.getChildrenOfType(type, pattern) ?? [];
+        } else {
+            return this.getParent()?.getChildren()
+                .filter(node => node.getToken().tokenText.match(pattern)) ?? [];
+        }
     }
 
     isDocument(): boolean {
@@ -323,6 +393,26 @@ export class PddlSyntaxNode extends TextRange {
 
     isNotType(type: PddlTokenType): boolean {
         return this.getToken().type !== type;
+    }
+
+    isAnyOf(types: PddlTokenType[]): boolean {
+        return types.includes(this.getToken().type);
+    }
+
+    isNoneOf(types: PddlTokenType[]): boolean {
+        return !this.isAnyOf(types);
+    }
+
+    isNumericExpression(): boolean {
+        return ['(=', '(>', '(<', '(>=', '(<=', '(+', '(-', '(/', '(*'].includes(this.getToken().tokenText.replace(' ', ''));
+    }
+
+    isLogicalExpression(): boolean {
+        return ['(and', '(or', '(not'].includes(this.getToken().tokenText.replace(' ', ''));
+    }
+
+    isTemporalExpression(): boolean {
+        return ['(at start', '(at end', '(over all'].includes(this.getToken().tokenText.replace(/  /g, ' '));
     }
 
     toString(): string {
