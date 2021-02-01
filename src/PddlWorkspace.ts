@@ -3,20 +3,21 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
+import { URI } from 'vscode-uri';
+import { EventEmitter } from 'events';
+import { dirname, basename, extname, join } from 'path';
+
 import { HappeningsParser } from './parser/HappeningsParser';
 import { ProblemInfo } from './ProblemInfo';
 import { FileInfo, ParsingProblem, UnknownFileInfo } from './FileInfo';
 import { HappeningsInfo } from "./HappeningsInfo";
-import { dirname, basename } from 'path';
 import { PddlExtensionContext } from './PddlExtensionContext';
-import { EventEmitter } from 'events';
 import { PddlSyntaxTreeBuilder } from './parser/PddlSyntaxTreeBuilder';
-import { DocumentPositionResolver, PddlRange } from './DocumentPositionResolver';
+import { DocumentPositionResolver, PddlRange, SimpleDocumentPositionResolver } from './DocumentPositionResolver';
 import { DomainInfo } from './DomainInfo';
-import { URI } from 'vscode-uri';
 import { PlanInfo } from './PlanInfo';
 import { PddlPlanParser } from './parser/PddlPlanParser';
-import { PddlLanguage, FileStatus } from './language';
+import { PddlLanguage, FileStatus, PDDL, toLanguageFromId } from './language';
 import { PddlFileParser, PddlDomainParser, PddlProblemParser } from './parser/index';
 import { PddlWorkspaceExtension } from './PddlWorkspaceExtension';
 import { PlannerRegistrar } from './planner/PlannerRegistrar';
@@ -27,12 +28,16 @@ function lowerCaseEquals(first: string, second: string): boolean {
     else { return first.toLowerCase() === second.toLowerCase(); }
 }
 
-class Folder {
+export class Folder {
     files: Map<string, FileInfo> = new Map<string, FileInfo>();
-    folderPath: string;
+    private readonly folderUri: URI;
 
-    constructor(folderPath: string) {
-        this.folderPath = folderPath;
+    constructor(public readonly folderPath: string) {
+        this.folderUri = URI.file(this.folderPath);
+    }
+
+    getFolderUri(): URI {
+        return this.folderUri;
     }
 
     hasFile(fileUri: URI): boolean {
@@ -79,6 +84,63 @@ class Folder {
     }
 }
 
+/**
+ * Enumeration of file types. The types `File` and `Directory` can also be
+ * a symbolic links, in that case use `FileType.File | FileType.SymbolicLink` and
+ * `FileType.Directory | FileType.SymbolicLink`.
+ */
+export enum FileType {
+    /**
+     * The file type is unknown.
+     */
+    Unknown = 0,
+    /**
+     * A regular file.
+     */
+    File = 1,
+    /**
+     * A directory.
+     */
+    Directory = 2,
+    /**
+     * A symbolic link to a file.
+     */
+    SymbolicLink = 64
+}
+
+export interface PddlFileSystem {
+    
+    /**
+     * Retrieve all entries of a [directory](#FileType.Directory).
+     *
+     * @param uri The uri of the folder.
+     * @return An array of name/type-tuples or a thenable that resolves to such.
+     */
+    readDirectory(uri: URI): Promise<[string, FileType][]>;
+
+    /**
+     * Read the entire contents of a file.
+     *
+     * @param uri The uri of the file.
+     * @return An array of bytes or a thenable that resolves to such.
+     */
+    readFile(uri: URI): Promise<Uint8Array>;
+}
+
+interface FileNameTypeUri {
+    fileName: string;
+    fileType: FileType;
+    fileUri: URI;
+}
+
+function toFileNameTypeUri(folderUri: URI, file: [string, FileType]): FileNameTypeUri {
+    return {
+        fileName: file[0],
+        fileType: file[1],
+        fileUri: URI.file(join(folderUri.fsPath, file[0])),
+    };
+}
+
 export class PddlWorkspace extends EventEmitter {
     public readonly folders: Map<string, Folder> = new Map<string, Folder>();
     private parsingTimeout: NodeJS.Timer | undefined;
@@ -90,7 +152,7 @@ export class PddlWorkspace extends EventEmitter {
     public static UPDATED = Symbol("UPDATED");
     public static REMOVING = Symbol("REMOVING");
 
-    constructor(public epsilon: number, context?: PddlExtensionContext) {
+    constructor(public epsilon: number, context?: PddlExtensionContext, private fileLoader?: PddlFileSystem) {
         super();
         this.pddlFileParsers = [new PddlDomainParser(), new PddlProblemParser(context)];
         this.plannerRegistrar = new PlannerRegistrar();
@@ -180,7 +242,27 @@ export class PddlWorkspace extends EventEmitter {
 
         this.emitIfNew(PddlWorkspace.UPDATED, fileInfo);
         this.emitIfNew(PddlWorkspace.INSERTED, fileInfo);
+
+        this.loadFolder(folder);
+
         return fileInfo;
+    }
+
+    private async loadFolder(folder: Folder): Promise<void> {
+        const folderUri = folder.getFolderUri();
+
+        if (this.fileLoader) {
+            const files = await this.fileLoader.readDirectory(folderUri);
+            files
+                .map(file => toFileNameTypeUri(folderUri, file))
+                .filter(file => file.fileType === FileType.File
+                    && extname(file.fileName).toLowerCase() === '.' + PDDL
+                    && !folder.hasFile(file.fileUri))
+                .forEach(async (file) => {
+                    const fileContent = new TextDecoder("utf-8").decode(await this.fileLoader?.readFile(file.fileUri));
+                    fileContent && this.insertFile(folder, file.fileUri, toLanguageFromId(PDDL) ?? PddlLanguage.PDDL, -1, fileContent, new SimpleDocumentPositionResolver(fileContent));
+                });
+        }
     }
 
     invalidateDiagnostics(fileInfo: FileInfo): void {

@@ -1,6 +1,6 @@
 {
   "name": "pddl-workspace",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "description": "PDDL Workspace",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -13,7 +13,7 @@ import * as path from 'path';
 import {
     PddlWorkspace, FileInfo, PddlLanguage, 
     SimpleDocumentPositionResolver, DomainInfo, ProblemInfo,
-    FileStatus,
+    FileStatus, PddlFileSystem, FileType
 } from './src';
 import { CustomPddlParserExtension, CustomParser, CustomPddlFile } from './CustomPddlParserExtension';
 import { CustomPlannerProviderExtension, plannerKind as myPlannerKind, SolveServicePlannerProvider } from './CustomPlannerProvider';
@@ -101,8 +101,81 @@ describe('PddlWorkspace', () => {
             expect(correspondingDomain).to.equal(domainInfo, 'corresponding domain');
             const allFiles = pddlWorkspace.getAllFiles();
             expect(allFiles).to.deep.equal([domainInfo, problemInfo]);
-        })
-    })
+        });
+
+        it('loads other files from the same folder', (done) => {
+    
+            // GIVEN
+
+            const domainFileName = 'domain.pddl';
+            const problemFileName = 'problem.pddl';
+
+            const pddlDomainText = `(define (domain domain_name) )`;
+            const pddlProblemText = `(define (problem p1) (:domain domain_name))`;
+
+            class MockPddlFileSystem implements PddlFileSystem {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                async readDirectory(_uri: URI): Promise<[string, FileType][]> {
+                    return [
+                        [domainFileName, FileType.File],
+                        [problemFileName, FileType.File],
+                        ["some irrelevant directory", FileType.Directory],
+                        ["some irrelevant symbolic link", FileType.SymbolicLink],
+                    ];
+                }
+                async readFile(uri: URI): Promise<Uint8Array> {
+                    const fileName = path.basename(uri.fsPath);
+
+                    switch (fileName) {
+                        case domainFileName:
+                            return new TextEncoder().encode(pddlDomainText);
+                        default:
+                            assert.fail(`Should not be reading file ${fileName}`);
+                    }
+                }
+                
+            }
+
+            const pddlFileSystem = new MockPddlFileSystem();
+
+            const pddlWorkspace = new PddlWorkspace(1e-3, undefined, pddlFileSystem);
+            const insertedFiles: FileInfo[] = [];
+
+            let problemInfo: ProblemInfo
+
+            pddlWorkspace.on(PddlWorkspace.INSERTED, (file: FileInfo) => {
+                console.log(`Inserted: '${file.name}' from ${file.fileUri}.`);
+                insertedFiles.push(file);
+
+                if (file.isProblem()) {
+                    problemInfo = file as ProblemInfo;
+                }
+
+                if (file.isDomain()) {
+                    const correspondingDomain = pddlWorkspace.getDomainFileFor(problemInfo);
+
+                    const domainInfo = insertedFiles.find(fileInfo => fileInfo.isDomain());
+                    
+                    // THEN
+                    expect(domainInfo).be.instanceOf(DomainInfo);
+                    expect(insertedFiles).to.have.lengthOf(2);
+        
+                    expect(correspondingDomain).to.equal(domainInfo, 'corresponding domain');
+                    const allFiles = pddlWorkspace.getAllFiles();
+                    expect(allFiles).to.have.lengthOf(2);
+                    done();
+                }
+            });
+
+            pddlWorkspace.upsertFile(
+                URI.file(path.join('folder1', problemFileName)),
+                PddlLanguage.PDDL,
+                1, // content version
+                pddlProblemText,
+                new SimpleDocumentPositionResolver(pddlProblemText));
+
+        });
+    });
 
     describe('#addPddlFileParser', () => {
 
