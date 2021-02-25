@@ -25,7 +25,7 @@ export class CustomParser extends PddlFileParser<CustomPddlFile> {
     }
     async tryParse(fileUri: URI, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<CustomPddlFile | undefined> {
         this.callback && this.callback(fileUri, fileVersion);
-        if ('(:custom-pddl') {
+        if (fileText.includes('(:custom-pddl')) {
             const pddlFile = new CustomPddlFile(fileUri, fileVersion, 'custom', syntaxTree, positionResolver);
             pddlFile.setText(fileText);
             return pddlFile;
