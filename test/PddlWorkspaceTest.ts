@@ -268,6 +268,68 @@ describe('PddlWorkspace', () => {
         });
     });
 
+    describe('#upsertAndParseFolder', () => {
+        it('loads and parses 2 files in the folder', (done) => {
+    
+            // GIVEN
+
+            const domainFileName = 'domain.pddl';
+            const problem1FileName = 'problem1.pddl';
+
+            const pddlDomainText = `(define (domain domain_name) )`;
+            const pddlProblem1Text = `(define (problem p1) (:domain domain_name))`;
+
+            const filesRead: string[] = [];
+
+            class MockPddlFileSystem implements PddlFileSystem {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                async readDirectory(_uri: URI): Promise<[string, FileType][]> {
+                    return [
+                        [domainFileName, FileType.File],
+                        [problem1FileName, FileType.File],
+                        ["some irrelevant directory", FileType.Directory],
+                        ["some irrelevant symbolic link", FileType.SymbolicLink],
+                    ];
+                }
+                async readFile(uri: URI): Promise<Uint8Array> {
+                    const fileName = path.basename(uri.fsPath);
+                    console.log(`Loading file ${uri.fsPath}`);
+                    if (filesRead.includes(fileName)) {
+                        assert.fail(`Already read ${fileName}`);
+                    }
+
+                    filesRead.push(fileName);
+
+                    switch (fileName) {
+                        case domainFileName:
+                            return new TextEncoder().encode(pddlDomainText);
+                        case problem1FileName:
+                            return new TextEncoder().encode(pddlProblem1Text);
+                        default:
+                            assert.fail(`File does not exist: ${fileName}`);
+                    }
+                }
+                
+            }
+
+            const pddlFileSystem = new MockPddlFileSystem();
+
+            const pddlWorkspace = new PddlWorkspace(1e-3, undefined, pddlFileSystem);
+            const insertedFiles: FileInfo[] = [];
+
+            pddlWorkspace.on(PddlWorkspace.INSERTED, (file: FileInfo) => {
+                console.log(`Inserted: '${file.name}' from ${file.fileUri}.`);
+                insertedFiles.push(file);
+
+                if (insertedFiles.length === 2) {
+                    done();
+                }
+            });
+
+            pddlWorkspace.upsertAndParseFolder(URI.file('folder1'));
+        });
+    });
+
     describe('#addPddlFileParser', () => {
 
         it('supports custom PDDL parsers', async () => {

@@ -367,6 +367,23 @@ export class PddlWorkspace extends EventEmitter {
         }));
     }
 
+    async upsertAndParseFolder(folderUri: URI): Promise<Folder> {
+        const folderPath = folderUri.fsPath;
+        let folder: Folder;
+
+        if (!this.folders.has(folderPath)) {
+            folder = new Folder(folderPath);
+            this.folders.set(folderPath, folder);
+            this.loadFolder(folder);
+        }
+        else {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            folder = this.folders.get(folderPath)!;
+        }
+
+        return folder;
+    }
+
     private upsertFolder(folderPath: string): Folder {
         let folder: Folder;
 
