@@ -13,7 +13,7 @@ import * as path from 'path';
 import {
     PddlWorkspace, FileInfo, PddlLanguage, 
     SimpleDocumentPositionResolver, DomainInfo, ProblemInfo,
-    FileStatus, PddlFileSystem, FileType
+    FileStatus, PddlFileSystem, FileType, UnknownFileInfo
 } from './src';
 import { CustomPddlParserExtension, CustomParser, CustomPddlFile } from './CustomPddlParserExtension';
 import { CustomPlannerProviderExtension, plannerKind as myPlannerKind, SolveServicePlannerProvider } from './CustomPlannerProvider';
@@ -175,6 +175,159 @@ describe('PddlWorkspace', () => {
                 new SimpleDocumentPositionResolver(pddlProblemText));
 
         });
+
+        it('loading 3 files from the same folder does not cause event storm', (done) => {
+    
+            // GIVEN
+
+            const domainFileName = 'domain.pddl';
+            const problem1FileName = 'problem1.pddl';
+            const problem2FileName = 'problem2.pddl';
+
+            const pddlDomainText = `(define (domain domain_name) )`;
+            const pddlProblem1Text = `(define (problem p1) (:domain domain_name))`;
+            const pddlProblem2Text = `(define (problem p2) (:domain domain_name))`;
+
+            const filesRead: string[] = [];
+
+            class MockPddlFileSystem implements PddlFileSystem {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                async readDirectory(_uri: URI): Promise<[string, FileType][]> {
+                    return [
+                        [domainFileName, FileType.File],
+                        [problem1FileName, FileType.File],
+                        [problem2FileName, FileType.File],
+                        ["some irrelevant directory", FileType.Directory],
+                        ["some irrelevant symbolic link", FileType.SymbolicLink],
+                    ];
+                }
+                async readFile(uri: URI): Promise<Uint8Array> {
+                    const fileName = path.basename(uri.fsPath);
+                    console.log(`Loading file ${uri.fsPath}`);
+                    if (filesRead.includes(fileName)) {
+                        assert.fail(`Already read ${fileName}`);
+                    }
+
+                    filesRead.push(fileName);
+
+                    switch (fileName) {
+                        case domainFileName:
+                            return new TextEncoder().encode(pddlDomainText);
+                        case problem2FileName:
+                            return new TextEncoder().encode(pddlProblem2Text);
+                        default:
+                            assert.fail(`Should not be reading file ${fileName} again`);
+                    }
+                }
+                
+            }
+
+            const pddlFileSystem = new MockPddlFileSystem();
+
+            const pddlWorkspace = new PddlWorkspace(1e-3, undefined, pddlFileSystem);
+            const insertedFiles: FileInfo[] = [];
+
+            let problemInfo: ProblemInfo
+
+            pddlWorkspace.on(PddlWorkspace.INSERTED, (file: FileInfo) => {
+                console.log(`Inserted: '${file.name}' from ${file.fileUri}.`);
+                insertedFiles.push(file);
+
+                if (file.isProblem() && !problemInfo) {
+                    problemInfo = file as ProblemInfo;
+                }
+
+                if (file.isDomain()) {
+                    const correspondingDomain = pddlWorkspace.getDomainFileFor(problemInfo);
+
+                    const domainInfo = insertedFiles.find(fileInfo => fileInfo.isDomain());
+                    
+                    // THEN
+                    expect(domainInfo).be.instanceOf(DomainInfo);
+                    expect(insertedFiles).to.have.lengthOf(2);
+        
+                    expect(correspondingDomain).to.equal(domainInfo, 'corresponding domain');
+                    const allFiles = pddlWorkspace.getAllFiles();
+                    expect(allFiles).to.have.lengthOf(2);
+                }
+
+                // todo: should do something for the problem2?
+
+                if (insertedFiles.length === 3) {
+                    done();
+                }
+            });
+
+            pddlWorkspace.upsertFile(
+                URI.file(path.join('folder1', problem1FileName)),
+                PddlLanguage.PDDL,
+                1, // content version
+                pddlProblem1Text,
+                new SimpleDocumentPositionResolver(pddlProblem1Text));
+
+        });
+    });
+
+    describe('#upsertAndParseFolder', () => {
+        it('loads and parses 2 files in the folder', (done) => {
+    
+            // GIVEN
+
+            const domainFileName = 'domain.pddl';
+            const problem1FileName = 'problem1.pddl';
+
+            const pddlDomainText = `(define (domain domain_name) )`;
+            const pddlProblem1Text = `(define (problem p1) (:domain domain_name))`;
+
+            const filesRead: string[] = [];
+
+            class MockPddlFileSystem implements PddlFileSystem {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                async readDirectory(_uri: URI): Promise<[string, FileType][]> {
+                    return [
+                        [domainFileName, FileType.File],
+                        [problem1FileName, FileType.File],
+                        ["some irrelevant directory", FileType.Directory],
+                        ["some irrelevant symbolic link", FileType.SymbolicLink],
+                    ];
+                }
+                async readFile(uri: URI): Promise<Uint8Array> {
+                    const fileName = path.basename(uri.fsPath);
+                    console.log(`Loading file ${uri.fsPath}`);
+                    if (filesRead.includes(fileName)) {
+                        assert.fail(`Already read ${fileName}`);
+                    }
+
+                    filesRead.push(fileName);
+
+                    switch (fileName) {
+                        case domainFileName:
+                            return new TextEncoder().encode(pddlDomainText);
+                        case problem1FileName:
+                            return new TextEncoder().encode(pddlProblem1Text);
+                        default:
+                            assert.fail(`File does not exist: ${fileName}`);
+                    }
+                }
+                
+            }
+
+            const pddlFileSystem = new MockPddlFileSystem();
+
+            const pddlWorkspace = new PddlWorkspace(1e-3, undefined, pddlFileSystem);
+            const insertedFiles: FileInfo[] = [];
+
+            pddlWorkspace.on(PddlWorkspace.INSERTED, (file: FileInfo) => {
+                console.log(`Inserted: '${file.name}' from ${file.fileUri}.`);
+                insertedFiles.push(file);
+
+                if (insertedFiles.length === 2) {
+                    done();
+                }
+            });
+
+            pddlWorkspace.upsertAndParseFolder(URI.file('folder1'));
+        });
     });
 
     describe('#addPddlFileParser', () => {
@@ -190,6 +343,30 @@ describe('PddlWorkspace', () => {
 
             // THEN
             expect(actual).be.instanceOf(CustomPddlFile);
+        });
+
+        it('re-parses using the custom PDDL parsers', async () => {
+            // GIVEN
+            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const pddlText = `(:custom-pddl)`;
+            const fileUri = URI.parse('file:///test');
+            const unknownFile = await pddlWorkspace.upsertFile(fileUri, PddlLanguage.PDDL, 1, pddlText, new SimpleDocumentPositionResolver(pddlText));
+            expect(unknownFile).be.instanceOf(UnknownFileInfo);
+
+            // WHEN
+            pddlWorkspace.addExtension(new CustomPddlParserExtension());
+
+            const actualDirty = pddlWorkspace.getFileInfo(fileUri);
+            if (!actualDirty) {
+                assert.fail("file is not in the workspace?!");
+            }
+            expect(actualDirty.getStatus()).to.equal(FileStatus.Dirty, "file should be dirty");
+
+
+            const actual = await pddlWorkspace.reParseFile(unknownFile);
+
+            // THEN
+            expect(actual).be.instanceOf(CustomPddlFile, "file should be re-parsed as 'custom'");
         });
     });
 

@@ -184,7 +184,9 @@ export class PddlWorkspace extends EventEmitter {
         this.pddlFileParsers.unshift(...parsers);
         if (parsers.length > 0) {
             this.getAllFilesIf(fi => fi.getLanguage() === PddlLanguage.PDDL)
-                .forEach(fi => this.invalidateDiagnostics(fi));
+                .forEach(fi => this.invalidateDiagnostics(fi, FileStatus.Dirty));
+            
+            this.scheduleParsing();
         }
     }
 
@@ -265,8 +267,8 @@ export class PddlWorkspace extends EventEmitter {
         }
     }
 
-    invalidateDiagnostics(fileInfo: FileInfo): void {
-        fileInfo.setStatus(FileStatus.Parsed);
+    invalidateDiagnostics(fileInfo: FileInfo, fileStatus?: FileStatus): void {
+        fileInfo.setStatus(fileStatus ?? FileStatus.Parsed);
         this.emitIfNew(PddlWorkspace.UPDATED, fileInfo);
     }
 
@@ -288,7 +290,7 @@ export class PddlWorkspace extends EventEmitter {
     }
 
     private cancelScheduledParsing(): void {
-        if (this.parsingTimeout) { clearTimeout(this.parsingTimeout); }
+        if (this.parsingTimeout) { clearTimeout(this.parsingTimeout); } // todo: use .refresh()
     }
 
     private parseAllDirty(): void {
@@ -363,6 +365,23 @@ export class PddlWorkspace extends EventEmitter {
             const offendingPosition = positionResolver.resolveToPosition(token.getStart());
             return new ParsingProblem(`Unexpected token: ${token.toString()}`, "error", PddlRange.createSingleCharacterRange({ line: offendingPosition.line, character: offendingPosition.character }));
         }));
+    }
+
+    async upsertAndParseFolder(folderUri: URI): Promise<Folder> {
+        const folderPath = folderUri.fsPath;
+        let folder: Folder;
+
+        if (!this.folders.has(folderPath)) {
+            folder = new Folder(folderPath);
+            this.folders.set(folderPath, folder);
+            this.loadFolder(folder);
+        }
+        else {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            folder = this.folders.get(folderPath)!;
+        }
+
+        return folder;
     }
 
     private upsertFolder(folderPath: string): Folder {
