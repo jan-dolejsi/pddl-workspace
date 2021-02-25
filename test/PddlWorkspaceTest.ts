@@ -13,7 +13,7 @@ import * as path from 'path';
 import {
     PddlWorkspace, FileInfo, PddlLanguage, 
     SimpleDocumentPositionResolver, DomainInfo, ProblemInfo,
-    FileStatus, PddlFileSystem, FileType
+    FileStatus, PddlFileSystem, FileType, UnknownFileInfo
 } from './src';
 import { CustomPddlParserExtension, CustomParser, CustomPddlFile } from './CustomPddlParserExtension';
 import { CustomPlannerProviderExtension, plannerKind as myPlannerKind, SolveServicePlannerProvider } from './CustomPlannerProvider';
@@ -281,6 +281,30 @@ describe('PddlWorkspace', () => {
 
             // THEN
             expect(actual).be.instanceOf(CustomPddlFile);
+        });
+
+        it('re-parses using the custom PDDL parsers', async () => {
+            // GIVEN
+            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const pddlText = `(:custom-pddl)`;
+            const fileUri = URI.parse('file:///test');
+            const unknownFile = await pddlWorkspace.upsertFile(fileUri, PddlLanguage.PDDL, 1, pddlText, new SimpleDocumentPositionResolver(pddlText));
+            expect(unknownFile).be.instanceOf(UnknownFileInfo);
+
+            // WHEN
+            pddlWorkspace.addExtension(new CustomPddlParserExtension());
+
+            const actualDirty = pddlWorkspace.getFileInfo(fileUri);
+            if (!actualDirty) {
+                assert.fail("file is not in the workspace?!");
+            }
+            expect(actualDirty.getStatus()).to.equal(FileStatus.Dirty, "file should be dirty");
+
+
+            const actual = await pddlWorkspace.reParseFile(unknownFile);
+
+            // THEN
+            expect(actual).be.instanceOf(CustomPddlFile, "file should be re-parsed as 'custom'");
         });
     });
 
