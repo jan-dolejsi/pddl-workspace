@@ -5,6 +5,7 @@
 'use strict';
 
 import { DomainInfo , ProblemInfo, Plan, parser } from '../index';
+import { PlannerRunConfiguration } from './PlannerProvider';
 import { PlannerResponseHandler } from './PlannerResponseHandler';
 
 /**
@@ -12,15 +13,28 @@ import { PlannerResponseHandler } from './PlannerResponseHandler';
  */
 export abstract class Planner {
 
-    planningProcessKilled = false;
+    private _planningProcessKilled = false;
 
-    constructor(protected readonly plannerPath: string) {
+    constructor(protected readonly plannerPath: string, protected plannerConfiguration: PlannerRunConfiguration) {
 
+    }
+
+    /** `true` if the planning run was stopped */
+    get planningProcessKilled(): boolean {
+        return this._planningProcessKilled;
+    }
+
+    get requiresKeyboardInput(): boolean {
+        return this.plannerConfiguration.requiresKeyboardInput ?? false;
+    }
+    /** `true` if the planner supports search debugger call-backs */
+    get supportsSearchDebugger(): boolean {
+        return this.plannerConfiguration.supportsSearchDebugger ?? true;
     }
 
     abstract plan(domain: DomainInfo, problem: ProblemInfo, planParser: parser.PddlPlannerOutputParser, responseHandler: PlannerResponseHandler): Promise<Plan[]>;
 
     stop(): void {
-        this.planningProcessKilled = true;
+        this._planningProcessKilled = true;
     }
 }

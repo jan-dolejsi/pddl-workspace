@@ -2,11 +2,12 @@
  * Copyright (c) Jan Dolejsi 2020. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-import { PddlWorkspaceExtension, planner, OutputAdaptor } from './src';
+import { PddlWorkspaceExtension, planner, OutputAdaptor } from '../src';
 import { URI } from 'vscode-uri';
-import { PlannerProvider } from './planner';
+import { PlannerProvider } from './PlannerProvider';
+import { WellKnownPlannerKind } from './PlannerRegistrar';
 
-export const plannerKind = new planner.PlannerKind("my-planning-service");
+export const plannerKind = WellKnownPlannerKind.SERVICE_SYNC.derive("my-planning-service");
 
 /**
  * Wrapper for a PDDL planning service.

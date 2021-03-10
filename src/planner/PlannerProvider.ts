@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import { OutputAdaptor } from "../PreProcessors";
+import { Authentication } from "./Authentication";
 import { Planner } from "./Planner";
 import { PlannerKind } from "./PlannerRegistrar";
 
@@ -30,7 +31,7 @@ export interface PlannerProvider {
     showHelp?(output: OutputAdaptor): void;
 
     /** Custom `Planner` implementation. */
-    createPlanner?(configuration: PlannerConfiguration, plannerOptions: string, workingDirectory: string): Planner;
+    createPlanner?(configuration: PlannerConfiguration, plannerInvocationOptions?: PlannerRunConfiguration): Planner | undefined;
 
     /** Command-line (or other) options specific to this `Planner` */
     getPlannerOptions?(): PlannerOption[];
@@ -59,4 +60,27 @@ export interface PlannerOption {
     label?: string;
     /** Documentation to show right from the label/option. */
     description?: string;
+}
+
+/** Planner invocation configuration. */
+export interface PlannerRunConfiguration {
+
+    // /** Configuration that was used by the planner factory to create this Planner */
+    // configuration: PlannerConfiguration;
+
+    // /** Planner provider that was used to create this Planner */
+    // provider: PlannerProvider;
+
+    /** Command-line or url query options. */
+    options?: string;
+
+    workingDirectory?: string;
+
+    authentication?: Authentication;
+
+    /** `true` if the planner requires command-line interaction */
+    requiresKeyboardInput?: boolean;
+
+    /** `true` if the planner supports search debugger call-backs */
+    supportsSearchDebugger?: boolean;
 }
