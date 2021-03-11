@@ -3,8 +3,6 @@
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
-/* eslint-disable @typescript-eslint/no-use-before-define */
-
 import { DirectionalGraph } from "./utils/DirectionalGraph";
 import { asSerializable, objToStrMap } from "./utils/serializationUtils";
 import { FileInfo } from "./FileInfo";

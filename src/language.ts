@@ -3,7 +3,6 @@
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { PddlRange } from "./DocumentPositionResolver";
 
 // Language ID of Domain and Problem files

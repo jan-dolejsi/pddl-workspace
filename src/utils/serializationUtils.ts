@@ -3,8 +3,6 @@
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
 
-/* eslint-disable @typescript-eslint/no-use-before-define */
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asSerializable(obj: any): any {
     if (obj === undefined || obj === null) {

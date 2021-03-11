@@ -2,7 +2,6 @@
 * Copyright (c) Jan Dolejsi. All rights reserved.
 * Licensed under the MIT License. See License.txt in the project root for license information.
 * ------------------------------------------------------------------------------------------ */
-/* eslint-disable @typescript-eslint/no-use-before-define */
 
 import { FileInfo } from "./FileInfo";
 import { PreProcessor } from "./PreProcessors";

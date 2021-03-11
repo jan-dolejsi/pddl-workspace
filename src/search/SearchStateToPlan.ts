@@ -4,8 +4,6 @@
 * ------------------------------------------------------------------------------------------ */
 'use strict';
 
-/* eslint-disable @typescript-eslint/no-use-before-define */
-
 import { SearchState } from "./SearchState";
 import { ProblemInfo, DomainInfo, Plan, PlanStep, PlanStepCommitment, HappeningType } from '..';
 import { SearchHappening } from "./SearchHappening";
