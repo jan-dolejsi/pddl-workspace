@@ -15,7 +15,7 @@ import {
     FileStatus, PddlFileSystem, FileType, UnknownFileInfo
 } from './src';
 import { CustomPddlParserExtension, CustomParser, CustomPddlFile } from './CustomPddlParserExtension';
-import { CustomPlannerProviderExtension, plannerKind as myPlannerKind, SolveServicePlannerProvider } from './CustomPlannerProvider';
+import { CustomPlannerProviderExtension, plannerKind as myPlannerKind, SolveServicePlannerProvider } from './planner/CustomPlannerProvider';
 
 describe('PddlWorkspace', () => {
     // var subject: PddlWorkspace;
