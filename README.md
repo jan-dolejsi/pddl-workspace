@@ -201,8 +201,8 @@ export class CustomPlannerProviderExtension implements PddlWorkspaceExtension {
 Starting from version 3.5.0, the `PlannerProvider` may optionally also implement custom creation of the `Planner`. Here is an example for composing `java -jar xyz.jar` command-line:
 
 ```typescript
-    createPlanner(configuration: planner.PlannerConfiguration, plannerOptions: string, workingDirectory: string): planner.Planner {
-        return new PlannerExecutable(`java -jar ${configuration.path}`, plannerOptions, configuration.syntax, workingDirectory);
+    createPlanner(configuration: planner.PlannerConfiguration, , plannerInvocationOptions: planner.PlannerRunConfiguration): planner.Planner {
+        return new PlannerExecutable(`java -jar ${configuration.path}`, plannerInvocationOptions.options, configuration.syntax, plannerInvocationOptions.workingDirectory);
     }
 ```
 

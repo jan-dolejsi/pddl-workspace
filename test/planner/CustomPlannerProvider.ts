@@ -2,11 +2,10 @@
  * Copyright (c) Jan Dolejsi 2020. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-import { PddlWorkspaceExtension, planner, OutputAdaptor } from './src';
+import { PddlWorkspaceExtension, planner, OutputAdaptor } from '../../src';
 import { URI } from 'vscode-uri';
-import { PlannerProvider } from './planner';
 
-export const plannerKind = new planner.PlannerKind("my-planning-service");
+export const plannerKind = planner.WellKnownPlannerKind.SERVICE_SYNC.derive("my-planning-service");
 
 /**
  * Wrapper for a PDDL planning service.
@@ -73,7 +72,7 @@ export class SolveServicePlannerProvider implements planner.PlannerProvider {
  * Example custom Planner Provider extension.
  */
 export class CustomPlannerProviderExtension implements PddlWorkspaceExtension {
-    getPlannerProvider(): PlannerProvider[] | undefined {
+    getPlannerProvider(): planner.PlannerProvider[] | undefined {
         return [new SolveServicePlannerProvider()];
     }
 }

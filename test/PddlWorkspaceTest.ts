@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 /* --------------------------------------------------------------------------------------------
  * Copyright (c) Jan Dolejsi. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
@@ -16,7 +15,7 @@ import {
     FileStatus, PddlFileSystem, FileType, UnknownFileInfo
 } from './src';
 import { CustomPddlParserExtension, CustomParser, CustomPddlFile } from './CustomPddlParserExtension';
-import { CustomPlannerProviderExtension, plannerKind as myPlannerKind, SolveServicePlannerProvider } from './CustomPlannerProvider';
+import { CustomPlannerProviderExtension, plannerKind as myPlannerKind, SolveServicePlannerProvider } from './planner/CustomPlannerProvider';
 
 describe('PddlWorkspace', () => {
     // var subject: PddlWorkspace;

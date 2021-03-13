@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 /* --------------------------------------------------------------------------------------------
  * Copyright (c) Jan Dolejsi 2020. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
@@ -34,6 +33,15 @@ export class PlannerRegistrar {
 
 export class PlannerKind {
     constructor(public readonly kind: string) { }
+
+    /**
+     * Derives a kind of planner implementation/variant.
+     * @param implementation implementation/variant name
+     * @returns new planner kind
+     */
+    derive(implementation: string): PlannerKind {
+        return new PlannerKind(this.kind + ':' + implementation);
+    }
 }
 
 export class WellKnownPlannerKind {

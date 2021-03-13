@@ -3,6 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
+import * as os from 'os';
+
 export class Util {
 
     /**
@@ -16,7 +18,7 @@ export class Util {
     }
 
     static shouldBeDoubleQuoted(path: string): boolean {
-        return path.includes(' ') && !path.includes('"')
+        return os.platform() === 'win32' && path.includes(' ') && !path.includes('"')
             && !path.includes(" -jar ")
             && !path.includes(" -javaagent:")
             && !path.startsWith("node ");
