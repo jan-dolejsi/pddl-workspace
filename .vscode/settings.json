@@ -9,5 +9,6 @@
 			]
 		}
 	},
-	"mocha.files.glob": "out/test/**/*Test.js"
+	"mocha.files.glob": "out/test/**/*Test.js",
+	"WhiteSource Advise.BaseBranch": "master"
 }
