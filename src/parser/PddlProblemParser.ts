@@ -56,16 +56,16 @@ export class PddlProblemParser extends PddlFileParser<ProblemInfo> {
                 const filePath = fileUri.fsPath;
                 const workingDirectory = dirname(filePath);
                 fileText = await this.problemPreParser.process(preProcessor!, fileText, workingDirectory);
-            } catch (ex) {
+            } catch (ex: unknown) {
                 const problemInfo = new ProblemInfo(fileUri, fileVersion, "unknown", "unknown", PddlSyntaxTree.EMPTY, positionResolver);
                 problemInfo.setText(fileText);
                 if (ex instanceof PreProcessingError) {
                     const parsingError = ex as PreProcessingError;
                     problemInfo.addProblems([new ParsingProblem(parsingError.message, "error", PddlRange.createSingleCharacterRange({ line: parsingError.line, character: parsingError.column }))]);
                 }
-                else {
+                else if (ex instanceof Error) {
                     const line = positionResolver.resolveToPosition(preProcessor?.metaDataLineOffset || 0).line;
-                    problemInfo.addProblems([new ParsingProblem(ex.message || ex, "error", PddlRange.createFullLineRange(line))]);
+                    problemInfo.addProblems([new ParsingProblem(ex.message ?? ex, "error", PddlRange.createFullLineRange(line))]);
                 }
                 if (preProcessor) { problemInfo.setPreParsingPreProcessor(preProcessor); }
                 return problemInfo;

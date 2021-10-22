@@ -579,14 +579,13 @@ describe('PddlPlannerOutputParser', () => {
             End of plan print-out.`;
 
             // WHEN
-            let parser: PddlPlannerOutputParser | null = null;
+            let parser1: PddlPlannerOutputParser | undefined = undefined;
             await new Promise((resolve) => {
-                parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve([]));
-                parser.appendBuffer(planText);
+                parser1 = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve([]));
+                parser1.appendBuffer(planText);
             });
-            if (!parser) { assert.fail("launching plan parser failed"); }
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const plans = parser!.getPlans();
+            if (parser1 === undefined) { assert.fail("launching plan parser failed"); }
+            const plans = (parser1 as PddlPlannerOutputParser).getPlans();
 
             // THEN
             expect(plans).to.have.length(1, 'there should be one plan');
@@ -649,14 +648,13 @@ describe('PddlPlannerOutputParser', () => {
             End of plan print-out.`;
 
             // WHEN
-            let parser: PddlPlannerOutputParser | null = null;
+            let parser: PddlPlannerOutputParser | undefined = undefined;
             await new Promise((resolve) => {
                 parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve([]));
                 parser.appendBuffer(planText);
             });
             if (!parser) { assert.fail("launching plan parser failed"); }
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const plans = parser!.getPlans();
+            const plans = (parser as PddlPlannerOutputParser).getPlans();
 
             // THEN
             expect(plans).to.have.length(1, 'there should be one plan');

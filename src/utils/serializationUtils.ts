@@ -4,7 +4,7 @@
 * ------------------------------------------------------------------------------------------ */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function asSerializable(obj: any): any {
+export function asSerializable(obj: any): unknown {
     if (obj === undefined || obj === null) {
         return obj;
     }
