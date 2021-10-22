@@ -581,7 +581,7 @@ describe('PddlPlannerOutputParser', () => {
             // WHEN
             let parser: PddlPlannerOutputParser | null = null;
             await new Promise((resolve) => {
-                parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve());
+                parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve([]));
                 parser.appendBuffer(planText);
             });
             if (!parser) { assert.fail("launching plan parser failed"); }
@@ -651,7 +651,7 @@ describe('PddlPlannerOutputParser', () => {
             // WHEN
             let parser: PddlPlannerOutputParser | null = null;
             await new Promise((resolve) => {
-                parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve());
+                parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 }, () => resolve([]));
                 parser.appendBuffer(planText);
             });
             if (!parser) { assert.fail("launching plan parser failed"); }
