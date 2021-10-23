@@ -7,6 +7,7 @@ import * as process from 'child_process';
 import * as path from 'path';
 import * as nunjucks from 'nunjucks';
 import * as fs from 'fs';
+import { ErrorWithMessage } from './utils';
 
 export interface OutputAdaptor {
     appendLine(text: string): void;
@@ -218,13 +219,14 @@ export class NunjucksPreProcessor extends PreProcessor {
             const translated = this.nunjucksEnv.renderString(input, { data: data });
 
             return this.removeMetaDataLine(translated);
-        } catch (error) {
+        } catch (error: unknown) {
+            const error1 = error as ErrorWithMessage;
             const pattern = /\((.+)\)\s+\[Line\s+(\d+),\s+Column\s+(\d+)\]/;
-            const match = pattern.exec(error.message);
+            const match = pattern.exec(error1.message);
             if (match) {
                 throw new PreProcessingError(match[1], parseInt(match[2]) - 1, parseInt(match[3]) - 1);
             } else {
-                throw new PreProcessingError(error.message, 0, 0);
+                throw new PreProcessingError(error1.message, 0, 0);
             }
         }
     }

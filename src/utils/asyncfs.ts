@@ -56,8 +56,9 @@ export async function isEmpty(directory: string): Promise<boolean> {
 export async function exists(path: fs.PathLike): Promise<boolean> {
     try {
         await fs.promises.stat(path);
-    } catch (err) {
-        if (err.code === 'ENOENT') {
+    } catch (err: unknown) {
+        const error = err as NodeJS.ErrnoException;
+        if (error.code === 'ENOENT') {
             return false;
         } else {
             throw err;

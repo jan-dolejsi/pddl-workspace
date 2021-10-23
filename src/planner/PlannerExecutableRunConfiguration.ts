@@ -7,6 +7,7 @@ import { PlannerRunConfiguration } from "./PlannerProvider";
 
 /** PlannerExecutable run configuration. */
 export interface PlannerExecutableRunConfiguration extends PlannerRunConfiguration {
+    /** @deprecated use the syntax in the PlannerConfiguration */
     plannerSyntax?: string | undefined;
     workingDirectory: string;
 }

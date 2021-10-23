@@ -28,33 +28,78 @@ describe('PddlWorkspace', () => {
         it('should handle tpddl schema and encoded encoded windows file name', () => {
             const uri = URI.file(path.join('c:', 'folder', 'file.txt')).with({ scheme: 'tpddl' });
             const fileName = PddlWorkspace.getFileName(uri);
-            assert.equal(fileName, 'file.txt');
+            assert.strictEqual(fileName, 'file.txt');
         });
 
         it('should handle file schema and encoded encoded windows file name', () => {
             const uri = URI.file(path.join('c:', 'folder', 'file.txt'));
             const fileName = PddlWorkspace.getFileName(uri);
-            assert.equal(fileName, 'file.txt');
+            assert.strictEqual(fileName, 'file.txt');
         });
     });
 
-    describe('#getFolderUri', () => {
+    describe('#getFolderPath', () => {
         it('should handle tpddl schema and encoded windows file name', () => {
             const uri = URI.file(path.join('c:', 'folder', 'file.txt')).with({ scheme: 'tpddl' });
             const fileName = PddlWorkspace.getFolderPath(uri);
-            assert.equal(fileName, path.join('c:', 'folder'));
+            assert.strictEqual(fileName, path.join('c:', 'folder'));
         });
 
         it('should handle file schema and encoded windows file name', () => {
             const uri = URI.file(path.join('c:', 'folder', 'file.txt'));
             const fileName = PddlWorkspace.getFolderPath(uri);
-            assert.equal(fileName, path.join('c:', 'folder'));
+            assert.strictEqual(fileName, path.join('c:', 'folder'));
         });
 
         it('should handle longer path with file schema and encoded windows file name', () => {
             const uri = URI.file(path.join('c:', 'folder', 'sub-folder', 'file.txt'));
             const fileName = PddlWorkspace.getFolderPath(uri);
-            assert.equal(fileName, path.join('c:', 'folder', 'sub-folder'));
+            assert.strictEqual(fileName, path.join('c:', 'folder', 'sub-folder'));
+        });
+    });
+
+    describe('#getFolder', () => {
+        it('parsed two files in the same folder', async () => {
+
+            // GIVEN
+            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const insertedFiles: FileInfo[] = [];
+            pddlWorkspace.on(PddlWorkspace.INSERTED, (file: FileInfo) => {
+                console.log(`Inserted: '${file.name}' from ${file.fileUri}.`);
+                insertedFiles.push(file);
+            })
+
+            const pddlDomainText = `(define (domain domain_name) )`;
+            const pddlProblemText = `(define (problem p1) (:domain domain_name))`;
+
+            // WHEN
+            const domainInfo = await pddlWorkspace.upsertFile(
+                URI.file(path.join('folder1', 'domain.pddl')),
+                PddlLanguage.PDDL,
+                1, // content version
+                pddlDomainText,
+                new SimpleDocumentPositionResolver(pddlDomainText));
+
+            const problemInfo = await pddlWorkspace.upsertFile(
+                URI.file(path.join('folder1', 'problem.pddl')),
+                PddlLanguage.PDDL,
+                1, // content version
+                pddlProblemText,
+                new SimpleDocumentPositionResolver(pddlProblemText));
+
+            const correspondingDomain = pddlWorkspace.getDomainFileFor(problemInfo as ProblemInfo);
+
+            // now do something like `solve(correspondingDomain, problemInfo)`
+
+            // THEN
+            expect(domainInfo).be.instanceOf(DomainInfo);
+            expect(problemInfo).be.instanceOf(ProblemInfo);
+            expect(insertedFiles).to.have.lengthOf(2);
+            expect(insertedFiles).to.deep.equal([domainInfo, problemInfo]);
+
+            expect(correspondingDomain).to.equal(domainInfo, 'corresponding domain');
+            const allFiles = pddlWorkspace.getAllFiles();
+            expect(allFiles).to.deep.equal([domainInfo, problemInfo]);
         });
     });
 

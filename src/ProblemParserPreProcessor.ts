@@ -5,6 +5,7 @@
 
 import { PreProcessor, CommandPreProcessor, OutputAdaptor, NunjucksPreProcessor, Jinja2PreProcessor, PythonPreProcessor, PreProcessingError } from "./PreProcessors";
 import { PddlExtensionContext } from "./PddlExtensionContext";
+import { ErrorWithMessage } from "./utils";
 
 class ConsoleOutputAdaptor implements OutputAdaptor {
     appendLine(text: string): void {
@@ -49,26 +50,29 @@ export class ProblemParserPreProcessor {
                     try {
                         const args1 = this.parseArgs(match[5]);
                         preProcessor = new PythonPreProcessor(this.context.pythonPath(), match[3], args1, match[0], match.index);
-                    } catch (err) {
+                    } catch (err: unknown) {
                         console.log(err);
-                        throw new PreProcessingError(err.message ?? err, 0, 0);
+                        const error = err as ErrorWithMessage;
+                        throw new PreProcessingError(error.message ?? err, 0, 0);
                     }
                     break;
                 case "nunjucks":
                     try {
                         preProcessor = new NunjucksPreProcessor(match[6], match[0], match.index, true);
-                    } catch (err) {
+                    } catch (err: unknown) {
                         console.log(err);
-                        throw new PreProcessingError(err.message ?? err, 0, 0);
+                        const error = err as ErrorWithMessage;
+                        throw new PreProcessingError(error.message ?? err, 0, 0);
                     }
                     break;
                 case "jinja2":
                     if (!this.context) { break; }
                     try {
                         preProcessor = new Jinja2PreProcessor(this.context.pythonPath(), this.context.extensionPath, match[6], match[0], match.index);
-                    } catch (err) {
+                    } catch (err: unknown) {
                         console.log(err);
-                        throw new PreProcessingError(err.message ?? err, 0, 0);
+                        const error = err as ErrorWithMessage;
+                        throw new PreProcessingError(error.message ?? err, 0, 0);
                     }
                     break;
                 default:

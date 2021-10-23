@@ -151,6 +151,7 @@ export class PddlWorkspace extends EventEmitter {
     public static INSERTED = Symbol("INSERTED");
     public static UPDATED = Symbol("UPDATED");
     public static REMOVING = Symbol("REMOVING");
+    static MAX_FILES_PER_FOLDER = 30;
 
     constructor(public epsilon: number, context?: PddlExtensionContext, private fileLoader?: PddlFileSystem) {
         super();
@@ -259,7 +260,8 @@ export class PddlWorkspace extends EventEmitter {
                 .map(file => toFileNameTypeUri(folderUri, file))
                 .filter(file => file.fileType === FileType.File
                     && extname(file.fileName).toLowerCase() === '.' + PDDL
-                    && !folder.hasFile(file.fileUri))
+                    && !folder.hasFile(file.fileUri)
+                    && folder.files.size < PddlWorkspace.MAX_FILES_PER_FOLDER)
                 .forEach(async (file) => {
                     const fileContent = new TextDecoder("utf-8").decode(await this.fileLoader?.readFile(file.fileUri));
                     fileContent && this.insertFile(folder, file.fileUri, toLanguageFromId(PDDL) ?? PddlLanguage.PDDL, -1, fileContent, new SimpleDocumentPositionResolver(fileContent));
@@ -369,19 +371,17 @@ export class PddlWorkspace extends EventEmitter {
 
     async upsertAndParseFolder(folderUri: URI): Promise<Folder> {
         const folderPath = folderUri.fsPath;
-        let folder: Folder;
+        const folder = this.folders.get(folderPath);
+        if (folder) { return folder; }
 
-        if (!this.folders.has(folderPath)) {
-            folder = new Folder(folderPath);
-            this.folders.set(folderPath, folder);
-            this.loadFolder(folder);
-        }
-        else {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            folder = this.folders.get(folderPath)!;
-        }
+        const newFolder = new Folder(folderPath);
+        this.folders.set(folderPath, newFolder);
+        this.loadFolder(newFolder)
+        return newFolder;
+    }
 
-        return folder;
+    getFolder(folderUri: URI): Folder | undefined {
+        return this.folders.get(folderUri.fsPath);
     }
 
     private upsertFolder(folderPath: string): Folder {
