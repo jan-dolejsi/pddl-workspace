@@ -79,12 +79,6 @@ describe('PddlPlanParser', () => {
             assert.deepStrictEqual(planInfo?.getVersion(), 33, 'version');
             const expectedStep = new PlanStep(0.001, 'a p1 p2', true, 10, 3);
             assert.deepStrictEqual(planInfo?.getSteps(), [expectedStep], 'this should be a plan');
-
-            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
-            const plan = planInfo.getPlan(domain, problem);
-            expect(plan.metric).to.equal(0.001);
-            expect(plan.makespan).to.equal(10.001);
         });
 
         it('parses temporal plan with zero metric', () => {
@@ -186,8 +180,3 @@ describe('PddlPlanParser', () => {
         });
     });
 });
-
-function createPositionResolver(): import("../DocumentPositionResolver").DocumentPositionResolver {
-    throw new Error('Function not implemented.');
-}
-
