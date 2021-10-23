@@ -547,6 +547,30 @@ describe('PddlPlannerOutputParser', () => {
             assert.strictEqual(plan.statesEvaluated, 10, 'states evaluated');
         });
 
+        it('parses plan with zero metric', () => {
+            // GIVEN
+            const planText = `;;!domain: d1
+            ;;!problem: p1
+            
+            Metric: 0.000
+            States evaluated: 10
+            2.00: (a x)  [6.0000]
+            Makespan: 8.000`;
+
+            // WHEN
+            const parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: EPSILON, minimumPlansExpected: 1 });
+            parser.appendBuffer(planText);
+            parser.onPlanFinished();
+            const plans = parser.getPlans();
+
+            // THEN
+            expect(plans).to.have.length(1, 'there should be one empty plan');
+            const plan = plans[0];
+            assert.strictEqual(plan.makespan, 8, 'plan makespan');
+            assert.strictEqual(plan.metric, 0, 'plan metric');
+            assert.strictEqual(plan.statesEvaluated, 10, 'states evaluated');
+        });
+
         it('parses xml plan', async () => {
             // GIVEN
             const planText = `States evaluated: 51

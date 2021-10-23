@@ -36,7 +36,7 @@ export class Plan {
             plan.helpfulActions
         );
 
-        plan._metric && (clonedPlan.metric = plan._metric);
+        plan._metric !== undefined && (clonedPlan.metric = plan._metric);
         clonedPlan.statesEvaluated = plan.statesEvaluated;
 
         return clonedPlan;

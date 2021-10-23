@@ -5,8 +5,8 @@
 
 import * as assert from 'assert';
 import { expect } from 'chai';
-import { PddlPlanParser } from './src';
-import { PlanStep, Happening, HappeningType, PddlLanguage } from '../src';
+import { PddlPlanParser, PddlSyntaxTree } from './src';
+import { PlanStep, Happening, HappeningType, PddlLanguage, DomainInfo, ProblemInfo } from '../src';
 import { URI } from 'vscode-uri';
 
 describe('PddlPlanParser', () => {
@@ -66,7 +66,45 @@ describe('PddlPlanParser', () => {
             const planInfo = new PddlPlanParser().parseText(planText, epsilon, fileUri, 33);
 
             // THEN
-            expect(planInfo).to.not.be.undefined;;
+            expect(planInfo).to.not.be.undefined;
+            assert.strictEqual(planInfo?.fileUri, fileUri);
+            const expectedHappenings = [
+                new Happening(0.001, HappeningType.START, 'a p1 p2', 0, 0),
+                new Happening(10.001, HappeningType.END, 'a p1 p2', 0, 0)
+            ];
+            assert.deepStrictEqual(planInfo?.getHappenings(), expectedHappenings, 'there should be 2 happenings');
+            assert.strictEqual(planInfo?.getLanguage(), PddlLanguage.PLAN, 'the language should be plan');
+            assert.deepStrictEqual(planInfo?.isPlan(), true, 'this should be a plan');
+            assert.deepStrictEqual(planInfo?.getParsingProblems(), [], 'there should be no parsing issues');
+            assert.deepStrictEqual(planInfo?.getVersion(), 33, 'version');
+            const expectedStep = new PlanStep(0.001, 'a p1 p2', true, 10, 3);
+            assert.deepStrictEqual(planInfo?.getSteps(), [expectedStep], 'this should be a plan');
+
+            const domain = new DomainInfo(URI.parse("file:///fake"), 1, "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const problem = new ProblemInfo(URI.parse("file:///fake"), 1, "problem1", "domain1", PddlSyntaxTree.EMPTY, createPositionResolver());
+            const plan = planInfo.getPlan(domain, problem);
+            expect(plan.metric).to.equal(0.001);
+            expect(plan.makespan).to.equal(10.001);
+        });
+
+        it('parses temporal plan with zero metric', () => {
+            // GIVEN
+            const planText = `;;!domain: domain1
+            ;;!problem: problem1
+            
+            0.00100: (a p1 p2) [10]
+            
+            ; Makespan: 10.001
+            ; Cost: 0
+            ; States evaluated: 1`;
+
+            const fileUri = URI.parse('file://directory/file1.plan');
+            const epsilon = 0.1;
+            // WHEN
+            const planInfo = new PddlPlanParser().parseText(planText, epsilon, fileUri, 33);
+
+            // THEN
+            expect(planInfo).to.not.be.undefined;
             assert.strictEqual(planInfo?.fileUri, fileUri);
             const expectedHappenings = [
                 new Happening(0.001, HappeningType.START, 'a p1 p2', 0, 0),
@@ -148,4 +186,8 @@ describe('PddlPlanParser', () => {
         });
     });
 });
+
+function createPositionResolver(): import("../DocumentPositionResolver").DocumentPositionResolver {
+    throw new Error('Function not implemented.');
+}
 
