@@ -5,8 +5,8 @@
 
 import * as assert from 'assert';
 import { expect } from 'chai';
-import { PddlPlanParser, PddlSyntaxTree } from './src';
-import { PlanStep, Happening, HappeningType, PddlLanguage, DomainInfo, ProblemInfo } from '../src';
+import { PddlPlanParser } from './src';
+import { PlanStep, Happening, HappeningType, PddlLanguage } from '../src';
 import { URI } from 'vscode-uri';
 
 describe('PddlPlanParser', () => {
@@ -35,7 +35,7 @@ describe('PddlPlanParser', () => {
             const planInfo = new PddlPlanParser().parseText(planText, epsilon, fileUri, version);
 
             // THEN
-            expect(planInfo).to.not.be.undefined;;
+            expect(planInfo).to.not.be.undefined;
             expect(planInfo?.fileUri).to.equal(fileUri);
             const expectedHappening = new Happening(0.001, HappeningType.INSTANTANEOUS, 'a', 0, 0);
             expect(planInfo?.getHappenings()).to.deep.equal([expectedHappening], 'there should be 1 happening');
@@ -164,7 +164,7 @@ describe('PddlPlanParser', () => {
             const planInfo = new PddlPlanParser().parseText(planText, epsilon, fileUri, 33);
 
             // THEN
-            expect(planInfo).to.not.be.undefined;;
+            expect(planInfo).to.not.be.undefined;
             expect(planInfo?.fileUri).to.deep.equal(fileUri);
             const expectedHappenings = [
                 new Happening(0, HappeningType.START, 'DRIVE TRUCK0 DISTRIBUTOR1 DISTRIBUTOR0', 0, 0),
