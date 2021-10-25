@@ -81,7 +81,7 @@ export class PddlPlanParser {
         if (group) {
             // this line is a valid plan step
             const time = group[2] ? parseFloat(group[2]) : planBuilder.getMakespan();
-            const action = group[3];
+            const action = group[3].trim();
             const isDurative = group[5] ? true : false;
             const duration = isDurative ? parseFloat(group[5]) : planBuilder.epsilon;
             return new PlanStep(time, action, isDurative, duration, lineIndex);
