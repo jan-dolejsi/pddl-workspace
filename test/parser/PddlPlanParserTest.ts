@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import { expect } from 'chai';
-import { PddlPlanParser } from './src';
+import { PddlPlanParser, PddlPlanBuilder } from './src';
 import { PlanStep, Happening, HappeningType, PddlLanguage } from '../src';
 import { URI } from 'vscode-uri';
 
@@ -177,6 +177,88 @@ describe('PddlPlanParser', () => {
             assert.deepStrictEqual(planInfo?.getVersion(), 33, 'version');
             const expectedStep0 = new PlanStep(0.000, 'DRIVE TRUCK0 DISTRIBUTOR1 DISTRIBUTOR0', true, 1, 31);
             expect(planInfo?.getSteps()).to.deep.equal([expectedStep0], 'this should be the plan');
+        });
+
+        it('parses PDDL4J plan', () => {
+            // GIVEN
+            const planText = `
+            parsing domain file "domain--4976-qKNHzW6M2X2f-.pddl" done successfully
+            parsing problem file "problem--4976-3GlAwE9PTWiS-.pddl" done successfully
+            java.lang.IllegalStateException: Instrumentation environment not initialised.
+            
+            encoding problem done successfully (88 ops, 32 facts)
+            * starting enforced hill climbing
+            java.lang.IllegalStateException: Instrumentation environment not initialised.
+            java.lang.IllegalStateException: Instrumentation environment not initialised.
+            * enforced hill climbing succeeded
+            * starting greedy best first search anytime (optimized)
+            java.lang.IllegalStateException: Instrumentation environment not initialised.
+            java.lang.IllegalStateException: Instrumentation environment not initialised.
+            java.lang.IllegalStateException: Instrumentation environment not initialised.
+            * greedy best first search anytime failed
+            
+            found plan as follows:
+            
+            0: (             walk driver1 s2 p1-2) [1]
+            1: (             walk driver1 p1-2 s1) [1]
+            2: (             walk driver1 s1 p1-0) [1]
+            3: (             walk driver1 p1-0 s0) [1]
+            4: (    board-truck driver1 truck1 s0) [1]
+            5: ( drive-truck truck1 s0 s1 driver1) [1]
+            6: (disembark-truck driver1 truck1 s1) [1]
+            
+            plan total cost: 7.00
+            
+            
+            time spent:       0.07 seconds parsing 
+                              0.12 seconds encoding 
+                              0.04 seconds searching
+                              0.24 seconds total time
+            
+            memory used:     -0.00 MBytes for problem representation
+                             -0.00 MBytes for searching
+                             -0.00 MBytes total
+            
+            
+            `;
+
+            const fileUri = URI.parse('file://directory/file1.plan');
+            const epsilon = 1;
+            // WHEN
+            const planInfo = new PddlPlanParser().parseText(planText, epsilon, fileUri, 33);
+
+            // THEN
+            expect(planInfo).to.not.be.undefined;
+            expect(planInfo?.fileUri).to.deep.equal(fileUri);
+            assert.strictEqual(planInfo?.getLanguage(), PddlLanguage.PLAN, 'the language should be plan');
+            assert.deepStrictEqual(planInfo?.isPlan(), true, 'this should be a plan');
+            assert.deepStrictEqual(planInfo?.getParsingProblems(), [], 'there should be no parsing issues');
+            assert.deepStrictEqual(planInfo?.getVersion(), 33, 'version');
+            expect(planInfo?.metric).to.equal(7, 'version');
+            const expectedStep0 = new PlanStep(0.000, 'walk driver1 s2 p1-2', true, 1, 18);
+            expect(planInfo?.getSteps()[0]).to.deep.equal(expectedStep0, 'this should be the plan');
+        });
+
+
+        it('parses PDDL4J plan step', () => {
+            // GIVEN
+            const planText = `0: (             walk driver1 s2 p1-2) [1]`;
+            const epsilon = 1;
+
+            // WHEN
+            const pddlPlanBuilder = new PddlPlanBuilder(epsilon);
+            const planStep = new PddlPlanParser().parse(planText, 33, pddlPlanBuilder);
+
+            // THEN
+            expect(planStep).to.not.be.undefined;
+            // expect(planStep?.commitment).to.deep.equal(PlanStepCommitment.Committed);
+            expect(planStep?.fullActionName).to.equal('walk driver1 s2 p1-2', 'full action name');
+            expect(planStep?.getActionName()).to.equal('walk', 'short action name');
+            expect(planStep?.getDuration()).to.equal(1, 'duration');
+            expect(planStep?.getStartTime()).to.equal(0, 'start time');
+            expect(planStep?.getObjects()).to.deep.equal(['driver1', 's2', 'p1-2'], 'objects');
+            const expectedStep0 = new PlanStep(0.000, 'walk driver1 s2 p1-2', true, 1, 33);
+            expect(planStep).to.deep.equal(expectedStep0, 'this should be the plan');
         });
     });
 });
