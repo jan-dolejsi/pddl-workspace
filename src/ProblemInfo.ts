@@ -118,8 +118,39 @@ export class ProblemInfo extends FileInfo {
         clonedProblem.setMetrics(problem.metrics);
         clonedProblem.setObjects(TypeObjectMap.clone(problem.objects));
         clonedProblem.setSupplyDemands(problem.supplyDemands);
-        
+
         return clonedProblem;
+    }
+
+    /**
+     * Copy constructor for deriving problem file with new initial state (preserving TILs after the `newStateTime`).
+     * @param origProblem original (de-serialized) problem
+     * @param newState new initial state
+     * @param newStateTime time at which the new state is effective
+     */
+    static cloneWithInitStateAt(origProblem: ProblemInfo, newState: TimedVariableValue[], newStateTime = 0): string {
+        const origProblemText = origProblem.getText();
+        const initNode = origProblem.syntaxTree.getDefineNodeOrThrow().getFirstOpenBracket(':init');
+
+        if (origProblem.getSupplyDemands().length) {
+            throw new Error("Problems with supply-demand are not supported.");
+        }
+
+        // some TILs from the original problem are still in the future
+        const futureTils = origProblem.getInits()
+            // filter original TILs occurring after `newStateTime`
+            .filter(til => til.getTime() > newStateTime);
+        const newStateWithTils = newState.concat(futureTils)
+            .map(til => TimedVariableValue.copy(til));
+        newStateWithTils.forEach(til => til.setTime(til.getTime() - newStateTime));
+
+        const newInit = newStateWithTils.map(tiv => tiv.toPddlString()).join('\n\t');
+
+        const newProblemText = origProblemText.substring(0, initNode.getStart())
+            + '\n(:init\n' + newInit + '\n)'
+            + origProblemText.substring(initNode.getEnd());
+
+        return newProblemText;
     }
 
     setPreParsingPreProcessor(preProcessor: PreProcessor): void {
@@ -218,6 +249,10 @@ export class TimedVariableValue {
         return this.time;
     }
 
+    setTime(time: number): void {
+        this.time = time;
+    }
+
     getVariableName(): string {
         return this.variableName;
     }
@@ -254,5 +289,15 @@ export class TimedVariableValue {
 
     toString(): string {
         return `${this.variableName}=${this.value} @ ${this.time}`;
+    }
+
+    toPddlString(): string {
+        const valuePddl =
+            typeof this.value == "boolean" ?
+                this.value === true ? `(${this.variableName})` : `(not (${this.variableName}))` :
+                `(= (${this.variableName}) ${this.value})`;
+        return this.time <= 0 ?
+            valuePddl
+            : `(at ${this.time} ${valuePddl})`;
     }
 }

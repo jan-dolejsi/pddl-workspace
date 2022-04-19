@@ -60,6 +60,10 @@ export interface PlannerConfiguration {
     url?: string;
     /**  user can configure this planner */
     canConfigure: boolean;
+    /** Planner support for search debugger call-backs */
+    searchDebuggerSupport?: SearchDebuggerSupportType;
+    /** Planner command-line option for search debugger callback address. Include the $(port) placeholder to pass the HTTP port. */
+    searchDebuggerCommandLineSyntax?: string;
 }
 
 /** Planner options */
@@ -84,8 +88,26 @@ export interface PlannerRunConfiguration {
     /** `true` if the planner requires command-line interaction */
     requiresKeyboardInput?: boolean;
 
-    /** `true` if the planner supports search debugger call-backs */
+    /** @deprecated `true` if the planner supports search debugger call-backs */
     supportsSearchDebugger?: boolean;
+
+    /** `true` if the search debugger is active */
+    searchDebuggerEnabled?: boolean;
+
+    /** Planner support for search debugger call-backs */
+    searchDebuggerPort?: number;
+}
+
+/** Communication mechanism between the search debugger and the planner. */
+export enum SearchDebuggerSupportType {
+    /** Search Debugger not supported. */
+    None = "None",
+    /** HTTP callback to the port exposed by the Search Debugger. */
+    HttpCallback = "HttpCallback",
+    /** HTTP Web Socket that the Search Debugger opens after the async request is sent to the planning service. Json format. */
+    WebSocketJson = "WebSocketJson",
+    /** HTTP Web Socket that the Search Debugger opens after the async request is sent to the planning service. Binary format. */
+    WebSocketBinary = "WebSocketBinary",
 }
 
 /** Trouble shooting information and options. */

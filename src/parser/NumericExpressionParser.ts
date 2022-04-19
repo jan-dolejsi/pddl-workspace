@@ -59,6 +59,7 @@ export class NumericExpressionParser {
             // the parsed value may be NaN
             return new NumericLiteral(parseFloat(node.getToken().tokenText));
         }
+        return undefined;
     }
 
     private parseChildren(node: PddlSyntaxNode): NumericExpression[] {

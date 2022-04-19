@@ -10,5 +10,5 @@
 		}
 	},
 	"mocha.files.glob": "out/test/**/*Test.js",
-	"WhiteSource Advise.BaseBranch": "master"
+	"WhiteSource Advise.Diff.BaseBranch": "master"
 }

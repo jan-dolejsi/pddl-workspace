@@ -71,7 +71,3 @@ export class Util {
 export function equalsCaseInsensitive(text1: string, text2: string): boolean {
     return text1.toLowerCase() === text2.toLowerCase();
 }
-
-export interface ErrorWithMessage {
-    message: string;
-}
