@@ -30,6 +30,7 @@ export class CustomParser extends PddlFileParser<CustomPddlFile> {
             pddlFile.setText(fileText);
             return pddlFile;
         }
+        return undefined;
     }
 }
 

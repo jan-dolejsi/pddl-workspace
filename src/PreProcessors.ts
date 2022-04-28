@@ -7,7 +7,6 @@ import * as process from 'child_process';
 import * as path from 'path';
 import * as nunjucks from 'nunjucks';
 import * as fs from 'fs';
-import { ErrorWithMessage } from './utils';
 
 export interface OutputAdaptor {
     appendLine(text: string): void;
@@ -220,7 +219,7 @@ export class NunjucksPreProcessor extends PreProcessor {
 
             return this.removeMetaDataLine(translated);
         } catch (error: unknown) {
-            const error1 = error as ErrorWithMessage;
+            const error1 = error as Error;
             const pattern = /\((.+)\)\s+\[Line\s+(\d+),\s+Column\s+(\d+)\]/;
             const match = pattern.exec(error1.message);
             if (match) {

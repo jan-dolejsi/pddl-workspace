@@ -5,7 +5,6 @@
 
 import { PreProcessor, CommandPreProcessor, OutputAdaptor, NunjucksPreProcessor, Jinja2PreProcessor, PythonPreProcessor, PreProcessingError } from "./PreProcessors";
 import { PddlExtensionContext } from "./PddlExtensionContext";
-import { ErrorWithMessage } from "./utils";
 
 class ConsoleOutputAdaptor implements OutputAdaptor {
     appendLine(text: string): void {
@@ -52,7 +51,7 @@ export class ProblemParserPreProcessor {
                         preProcessor = new PythonPreProcessor(this.context.pythonPath(), match[3], args1, match[0], match.index);
                     } catch (err: unknown) {
                         console.log(err);
-                        const error = err as ErrorWithMessage;
+                        const error = err as Error;
                         throw new PreProcessingError(error.message ?? err, 0, 0);
                     }
                     break;
@@ -61,7 +60,7 @@ export class ProblemParserPreProcessor {
                         preProcessor = new NunjucksPreProcessor(match[6], match[0], match.index, true);
                     } catch (err: unknown) {
                         console.log(err);
-                        const error = err as ErrorWithMessage;
+                        const error = err as Error;
                         throw new PreProcessingError(error.message ?? err, 0, 0);
                     }
                     break;
@@ -71,7 +70,7 @@ export class ProblemParserPreProcessor {
                         preProcessor = new Jinja2PreProcessor(this.context.pythonPath(), this.context.extensionPath, match[6], match[0], match.index);
                     } catch (err: unknown) {
                         console.log(err);
-                        const error = err as ErrorWithMessage;
+                        const error = err as Error;
                         throw new PreProcessingError(error.message ?? err, 0, 0);
                     }
                     break;
