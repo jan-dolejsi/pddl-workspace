@@ -12,5 +12,5 @@ module.exports = {
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-use-before-define": "off",
   },
-  ignorePatterns: ["out/"]
+  ignorePatterns: ["out/", "node_modules/", "dist/"]
 };

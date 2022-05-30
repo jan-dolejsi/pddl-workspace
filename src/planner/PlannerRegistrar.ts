@@ -51,6 +51,8 @@ export class WellKnownPlannerKind {
     public static readonly COMMAND = new PlannerKind("COMMAND");
     public static readonly SERVICE_SYNC = new PlannerKind("SERVICE_SYNC");
     public static readonly SERVICE_ASYNC = new PlannerKind("SERVICE_ASYNC");
+    public static readonly PLANNING_AS_A_SERVICE = new PlannerKind("PLANNING_AS_A_SERVICE");
+    public static readonly PLANNING_AS_A_SERVICE_PREVIEW = new PlannerKind("PLANNING_AS_A_SERVICE_PREVIEW");
 }
 
 class PlannerProviderMap extends StringifyingMap<PlannerKind, PlannerProvider> {
