@@ -260,5 +260,26 @@ describe('PddlPlanParser', () => {
             const expectedStep0 = new PlanStep(0.000, 'walk driver1 s2 p1-2', true, 1, 33);
             expect(planStep).to.deep.equal(expectedStep0, 'this should be the plan');
         });
+
+        it('parses plan step from dual-bfws-ffparser', () => {
+            // GIVEN
+            const planText = `(LIFT HOIST1 CRATE0 PALLET1 DISTRIBUTOR0)`;
+            const epsilon = 1;
+
+            // WHEN
+            const pddlPlanBuilder = new PddlPlanBuilder(epsilon);
+            const planStep = new PddlPlanParser().parse(planText, 33, pddlPlanBuilder);
+
+            // THEN
+            expect(planStep).to.not.be.undefined;
+            // expect(planStep?.commitment).to.deep.equal(PlanStepCommitment.Committed);
+            expect(planStep?.fullActionName).to.equal('LIFT HOIST1 CRATE0 PALLET1 DISTRIBUTOR0', 'full action name');
+            expect(planStep?.getActionName()).to.equal('LIFT', 'short action name');
+            expect(planStep?.getDuration()).to.equal(1, 'duration');
+            expect(planStep?.getStartTime()).to.equal(0, 'start time');
+            expect(planStep?.getObjects()).to.deep.equal(['HOIST1', 'CRATE0', 'PALLET1', 'DISTRIBUTOR0'], 'objects');
+            const expectedStep0 = new PlanStep(0.000, 'LIFT HOIST1 CRATE0 PALLET1 DISTRIBUTOR0', false, epsilon, 33);
+            expect(planStep).to.deep.equal(expectedStep0, 'this should be the plan');
+        });
     });
 });

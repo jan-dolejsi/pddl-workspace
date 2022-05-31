@@ -50,6 +50,13 @@ export class PlanStep {
         return this.isDurative ? this.time + (this.duration ?? Number.NaN) : this.time;
     }
 
+    /**
+     * @returns end time that makes this plan step effectively durative
+     */
+    getEffectiveEndTime(): number {
+        return this.time + (this.duration ?? Number.NaN);
+    }
+
     getDuration(): number | undefined {
         return this.duration;
     }
