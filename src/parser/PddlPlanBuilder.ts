@@ -21,8 +21,9 @@ export class PddlPlanBuilder {
     constructor(public readonly epsilon: number) { }
 
     add(step: PlanStep): void {
-        if (this.makespan < step.getEndTime()) {
-            this.makespan = step.getEndTime();
+        const effectiveEndTime = step.getEffectiveEndTime();
+        if (this.makespan < effectiveEndTime) {
+            this.makespan = effectiveEndTime;
         }
         this.steps.push(step);
     }

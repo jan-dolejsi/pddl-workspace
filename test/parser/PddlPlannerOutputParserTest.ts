@@ -409,7 +409,7 @@ describe('PddlPlannerOutputParser', () => {
             }
         });
 
-        it('parses multiple improving plans - lpg', () => {
+        it('parses plans from lpg', () => {
             // GIVEN
             const planText = `Parsing domain file:  domain 'DEPOT' defined ... done.
             Parsing problem file:  problem 'DEPOTPROB1818' defined ... done.
@@ -479,6 +479,33 @@ describe('PddlPlannerOutputParser', () => {
                 // expect(plan0.statesEvaluated, 'plan0 states evaluated').to.equal(10);
                 expect(plan0.makespan, 'plan0 makespan').to.equal(5);
                 expect(plan0.steps, 'plan0 should have N actions').to.have.lengthOf(11);
+            }
+        });
+
+        it('parses plans from dual-bfws-ffparser', () => {
+            // GIVEN
+            const planText = `(LIFT HOIST1 CRATE0 PALLET1 DISTRIBUTOR0)
+            (DRIVE TRUCK0 DISTRIBUTOR1 DISTRIBUTOR0)
+            (LOAD HOIST1 CRATE0 TRUCK0 DISTRIBUTOR0)
+            (DRIVE TRUCK0 DISTRIBUTOR0 DISTRIBUTOR1)
+            (UNLOAD HOIST2 CRATE0 TRUCK0 DISTRIBUTOR1)
+            (DROP HOIST2 CRATE0 PALLET2 DISTRIBUTOR1)
+            `;
+
+            // WHEN
+            const parser = new PddlPlannerOutputParser(dummyDomain, dummyProblem, { epsilon: 1 });
+            parser.appendBuffer(planText);
+            parser.onPlanFinished();
+            const plans = parser.getPlans();
+
+            // THEN
+            expect(plans, 'plans').to.have.lengthOf(1);
+            {
+                const plan0 = plans[0];
+                // expect(plan0.metric, 'plan0 cost').to.equal(11);
+                // expect(plan0.statesEvaluated, 'plan0 states evaluated').to.equal(10);
+                expect(plan0.makespan, 'plan0 makespan').to.equal(5);
+                expect(plan0.steps, 'plan0 should have N actions').to.have.lengthOf(6);
             }
         });
 

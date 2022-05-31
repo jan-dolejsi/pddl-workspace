@@ -57,7 +57,7 @@ export class PddlPlannerOutputParser {
             lastEndLine = nextEndLine + 1;
         }
         if (textString.length > lastEndLine) {
-            this.endOfBufferToBeParsedNextTime = textString.substr(lastEndLine);
+            this.endOfBufferToBeParsedNextTime = textString.substring(lastEndLine);
         }
     }
 
