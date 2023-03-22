@@ -57,7 +57,7 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            expect(domainInfo).to.not.be.undefined;;
+            expect(domainInfo).to.not.be.undefined;
             assert.strictEqual(domainInfo?.name, 'domain_name');
             assert.ok(domainInfo?.getRequirements().length ?? 0 > 0, 'there should be requirements');
             assert.deepStrictEqual(domainInfo?.getTypes(), [], 'there should be no types');
@@ -291,7 +291,7 @@ describe('PddlDomainParser', () => {
             const domainInfo = createPddlDomainParser(domainPddl);
 
             // THEN
-            expect(domainInfo).to.not.be.undefined;;
+            expect(domainInfo).to.not.be.undefined;
             expect(domainInfo?.getActions()).to.have.length(1, 'there should be 1 action');
             assert.equal(domainInfo?.getActions()[0].name, "action1", 'action name');
             assert.ok(domainInfo?.getActions()[0].isDurative(), 'action should be durative');

@@ -64,7 +64,7 @@ export class TypeObjectMap {
     static clone(other: unknown): TypeObjectMap {
         const map = new TypeObjectMap();
         const otherMap = objToStrMap(other);
-        otherMap.forEach((typeObjects: { type: string; objects: string[]}) => {
+        otherMap.forEach((typeObjects: { type: string; objects: string[] }) => {
             map.addAll(typeObjects.type, typeObjects.objects);
         });
 
@@ -157,11 +157,14 @@ export class TypeObjectMap {
  * Domain file.
  */
 export class DomainInfo extends FileInfo {
+    private predicatesNode: PddlBracketNode | undefined;
     private predicates: Variable[] = [];
+    private functionsNode: PddlBracketNode | undefined;
     private functions: Variable[] = [];
     private derived: Variable[] = [];
     private actions: Action[] = [];
     private typeInheritance: DirectionalGraph = new DirectionalGraph();
+    private typesNode: PddlBracketNode | undefined;
     private typeLocations = new Map<string, PddlRange>();
     private constants: TypeObjectMap = new TypeObjectMap();
     private events?: Action[];
@@ -179,17 +182,17 @@ export class DomainInfo extends FileInfo {
     static clone(domain: DomainInfo): DomainInfo {
         const clonedDomain = new DomainInfo(domain.fileUri, Number.NaN, domain.name,
             PddlSyntaxTree.EMPTY, new SimpleDocumentPositionResolver(''))
-        
+
         clonedDomain.setActions(domain.actions.map(a => this.cloneAction(a)));
         clonedDomain.setConstants(TypeObjectMap.clone(domain.constants));
         clonedDomain.setConstraints(domain.constraints);
         clonedDomain.setDerived(domain.derived);
         domain.events && clonedDomain.setEvents(domain.events);
-        clonedDomain.setFunctions(domain.functions);
-        clonedDomain.setPredicates(domain.predicates);
+        clonedDomain.setFunctions(domain.functions, domain.functionsNode);
+        clonedDomain.setPredicates(domain.predicates, domain.predicatesNode);
         domain.processes && clonedDomain.setProcesses(domain.processes);
         // todo: domain.requirements && clonedDomain.setRequirements(domain.getRequirements());
-        clonedDomain.setTypeInheritance(DirectionalGraph.fromGraph(domain.typeInheritance));
+        clonedDomain.setTypeInheritance(DirectionalGraph.fromGraph(domain.typeInheritance), domain.typesNode);
 
         return clonedDomain;
     }
@@ -212,16 +215,26 @@ export class DomainInfo extends FileInfo {
         return this.predicates;
     }
 
-    setPredicates(predicates: Variable[]): void {
+    getPredicatesNode(): PddlBracketNode | undefined {
+        return this.predicatesNode
+    }
+
+    setPredicates(predicates: Variable[], predicatesNode: PddlBracketNode | undefined): void {
         this.predicates = predicates;
+        this.predicatesNode = predicatesNode;
     }
 
     getFunctions(): Variable[] {
         return this.functions;
     }
 
-    setFunctions(functions: Variable[]): void {
+    getFunctionsNode(): PddlBracketNode | undefined {
+        return this.functionsNode;
+    }
+
+    setFunctions(functions: Variable[], functionsNode: PddlBracketNode | undefined): void {
         this.functions = functions;
+        this.functionsNode = functionsNode;
     }
 
     getFunction(liftedVariableName: string): Variable | undefined {
@@ -253,13 +266,9 @@ export class DomainInfo extends FileInfo {
         const structures = new Array<Action>();
         structures.push(...this.getActions());
         const events = this.getEvents();
-        if (events) {
-            structures.push(...events);
-        }
+        events && structures.push(...events);
         const processes = this.getProcesses();
-        if (processes) {
-            structures.push(...processes);
-        }
+        processes && structures.push(...processes);
         return structures;
     }
 
@@ -267,8 +276,13 @@ export class DomainInfo extends FileInfo {
         return this.typeInheritance;
     }
 
+    getTypesNode(): PddlBracketNode | undefined {
+        return this.typesNode;
+    }
+
     setTypeInheritance(typeInheritance: DirectionalGraph, typesNode?: PddlBracketNode, positionResolver?: DocumentPositionResolver): void {
         this.typeInheritance = typeInheritance;
+        this.typesNode = typesNode;
         if (typesNode && positionResolver) {
             this.getTypes().forEach(typeName => {
                 const typeNode = typesNode.getFirstChild(PddlTokenType.Other, new RegExp("^" + typeName + "$"));
@@ -382,6 +396,8 @@ export class InstantAction extends Action {
 
 export class DurativeAction extends Action {
     constructor(name: string | undefined, parameters: Parameter[], location: PddlRange,
+        public readonly actionNode?: PddlBracketNode,
+        public readonly parametersNode?: PddlBracketNode,
         public readonly duration?: PddlBracketNode,
         public readonly condition?: PddlBracketNode,
         public readonly effect?: PddlBracketNode) {

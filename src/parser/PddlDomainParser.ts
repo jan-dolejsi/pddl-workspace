@@ -9,7 +9,7 @@ import { PddlSyntaxNode } from "./PddlSyntaxNode";
 import { VariablesParser } from "./VariablesParser";
 import { DocumentPositionResolver, SimpleDocumentPositionResolver } from "../DocumentPositionResolver";
 import { DerivedVariablesParser } from "./DerivedVariableParser";
-import { DomainInfo, Action } from "../DomainInfo";
+import { DomainInfo, Action, DurativeAction } from "../DomainInfo";
 import { PddlSyntaxTree } from "./PddlSyntaxTree";
 import { InstantActionParser } from "./InstantActionParser";
 import { DurativeActionParser } from "./DurativeActionParser";
@@ -84,13 +84,13 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
         const predicatesNode = defineNode.getFirstOpenBracket(':predicates');
         if (predicatesNode) {
             const predicates = new VariablesParser(predicatesNode, positionResolver).getVariables();
-            domainInfo.setPredicates(predicates);
+            domainInfo.setPredicates(predicates, predicatesNode);
         }
 
         const functionsNode = defineNode.getFirstOpenBracket(':functions');
         if (functionsNode) {
             const functions = new VariablesParser(functionsNode, positionResolver).getVariables();
-            domainInfo.setFunctions(functions);
+            domainInfo.setFunctions(functions, functionsNode);
         }
 
         domainInfo.setDerived(PddlDomainParser.parseDerived(defineNode, positionResolver));
@@ -116,7 +116,7 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
         if (requirementsNode) {
             const requirements = requirementsNode.getNonWhitespaceChildren()
                 .filter(node => node.getToken().type === PddlTokenType.Keyword)
-                .map(node => node.getToken().tokenText);
+                .map(node => node.getToken().tokenText.toLowerCase());
             fileInfo.setRequirements(requirements);
         }
     }
@@ -133,7 +133,7 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
             .map(actionNode => new InstantActionParser(actionNode, positionResolver).getAction());
     }
 
-    parseDurativeActions(defineNode: PddlSyntaxNode, positionResolver: DocumentPositionResolver): Action[] {
+    parseDurativeActions(defineNode: PddlSyntaxNode, positionResolver: DocumentPositionResolver): DurativeAction[] {
         return defineNode.getChildrenOfType(PddlTokenType.OpenBracketOperator, /\(\s*:durative-action$/)
             .map(actionNode => new DurativeActionParser(actionNode, positionResolver).getAction());
     }

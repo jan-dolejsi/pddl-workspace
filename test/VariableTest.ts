@@ -60,4 +60,71 @@ describe('Variable', () => {
             assert.equal(variable.isGrounded(), true, "should be grounded");
         });
     });
+
+    describe('#from', () => {
+
+        it('from-lifted', () => {
+            // GIVEN
+            const variableName = "predicate1";
+    
+            // WHEN
+            const variable = Variable.from(variableName, [new Parameter("t1", "type1"), new Parameter("t2", "type2")]);
+    
+            // THEN
+            assert.equal(variable.getFullName(), variableName + ' ?t1 - type1 ?t2 - type2', "full name should be...");
+            assert.equal(variable.name, variableName);
+            assert.equal(variable.declaredNameWithoutTypes, "predicate1 ?t1 ?t2");
+            assert.equal(variable.isGrounded(), false, "should NOT be grounded");
+            expect(variable.parameters).to.have.length(2);
+        });
+    
+        it('constructs-grounded', () => {
+            // GIVEN
+            const variableName = "predicate1";
+    
+            // WHEN
+            const variable = Variable.from(variableName, [new ObjectInstance("o1", "type1"), new ObjectInstance("o2", "type1")]);
+    
+            // THEN
+            assert.equal(variable.getFullName(), "predicate1 o1 o2", "full name should be...");
+            assert.equal(variable.declaredNameWithoutTypes, "predicate1 o1 o2", "declared name without types should be...");
+            // assert.equal(variable.declaredName, variableName, "declared name should be...");
+            assert.equal(variable.name, variableName);
+            expect(variable.parameters).to.have.length(2);
+            assert.equal(variable.isGrounded(), true, "should be grounded");
+        });
+    });
+
+    describe("#ground()", () => {
+		it('Grounds to one object', () => {
+			// GIVEN
+            const variableName = "predicate1 ?p1 - type1";
+            const p1 = new Parameter("p1", "type1");
+            const variable = new Variable(variableName, [p1]);
+			
+			// WHEN
+            const o1 = p1.object("o1");
+            const groundedVariable = variable.ground([o1]);
+
+			expect(groundedVariable.getFullName()).to.be.equal('predicate1 o1');
+		});
+	});
+
+    describe("#bind()", () => {
+		it('Binds to an action parameter', () => {
+			// GIVEN
+            const variableName = "predicate1 ?p1 - type1";
+            const type1 = "type1";
+            const p1 = new Parameter("p1", type1);
+            const variable = new Variable(variableName, [p1]);
+			
+			// WHEN
+            const p2 = new Parameter("p2", type1);
+            const groundedVariable = variable.bind([p2]);
+
+			expect(groundedVariable.getFullName()).to.be.equal('predicate1 ?p2 - type1');
+			expect(groundedVariable.declaredNameWithoutTypes).to.be.equal('predicate1 ?p2');
+			expect(groundedVariable.parameters).to.deep.equal([p2]);
+		});
+	});
 });

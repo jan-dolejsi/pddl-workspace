@@ -61,6 +61,14 @@ export class Variable {
         this.name = declaredName.replace(/( .*)$/gi, '');
     }
 
+    static from(name: string, terms: Term[]): Variable {
+        let fullName = name;
+        if (terms.length) {
+            terms.forEach(t => fullName+= ' ' + t.toPddlString())
+        }
+        return new Variable(fullName, terms);
+    }
+
     static fromGrounded(fullName: string): Variable {
         const fragments = fullName.split(/\s+/);
         const name = fragments.shift();
@@ -74,7 +82,7 @@ export class Variable {
         return new Variable(name, terms); 
     }
 
-    bind(objects: ObjectInstance[]): Variable {
+    ground(objects: ObjectInstance[]): Variable {
         const objectNames = objects.map(o => o.name).join(" ");
         if (this.parameters.length !== objects.length) {
             throw new Error(`Invalid objects '${objectNames}' for function '${this.getFullName()}' with ${this.parameters.length} parameters.`);
@@ -82,6 +90,16 @@ export class Variable {
         let fullName = this.name;
         if (objects) { fullName += " " + objectNames; }
         return new Variable(fullName, objects);
+    }
+
+    bind(parameters: Parameter[]): Variable {
+        const paramDefs = parameters.map(o => o.toPddlString()).join(" ");
+        if (this.parameters.length !== parameters.length) {
+            throw new Error(`Invalid parameters '${paramDefs}' for function '${this.getFullName()}' with ${this.parameters.length} parameters.`);
+        }
+        let fullName = this.name;
+        if (parameters) { fullName += " " + paramDefs; }
+        return new Variable(fullName, parameters);
     }
 
     getFullName(): string {
@@ -134,6 +152,10 @@ export abstract class Term {
 export class Parameter extends Term {
     constructor(public name: string, type: string) {
         super(type);
+    }
+
+    object(objectName: string): ObjectInstance {
+        return new ObjectInstance(objectName, this.type);
     }
 
     toPddlString(): string {

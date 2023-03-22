@@ -7,12 +7,12 @@ import { expect, use } from 'chai';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 use(require('chai-string'));
 import { PddlSyntaxTreeBuilder } from './src';
-import { SimpleDocumentPositionResolver, PddlRange } from '../src';
+import { SimpleDocumentPositionResolver, PddlRange, DurativeAction } from '../src';
 import { DurativeActionParser } from './src';
 
 describe('DurativeActionParser', () => {
 
-    function createActionParser(actionPddl: string): DurativeActionParser {
+    function createActionParser(actionPddl: string): DurativeActionParser<DurativeAction> {
         const syntaxTree = new PddlSyntaxTreeBuilder(actionPddl).getTree();
         return new DurativeActionParser(
             syntaxTree.getRootNode().getFirstOpenBracketOrThrow(':durative-action'), 

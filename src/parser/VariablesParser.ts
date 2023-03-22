@@ -130,5 +130,4 @@ export class VariablesParser {
     getVariables(): Variable[] {
         return this.variables;
     }
-
 }
