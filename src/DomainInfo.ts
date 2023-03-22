@@ -262,6 +262,10 @@ export class DomainInfo extends FileInfo {
         return this.actions;
     }
 
+    getJobs(): DurativeAction[] | undefined {
+        return this.actions.filter(a => a instanceof Job);
+    }
+
     getStructures(): Action[] {
         const structures = new Array<Action>();
         structures.push(...this.getActions());
@@ -269,6 +273,8 @@ export class DomainInfo extends FileInfo {
         events && structures.push(...events);
         const processes = this.getProcesses();
         processes && structures.push(...processes);
+        const jobs = this.getJobs();
+        jobs && structures.push(...jobs);
         return structures;
     }
 
@@ -406,6 +412,17 @@ export class DurativeAction extends Action {
 
     isDurative(): boolean {
         return true;
+    }
+}
+
+export class Job extends DurativeAction {
+    constructor(name: string | undefined, parameters: Parameter[], location: PddlRange,
+        actionNode?: PddlBracketNode,
+        parametersNode?: PddlBracketNode,
+        duration?: PddlBracketNode,
+        condition?: PddlBracketNode,
+        effect?: PddlBracketNode) {
+        super(name, parameters, location, actionNode, parametersNode, duration, condition, effect);
     }
 }
 

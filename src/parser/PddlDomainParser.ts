@@ -9,10 +9,10 @@ import { PddlSyntaxNode } from "./PddlSyntaxNode";
 import { VariablesParser } from "./VariablesParser";
 import { DocumentPositionResolver, SimpleDocumentPositionResolver } from "../DocumentPositionResolver";
 import { DerivedVariablesParser } from "./DerivedVariableParser";
-import { DomainInfo, Action, DurativeAction } from "../DomainInfo";
+import { DomainInfo, Action, DurativeAction, Job } from "../DomainInfo";
 import { PddlSyntaxTree } from "./PddlSyntaxTree";
 import { InstantActionParser } from "./InstantActionParser";
-import { DurativeActionParser } from "./DurativeActionParser";
+import { DurativeActionParser, JobParser } from "./DurativeActionParser";
 import { PddlInheritanceParser } from "./PddlInheritanceParser";
 import { PddlConstraintsParser } from "./PddlConstraintsParser";
 import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
@@ -97,7 +97,8 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
 
         const instantActions = this.parseActionProcessOrEvent(defineNode, positionResolver, "action");
         const durativeActions = this.parseDurativeActions(defineNode, positionResolver);
-        domainInfo.setActions(instantActions.concat(durativeActions));
+        const jobs = this.parseJob(defineNode, positionResolver);
+        domainInfo.setActions(instantActions.concat(durativeActions).concat(jobs));
 
         const processes = this.parseActionProcessOrEvent(defineNode, positionResolver, "process");
         const events = this.parseActionProcessOrEvent(defineNode, positionResolver, "event");
@@ -136,5 +137,10 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
     parseDurativeActions(defineNode: PddlSyntaxNode, positionResolver: DocumentPositionResolver): DurativeAction[] {
         return defineNode.getChildrenOfType(PddlTokenType.OpenBracketOperator, /\(\s*:durative-action$/)
             .map(actionNode => new DurativeActionParser(actionNode, positionResolver).getAction());
+    }
+    
+    parseJob(defineNode: PddlSyntaxNode, positionResolver: DocumentPositionResolver): Job[] {
+        return defineNode.getChildrenOfType(PddlTokenType.OpenBracketOperator, /\(\s*:job$/)
+            .map(actionNode => new JobParser(actionNode, positionResolver).getAction());
     }
 }
