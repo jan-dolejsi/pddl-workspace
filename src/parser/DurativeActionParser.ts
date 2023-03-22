@@ -3,18 +3,19 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { PddlSyntaxNode } from "./PddlSyntaxNode";
+import { PddlBracketNode, PddlSyntaxNode } from "./PddlSyntaxNode";
 import { PddlTokenType } from "./PddlTokenizer";
 import { PddlRange, DocumentPositionResolver } from "../DocumentPositionResolver";
 import { parseParameters } from "./VariablesParser";
 import { DurativeAction } from "../DomainInfo";
 import { DerivedVariablesParser } from "./DerivedVariableParser";
+import { Parameter } from "../language";
 
 /** 
  * Parses `(:durative-action ...)` blocks.
  */
-export class DurativeActionParser {
-    private action: DurativeAction;
+export class DurativeActionParser<A extends DurativeAction> {
+    private action: A;
 
     constructor(actionNode: PddlSyntaxNode, positionResolver: DocumentPositionResolver) {
 
@@ -49,11 +50,17 @@ export class DurativeActionParser {
             end: positionResolver.resolveToPosition(actionNode.getEnd())
         });
         
-        this.action = new DurativeAction(actionName, parameters, location, durationNode, conditionNode, effectNode);
+        this.action = this.createDurativeAction(actionName, parameters, location, actionNode as PddlBracketNode, parametersNode, durationNode, conditionNode, effectNode);
         this.action.setDocumentation(DerivedVariablesParser.getDocumentationAbove(actionNode));
     }
 
-    getAction(): DurativeAction {
+    protected createDurativeAction(actionName: string | undefined, parameters: Parameter[], location: PddlRange,
+        actionNode: PddlBracketNode, parametersNode: PddlBracketNode | undefined, 
+        durationNode: PddlBracketNode | undefined, conditionNode: PddlBracketNode | undefined, effectNode: PddlBracketNode | undefined): A {
+        return new DurativeAction(actionName, parameters, location, actionNode, parametersNode, durationNode, conditionNode, effectNode) as A;
+    }
+
+    getAction(): A {
         return this.action;
     }
 }
