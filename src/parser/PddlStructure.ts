@@ -22,9 +22,10 @@ export class PddlStructure {
     static readonly DERIVED = ':derived';
     static readonly ACTION = ':action';
     static readonly DURATIVE_ACTION = ':durative-action';
+    static readonly JOB = ":job";
     static readonly PROCESS = ':process';
     static readonly EVENT = ':event';
-    static readonly PDDL_DOMAIN_STRUCTURES = [PddlStructure.DERIVED, PddlStructure.ACTION, PddlStructure.DURATIVE_ACTION, PddlStructure.PROCESS, PddlStructure.EVENT];
+    static readonly PDDL_DOMAIN_STRUCTURES = [PddlStructure.DERIVED, PddlStructure.ACTION, PddlStructure.DURATIVE_ACTION, PddlStructure.PROCESS, PddlStructure.EVENT, PddlStructure.JOB];
 
     /* PROBLEM KEYWORDS */
     static readonly PROBLEM = 'problem';

@@ -7,7 +7,7 @@ import { PddlBracketNode, PddlSyntaxNode } from "./PddlSyntaxNode";
 import { PddlTokenType } from "./PddlTokenizer";
 import { PddlRange, DocumentPositionResolver } from "../DocumentPositionResolver";
 import { parseParameters } from "./VariablesParser";
-import { DurativeAction } from "../DomainInfo";
+import { DurativeAction, Job } from "../DomainInfo";
 import { DerivedVariablesParser } from "./DerivedVariableParser";
 import { Parameter } from "../language";
 
@@ -62,5 +62,13 @@ export class DurativeActionParser<A extends DurativeAction> {
 
     getAction(): A {
         return this.action;
+    }
+}
+
+export class JobParser extends DurativeActionParser<Job> {
+    protected createDurativeAction(actionName: string | undefined, parameters: Parameter[], location: PddlRange,
+        actionNode: PddlBracketNode, parametersNode: PddlBracketNode | undefined, 
+        durationNode: PddlBracketNode | undefined, conditionNode: PddlBracketNode | undefined, effectNode: PddlBracketNode | undefined): Job {
+        return new Job(actionName, parameters, location, actionNode, parametersNode, durationNode, conditionNode, effectNode);
     }
 }
