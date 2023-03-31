@@ -2,16 +2,20 @@
   "name": "pddl-workspace",
   "version": "8.1.0",
   "description": "PDDL Workspace",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "types": "dist/cjs/index.d.ts",
   "scripts": {
     "test": "npx mocha -- out/test/**/*Test.js",
     "pretest": "npx eslint ./src/**/*.ts && npm run compile",
-    "build": "tsc",
+    "build:esm": "tsc -p ./tsconfig.esm.json",
+    "build:cjs": "tsc -p ./tsconfig.cjs.json",
+    "build": "npm run build:esm && npm run build:cjs",
     "compile": "tsc && npm run copyToDist",
-    "copyToDist": "copyfiles --error --verbose --up 2 \"./out/src/**/*.*\" ./dist/",
+    "copyToDist:esm": "copyfiles --error --verbose --up 2 \"./out/esm/src/**/*.*\" ./dist/esm",
+    "copyToDist:cjs": "copyfiles --error --verbose --up 2 \"./out/cjs/src/**/*.*\" ./dist/cjs",
+    "copyToDist": "npm run copyToDist:cjs && npm run copyToDist:esm",
     "prepack": "npm run test && npm run copyToDist",
-    "watch": "tsc -w",
+    "watch": "tsc -w -p ./tsconfig.esm.json",
     "clean": "rmdir out /s && rmdir dist /s"
   },
   "keywords": [
@@ -25,6 +29,21 @@
     "type": "git",
     "url": "https://github.com/jan-dolejsi/pddl-workspace"
   },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/types/index.d.ts",
+        "default": "./dist/esm/index.mjs"
+      },
+      "require": {
+        "types": "./dist/cjs/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist/**/*"
+  ],
   "devDependencies": {
     "@types/chai": "4.3.1",
     "@types/chai-string": "1.4.2",
