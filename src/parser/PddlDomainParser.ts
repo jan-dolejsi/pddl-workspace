@@ -129,6 +129,8 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
                 .filter(node => node.getToken().type === PddlTokenType.Keyword)
                 .map(node => node.getToken().tokenText.toLowerCase());
             fileInfo.setRequirements(requirements);
+        } else {
+            fileInfo.setRequirements([]);
         }
     }
 
