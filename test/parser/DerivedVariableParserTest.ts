@@ -7,12 +7,7 @@ import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver, PddlRange } from '../src';
 import { DerivedVariablesParser } from './src';
 
-import { expect, use } from 'chai';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-use(require('chai-string'));
-use(function(_chai,utils) {
-    utils.objDisplay = function(obj: unknown): string { return obj+''; };
-});
+import { describe, it, expect } from 'vitest';
 
 describe('DerivedVariableParser', () => {
     describe('#getVariable', () => {
@@ -36,7 +31,7 @@ describe('DerivedVariableParser', () => {
             expect(derivedPredicate, 'there should be one derived predicate').to.not.be.undefined;
             expect(derivedPredicate?.name).equal('can-lift');
             expect(derivedPredicate?.parameters).to.have.length(2);
-            expect(derivedPredicate?.getDocumentation().join('\n')).to.startWith('can lift');
+            expect(derivedPredicate?.getDocumentation().join('\n')).toMatch(/^can lift/);
             expect(derivedPredicate?.getLocation()).to.deep.equal(PddlRange.createRange({ startLine: 2, startCharacter: 12, endLine: 3, endCharacter: 43 }));
         });
 

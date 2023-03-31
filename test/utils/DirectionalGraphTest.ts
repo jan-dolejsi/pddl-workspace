@@ -4,11 +4,11 @@
  * ------------------------------------------------------------------------------------------ */
 
 import { DirectionalGraph } from './src';
-import { expect } from 'chai';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('DirectionalGraph', () => {
     let graph: DirectionalGraph;
-    beforeEach(function () {
+    beforeEach(() => {
         graph = new DirectionalGraph();
     });
 

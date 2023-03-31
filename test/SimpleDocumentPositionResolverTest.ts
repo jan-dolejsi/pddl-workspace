@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
 import { SimpleDocumentPositionResolver, PddlPosition } from './src';
 
 describe('SimpleDocumentPositionResolver', () => {
@@ -17,7 +18,7 @@ describe('SimpleDocumentPositionResolver', () => {
 
             // WHEN
             const position0 = resolver.resolveToPosition(0);
-            assert.deepStrictEqual(position0, new PddlPosition(0, 0));
+            expect(position0).to.deep.equal(new PddlPosition(0, 0));
 
             const position1 = resolver.resolveToPosition(1);
             assert.deepStrictEqual(position1, new PddlPosition(0, 1));

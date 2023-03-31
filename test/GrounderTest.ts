@@ -6,7 +6,7 @@
 import { ProblemInfo, DocumentPositionResolver } from './src';
 import { Variable, Parameter, ObjectInstance } from './src';
 import * as assert from 'assert';
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 import { Grounder } from './src';
 import { PddlSyntaxTree } from './parser/src';
 import { SimpleDocumentPositionResolver } from './src';

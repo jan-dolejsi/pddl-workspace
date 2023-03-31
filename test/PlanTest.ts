@@ -10,7 +10,7 @@ import {
     TypeObjectMap, ProblemInfo, DocumentPositionResolver, SimpleDocumentPositionResolver
 } from "./src";
 import { DirectionalGraph } from './utils/src';
-const expect = require('chai').expect;
+import { describe, it, expect } from 'vitest';
 
 function createPositionResolver(): DocumentPositionResolver {
     return new SimpleDocumentPositionResolver('');
