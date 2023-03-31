@@ -224,6 +224,10 @@ export class DomainInfo extends FileInfo {
         this.predicatesNode = predicatesNode;
     }
 
+    injectPredicates(predicates: Variable[]): void {
+        this.predicates.push(...predicates);
+    }
+
     getFunctions(): Variable[] {
         return this.functions;
     }
@@ -235,6 +239,10 @@ export class DomainInfo extends FileInfo {
     setFunctions(functions: Variable[], functionsNode: PddlBracketNode | undefined): void {
         this.functions = functions;
         this.functionsNode = functionsNode;
+    }
+
+    injectFunctions(functions: Variable[]): void {
+        this.functions.push(...functions);
     }
 
     getFunction(liftedVariableName: string): Variable | undefined {

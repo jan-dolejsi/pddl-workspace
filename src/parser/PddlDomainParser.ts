@@ -19,11 +19,20 @@ import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
 import { Variable } from "../language";
 import { PddlFileParser } from "./PddlFileParser";
 import { URI } from "vscode-uri";
+import { JobSchedulingSyntaxInjector, SyntaxInjectors } from "../injector/SyntaxInjector";
 
 /**
  * Planning Domain parser.
  */
 export class PddlDomainParser extends PddlFileParser<DomainInfo> {
+    
+    private readonly injectors: SyntaxInjectors;
+    
+    constructor(private readonly options?: { injectors: SyntaxInjectors }) {
+        super();
+        this.injectors = options?.injectors ?? new SyntaxInjectors([new JobSchedulingSyntaxInjector()]);
+    }
+
     async tryParse(fileUri: URI, fileVersion: number, fileText: string, syntaxTree: PddlSyntaxTree, positionResolver: DocumentPositionResolver): Promise<DomainInfo | undefined> {
         //(define (domain domain_name)
 
@@ -46,6 +55,7 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
         const domainInfo = new DomainInfo(fileUri, fileVersion, domainName, syntaxTree, positionResolver);
         domainInfo.setText(fileText);
         this.parseDomainStructure(domainInfo, positionResolver);
+        this.inject(domainInfo, positionResolver);
         return domainInfo;
     }
 
@@ -142,5 +152,9 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
     parseJob(defineNode: PddlSyntaxNode, positionResolver: DocumentPositionResolver): Job[] {
         return defineNode.getChildrenOfType(PddlTokenType.OpenBracketOperator, /\(\s*:job$/)
             .map(actionNode => new JobParser(actionNode, positionResolver).getAction());
+    }
+
+    inject(domainInfo: DomainInfo, positionResolver: DocumentPositionResolver): void {
+        this.injectors.process(domainInfo, positionResolver);
     }
 }
