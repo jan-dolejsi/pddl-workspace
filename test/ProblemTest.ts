@@ -11,7 +11,7 @@ import {
     parser
 } from "./src";
 
-const expect = require('chai').expect;
+import { describe, it, expect } from 'vitest';
 
 function createPositionResolver(): DocumentPositionResolver {
     return new SimpleDocumentPositionResolver('');

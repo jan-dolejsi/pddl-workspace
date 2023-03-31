@@ -4,7 +4,8 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
+
 import { PddlPlannerOutputParser } from './src';
 import { DomainInfo } from '../src';
 import { ProblemInfo } from '../src';

@@ -1,6 +1,6 @@
 import { PlanStep, PlanStepCommitment } from "./src";
 
-const expect = require('chai').expect;
+import { describe, it, expect } from 'vitest';
 
 describe("PlanStep", () => {
     describe("#constructor", () => {

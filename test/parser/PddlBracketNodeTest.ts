@@ -5,6 +5,7 @@
 'use strict';
 
 import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
 import { PddlSyntaxTreeBuilder } from './src';
 
 describe('PddlBracketNode', () => {
@@ -20,7 +21,7 @@ describe('PddlBracketNode', () => {
             const actual = tree.getDefineNode().getText();
 
             // THEN
-            assert.strictEqual(actual, originalPddl);
+            expect(actual).to.equal(originalPddl);
         });
 
         it('gets (:types ) node text', () => {

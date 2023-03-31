@@ -4,10 +4,10 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
 import { PddlSyntaxTreeBuilder } from './src';
 import { PddlConstraintsParser } from './src';
 import { NamedConditionConstraint, AfterConstraint, StrictlyAfterConstraint } from '../src';
-import { expect } from 'chai';
 
 describe('PddlConstraintsParser', () => {
 

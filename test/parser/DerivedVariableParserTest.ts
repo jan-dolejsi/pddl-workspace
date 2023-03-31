@@ -7,6 +7,7 @@ import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver, PddlRange } from '../src';
 import { DerivedVariablesParser } from './src';
 
+import { describe, it } from 'vitest';
 import { expect, use } from 'chai';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 use(require('chai-string'));

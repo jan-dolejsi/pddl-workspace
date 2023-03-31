@@ -4,6 +4,8 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
+
 import { PddlSyntaxTreeBuilder } from './src';
 import { PddlStructure } from './src';
 import { PddlTokenType } from './src';
@@ -23,7 +25,7 @@ describe('PddlStructure', () => {
 
             // THEN
             assert.notStrictEqual(actualDomainNode, undefined, 'there should be a (domain element');
-            assert.strictEqual(actualDomainNode.getToken().tokenText, '(domain');
+            expect(actualDomainNode.getToken().tokenText).to.equal('(domain');
         });
         
         it('finds (domain when asking for a structure', () => {

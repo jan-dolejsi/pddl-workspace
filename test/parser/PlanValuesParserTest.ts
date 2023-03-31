@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 
 import { PlanValuesParser } from './src';
 import { PlanStep } from '../src';

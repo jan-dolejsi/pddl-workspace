@@ -4,7 +4,8 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
+
 import { PddlPlanParser, PddlPlanBuilder } from './src';
 import { PlanStep, Happening, HappeningType, PddlLanguage } from '../src';
 import { URI } from 'vscode-uri';

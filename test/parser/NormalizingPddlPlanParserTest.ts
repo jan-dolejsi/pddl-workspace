@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 import { PlanStep } from '../src';
 import { PddlPlanBuilder, PddlPlanParser, NormalizingPddlPlanParser } from './src';
 

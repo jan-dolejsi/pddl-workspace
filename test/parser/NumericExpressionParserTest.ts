@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-const expect = require('chai').expect;
+import { describe, it, expect } from 'vitest';
 import { PddlSyntaxTreeBuilder, NumericExpressionParser } from './src';
 import { VariableExpression, Sum, Product, NumericLiteral, Division, ValueMap } from '../src';
 

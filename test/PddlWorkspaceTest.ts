@@ -5,7 +5,7 @@
 'use strict';
 
 import * as assert from 'assert';
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 import { URI } from 'vscode-uri';
 import * as path from 'path';
 
