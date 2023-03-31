@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
 import { ActionEffectParser, MakeTrueEffect, MakeFalseEffect, IncreaseEffect } from './src';
 import { PddlSyntaxTreeBuilder } from './src';
 import { Variable } from '../src';
@@ -22,7 +23,7 @@ describe('ActionEffectParser', () => {
             const actual = ActionEffectParser.parseEffect(node);
 
             // THEN
-            assert.deepStrictEqual(actual, new MakeTrueEffect(node, new Variable(predicate)), "actual should equal expected");
+            expect(actual, "actual should equal expected").to.deep.equal(new MakeTrueEffect(node, new Variable(predicate)));
         });
 
         it('should parse a negation', () => {

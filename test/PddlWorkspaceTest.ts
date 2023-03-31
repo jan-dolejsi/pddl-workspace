@@ -5,7 +5,7 @@
 'use strict';
 
 import * as assert from 'assert';
-import { expect } from 'chai';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { URI } from 'vscode-uri';
 import * as path from 'path';
 
@@ -147,8 +147,7 @@ describe('PddlWorkspace', () => {
             expect(allFiles).to.deep.equal([domainInfo, problemInfo]);
         });
 
-        it('loads other files from the same folder', (done) => {
-    
+        it('loads other files from the same folder', () => new Promise(done => {
             // GIVEN
 
             const domainFileName = 'domain.pddl';
@@ -207,7 +206,7 @@ describe('PddlWorkspace', () => {
                     expect(correspondingDomain).to.equal(domainInfo, 'corresponding domain');
                     const allFiles = pddlWorkspace.getAllFiles();
                     expect(allFiles).to.have.lengthOf(2);
-                    done();
+                    done(null);
                 }
             });
 
@@ -218,9 +217,9 @@ describe('PddlWorkspace', () => {
                 pddlProblemText,
                 new SimpleDocumentPositionResolver(pddlProblemText));
 
-        });
+        }));
 
-        it('loading 3 files from the same folder does not cause event storm', (done) => {
+        it('loading 3 files from the same folder does not cause event storm', () => new Promise(done => {
     
             // GIVEN
 
@@ -298,7 +297,7 @@ describe('PddlWorkspace', () => {
                 // todo: should do something for the problem2?
 
                 if (insertedFiles.length === 3) {
-                    done();
+                    done(null);
                 }
             });
 
@@ -309,11 +308,11 @@ describe('PddlWorkspace', () => {
                 pddlProblem1Text,
                 new SimpleDocumentPositionResolver(pddlProblem1Text));
 
-        });
+        }));
     });
 
     describe('#upsertAndParseFolder', () => {
-        it('loads and parses 2 files in the folder', (done) => {
+        it('loads and parses 2 files in the folder', () => new Promise(done => {
     
             // GIVEN
 
@@ -366,12 +365,12 @@ describe('PddlWorkspace', () => {
                 insertedFiles.push(file);
 
                 if (insertedFiles.length === 2) {
-                    done();
+                    done(null);
                 }
             });
 
             pddlWorkspace.upsertAndParseFolder(URI.file('folder1'));
-        });
+        }));
     });
 
     describe('#addPddlFileParser', () => {

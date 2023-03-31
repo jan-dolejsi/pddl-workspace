@@ -4,8 +4,9 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
 import * as path from 'path';
-import { expect } from 'chai';
+
 import { URI } from 'vscode-uri';
 import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver } from '../src';

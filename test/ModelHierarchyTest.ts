@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
 import { ModelHierarchy, VariableReferenceKind } from './src';
 import { createPddlDomainParser } from './parser/PddlDomainParserTest';
 import { UnrecognizedStructure } from '../src/DomainInfo';
@@ -33,7 +34,7 @@ describe('ModelHierarchy', () => {
             const actual = new ModelHierarchy(domainInfo).getReferenceInfo(p, pddlText.lastIndexOf('(p)') + 1);
 
             // THEN
-            assert.strictEqual(actual.structure.getNameOrEmpty(), "a1", "action name");
+            expect(actual.structure.getNameOrEmpty(), "action name").toStrictEqual("a1");
             assert.strictEqual(actual.getTimeQualifier(), "", "action time qualifier");
             assert.strictEqual(actual.kind, VariableReferenceKind.READ, "read/write kind");
             assert.strictEqual(actual.part, "condition", "part");

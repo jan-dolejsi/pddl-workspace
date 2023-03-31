@@ -4,11 +4,12 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
+
 import { Parameter } from '../src';
 import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver, PddlRange } from '../src';
 import { VariablesParser, parseParameters } from './src';
-import { expect } from 'chai';
 
 describe('VariableParser', () => {
     describe('#parsePredicatesOrFunctions', () => {

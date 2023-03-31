@@ -3,9 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { expect, use } from 'chai';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-use(require('chai-string'));
+import { describe, it, expect } from 'vitest';
 import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver, PddlRange } from '../src';
 import { InstantActionParser } from './src';
@@ -34,7 +32,7 @@ describe('InstantActionParser', () => {
             expect(action.parameters).to.have.length(0);
             expect(action.preCondition).to.be.undefined;
             expect(action.effect).to.be.undefined;
-            expect(action.getDocumentation().join('\n')).to.startsWith('can lift');
+            expect(action.getDocumentation().join('\n')).toMatch(/^can lift/);
             expect(action.getLocation()).to.deep.equal(PddlRange.createSingleLineRange({ line: 2, start: 0, end: 9 }));
         });
 

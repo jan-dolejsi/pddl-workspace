@@ -3,9 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { expect, use } from 'chai';
+import { describe, it, expect } from 'vitest';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-use(require('chai-string'));
 import { PddlSyntaxTreeBuilder } from './src';
 import { SimpleDocumentPositionResolver, PddlRange, DurativeAction } from '../src';
 import { DurativeActionParser } from './src';
@@ -34,7 +33,7 @@ describe('DurativeActionParser', () => {
             expect(action.parameters).to.have.length(0);
             expect(action.condition).to.be.undefined;
             expect(action.effect).to.be.undefined;
-            expect(action.getDocumentation().join('\n')).to.startsWith('can lift');
+            expect(action.getDocumentation().join('\n')).toMatch(/^can lift/);
             expect(action.getLocation()).to.deep.equal(PddlRange.createSingleLineRange({ line: 2, start: 0, end: 18 }));
         });
 

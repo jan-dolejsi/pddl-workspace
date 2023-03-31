@@ -3,7 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as assert from 'assert';
+import { describe, it, expect } from 'vitest';
+
 import { PddlSyntaxTreeBuilder } from './src';
 
 describe('PddlSyntaxTree', () => {
@@ -19,7 +20,7 @@ describe('PddlSyntaxTree', () => {
             const defineNode = tree.getDefineNode();
 
             // THEN
-            assert.notStrictEqual(defineNode, undefined, 'there should be a (define element');
+            expect(defineNode, 'there should be a (define element').to.not.be.undefined;
         });
     });
 });

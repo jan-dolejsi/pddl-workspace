@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as os from 'os';
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 
 import { Util } from '../../src/utils/index';
 
