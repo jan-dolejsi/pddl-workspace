@@ -15,7 +15,8 @@ export function createPddlDomainParser(domainPddl: string): DomainInfo {
     const domainNode = syntaxTree.getDefineNodeOrThrow().getFirstOpenBracketOrThrow('domain');
     const positionResolver = new SimpleDocumentPositionResolver(domainPddl);
 
-    const domainInfo = new PddlDomainParser().parse(URI.parse("file:///mock"), 1, domainPddl, domainNode, syntaxTree, positionResolver);
+    const domainInfo = new PddlDomainParser()
+        .parse(URI.parse("file:///mock"), 1, domainPddl, domainNode, syntaxTree, positionResolver);
     if (domainInfo) {
         return domainInfo;
     } else {
@@ -181,6 +182,38 @@ describe('PddlDomainParser', () => {
             expect(domainInfo?.getPredicates()).to.have.length(1, 'there should be 1 predicate');
             expect(domainInfo?.getPredicates()[0].getFullName()).to.equal("said_hello", 'the predicate should be "said_hello"');
         });
+
+        it('injects :job-scheduling types, predicates and functions', () => {
+            // GIVEN
+            const actionName = 'say_hello';
+            const domainPddl = `(define (domain helloworld)
+            (:requirements :job-scheduling )
+            (:types other)
+            (:predicates 
+                (ready ?r - resource)
+            )
+            (:functions )
+            (:job ${actionName}
+                :parameters (?l - location ?r - resource ?o - other)
+            )
+            )`;
+
+            // WHEN
+            const domainInfo = createPddlDomainParser(domainPddl);
+
+            // THEN
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo.getTypes(), "all domain types").to.deep.equal(["other", "available", "location", "resource"]);
+            expect(domainInfo?.getPredicates().map(p => p.getFullName())).to.deep.equal([
+                'ready ?r - resource',
+                'is_available ?a - available',
+                'located_at ?r - resource ?l - location',
+                'busy ?r - resource',
+                actionName + '_job_started ?l - location ?o - other',
+                actionName + '_job_done ?l - location ?o - other'], 'there should be 1+5 predicates');
+            expect(domainInfo?.getFunctions().map(p => p.getFullName())).to.deep.equal([
+                actionName + '_job_duration ?l - location ?o - other'], 'there should be 1+5 predicates');
+            });
 
         it('extracts 2 predicates without whitespace', () => {
             // GIVEN
