@@ -228,6 +228,8 @@ export class PddlWorkspace extends EventEmitter {
         }
         else {
             fileInfo = await this.insertFile(folder, fileUri, language, fileVersion, fileText, positionResolver);
+            // ensure the other files in the folder are up to date too
+            this.loadFolder(folder);
         }
 
         return fileInfo;
@@ -246,8 +248,6 @@ export class PddlWorkspace extends EventEmitter {
         this.emitIfNew(PddlWorkspace.UPDATED, fileInfo);
         this.emitIfNew(PddlWorkspace.INSERTED, fileInfo);
 
-        this.loadFolder(folder);
-
         return fileInfo;
     }
 
@@ -255,17 +255,21 @@ export class PddlWorkspace extends EventEmitter {
         const folderUri = folder.getFolderUri();
 
         if (this.fileLoader) {
+            // parse eagerly all (up to a max) PDDL files in the folder that have not been parsed already
             const files = await this.fileLoader.readDirectory(folderUri);
-            files
+            const filePromises = files
                 .map(file => toFileNameTypeUri(folderUri, file))
                 .filter(file => file.fileType === FileType.File
                     && extname(file.fileName).toLowerCase() === '.' + PDDL
+                    // avoid parsing the same file again
                     && !folder.hasFile(file.fileUri)
+                    // stop at a maximum to avoid freezing the UI in huge folders
                     && folder.files.size < PddlWorkspace.MAX_FILES_PER_FOLDER)
-                .forEach(async (file) => {
+                .map(async (file) => {
                     const fileContent = new TextDecoder("utf-8").decode(await this.fileLoader?.readFile(file.fileUri));
-                    fileContent && this.insertFile(folder, file.fileUri, toLanguageFromId(PDDL) ?? PddlLanguage.PDDL, -1, fileContent, new SimpleDocumentPositionResolver(fileContent));
+                    return fileContent && this.insertFile(folder, file.fileUri, toLanguageFromId(PDDL) ?? PddlLanguage.PDDL, -1, fileContent, new SimpleDocumentPositionResolver(fileContent));
                 });
+            Promise.all(filePromises);
         }
     }
 
