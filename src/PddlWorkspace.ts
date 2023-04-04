@@ -154,7 +154,7 @@ export class PddlWorkspace extends EventEmitter {
     private defaultTimerDelayInSeconds = 1;
     private pddlFileParsers: PddlFileParser<FileInfo>[];
     private plannerRegistrar: PlannerRegistrar;
-    public readonly epsilon: number;
+    private _epsilon: number;
     private readonly fileLoader?: PddlFileSystem;
 
     public static INSERTED = Symbol("INSERTED");
@@ -164,10 +164,18 @@ export class PddlWorkspace extends EventEmitter {
 
     constructor(options: PddlWorkspaceOptions) {
         super();
-        this.epsilon = options.epsilon;
+        this._epsilon = options.epsilon;
         this.fileLoader = options.fileLoader;
         this.pddlFileParsers = [new PddlDomainParser(), new PddlProblemParser(options.context)];
         this.plannerRegistrar = new PlannerRegistrar();
+    }
+
+    get epsilon(): number {
+        return this._epsilon;
+    }
+
+    set epsilon(value: number) {
+        this._epsilon = value;
     }
 
     getPlannerRegistrar(): PlannerRegistrar {
