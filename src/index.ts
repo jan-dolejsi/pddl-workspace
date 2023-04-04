@@ -14,22 +14,13 @@ export * from './ModelHierarchy';
 export * from './PddlExtensionContext';
 export * from './PddlWorkspaceExtension';
 export * from './NumericExpression';
+export * from './Compilations';
 
 export * from './typeInheritance';
 export { Grounder } from './Grounder';
 
-// parser
-import * as parser from './parser/index';
-export { parser }; // until Typescript 3.8
-
-// planner
-import * as planner from './planner/index';
-export { planner }; // until Typescript 3.8
-
-// search
-import * as search from './search/index';
-export { search }; // until Typescript 3.8
-    
-// utils
-import * as utils from './utils/index';
-export { utils }; // until Typescript 3.8
+export * as parser from './parser/index';
+export * as planner from './planner/index';
+export * as search from './search/index';
+export * as utils from './utils/index';
+export * as injector from './injector/index';

@@ -18,7 +18,7 @@ import { DomainInfo } from './DomainInfo';
 import { PlanInfo } from './PlanInfo';
 import { PddlPlanParser } from './parser/PddlPlanParser';
 import { PddlLanguage, FileStatus, PDDL, toLanguageFromId } from './language';
-import { PddlFileParser, PddlDomainParser, PddlProblemParser } from './parser/index';
+import { PddlFileParser, PddlDomainParser, PddlProblemParser, PddlParserOptions } from './parser/index';
 import { PddlWorkspaceExtension } from './PddlWorkspaceExtension';
 import { PlannerRegistrar } from './planner/PlannerRegistrar';
 
@@ -141,21 +141,32 @@ function toFileNameTypeUri(folderUri: URI, file: [string, FileType]): FileNameTy
     };
 }
 
+export interface PddlWorkspaceOptions {
+    epsilon: number;
+    context?: PddlExtensionContext;
+    parserOptions?: PddlParserOptions;
+    fileLoader?: PddlFileSystem;
+}
+
 export class PddlWorkspace extends EventEmitter {
     public readonly folders: Map<string, Folder> = new Map<string, Folder>();
     private parsingTimeout: NodeJS.Timer | undefined;
     private defaultTimerDelayInSeconds = 1;
     private pddlFileParsers: PddlFileParser<FileInfo>[];
     private plannerRegistrar: PlannerRegistrar;
+    public readonly epsilon: number;
+    private readonly fileLoader?: PddlFileSystem;
 
     public static INSERTED = Symbol("INSERTED");
     public static UPDATED = Symbol("UPDATED");
     public static REMOVING = Symbol("REMOVING");
     static MAX_FILES_PER_FOLDER = 30;
 
-    constructor(public epsilon: number, context?: PddlExtensionContext, private fileLoader?: PddlFileSystem) {
+    constructor(options: PddlWorkspaceOptions) {
         super();
-        this.pddlFileParsers = [new PddlDomainParser(), new PddlProblemParser(context)];
+        this.epsilon = options.epsilon;
+        this.fileLoader = options.fileLoader;
+        this.pddlFileParsers = [new PddlDomainParser(), new PddlProblemParser(options.context)];
         this.plannerRegistrar = new PlannerRegistrar();
     }
 

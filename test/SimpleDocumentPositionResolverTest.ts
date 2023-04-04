@@ -19,6 +19,7 @@ describe('SimpleDocumentPositionResolver', () => {
             // WHEN
             const position0 = resolver.resolveToPosition(0);
             expect(position0).to.deep.equal(new PddlPosition(0, 0));
+            expect(resolver.resolveToOffset(position0)).to.equal(0);
 
             const position1 = resolver.resolveToPosition(1);
             assert.deepStrictEqual(position1, new PddlPosition(0, 1));
@@ -41,7 +42,8 @@ describe('SimpleDocumentPositionResolver', () => {
             assert.deepStrictEqual(position0, new PddlPosition(0, 0));
 
             const position1 = resolver.resolveToPosition(line1.length + 1);
-            assert.deepStrictEqual(position1, new PddlPosition(1, 0));
+            expect(position1).to.deep.equal(new PddlPosition(1, 0));
+            expect(resolver.resolveToOffset(position1)).to.equal(line1.length + 1);
         });
         
         it('two line of text with windows EOL', () => {

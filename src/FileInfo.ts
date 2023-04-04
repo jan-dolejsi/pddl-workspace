@@ -4,11 +4,12 @@
 * ------------------------------------------------------------------------------------------ */
 
 import { PddlRange, PddlPosition, DocumentPositionResolver } from "./DocumentPositionResolver";
-import { PddlSyntaxNode } from "./parser/PddlSyntaxNode";
+import { PddlBracketNode, PddlSyntaxNode } from "./parser/PddlSyntaxNode";
 import { PddlSyntaxTree } from "./parser/PddlSyntaxTree";
 import { PddlTokenType } from "./parser/PddlTokenizer";
 import { FileStatus, PddlLanguage, Variable } from "./language";
 import { URI } from "vscode-uri";
+import { Compilations } from "./Compilations";
 
 export function stripComments(pddlText: string): string {
     const lines = pddlText.split(/\r?\n/g);
@@ -32,6 +33,8 @@ export abstract class FileInfo {
     private status: FileStatus = FileStatus.Parsed;
     private parsingProblems: ParsingProblem[] = [];
     private requirements?: string[];
+    private requirementsNode: PddlBracketNode | undefined;
+    private readonly compilations = new Compilations();
 
     constructor(public readonly fileUri: URI, private version: number, public readonly name: string, public readonly syntaxTree: PddlSyntaxTree, private readonly positionResolver: DocumentPositionResolver) {
     }
@@ -162,8 +165,9 @@ export abstract class FileInfo {
         return this.positionResolver.resolveToRange(node.getStart(), node.getEnd());
     }
 
-    setRequirements(requirements: string[]): void {
+    setRequirements(requirements: string[], node?: PddlBracketNode): void {
         this.requirements = requirements;
+        this.requirementsNode = node;
     }
 
     getRequirements(): string[] {
@@ -175,8 +179,19 @@ export abstract class FileInfo {
         }
     }
 
+    getRequirementsNode(): PddlBracketNode | undefined {
+        return this.requirementsNode;
+    }
+
     getDocumentPositionResolver(): DocumentPositionResolver {
         return this.positionResolver;
+    }
+    
+    /**
+     * @returns code injections, code replacements
+     */
+    getCompilations(): Compilations {
+        return this.compilations;
     }
 }
 

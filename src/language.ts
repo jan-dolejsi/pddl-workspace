@@ -158,11 +158,35 @@ export class Parameter extends Term {
         return new ObjectInstance(objectName, this.type);
     }
 
+    isGrounded(): boolean { return false; }
+
     toPddlString(): string {
         return `?${this.name} - ${this.type}`;
     }
 
-    isGrounded(): boolean { return false; }
+    static createPddlString(...params: Parameter[]): string {
+        if (params.length === 0) {
+            return '';
+        }
+        
+        let lastType = params[0].type;
+
+        const output = [];
+
+        const addType = (type: string) => output.push('- ' + type);
+
+        for (const p of params) {
+            if (p.type !== lastType) {
+                addType(lastType);
+            }
+            lastType = p.type;
+            output.push('?' + p.name);
+        }
+
+        addType(lastType);
+        
+        return output.join(' ');
+    }
 }
 
 export class ObjectInstance extends Term {
