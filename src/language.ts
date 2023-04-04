@@ -135,8 +135,7 @@ export class Variable {
         this.location = range;
     }
 
-    getLocation(): PddlRange {
-        if (this.location === undefined) { throw new Error('Accessing getLocation() before parsing.'); }
+    getLocation(): PddlRange | undefined {
         return this.location;
     }
 }
