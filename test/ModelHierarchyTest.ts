@@ -6,7 +6,7 @@
 import * as assert from 'assert';
 import { describe, it, expect } from 'vitest';
 import { ModelHierarchy, VariableReferenceKind } from './src';
-import { createPddlDomainParser } from './parser/PddlDomainParserTest';
+import { createPddlDomainParser } from './parser/testUtils';
 import { UnrecognizedStructure } from '../src/DomainInfo';
 
 describe('ModelHierarchy', () => {

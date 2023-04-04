@@ -71,3 +71,57 @@ export class Util {
 export function equalsCaseInsensitive(text1: string, text2: string): boolean {
     return text1.toLowerCase() === text2.toLowerCase();
 }
+
+export function addToMapOfSets<K, V>(multiMap: Map<K, Set<V>>, key: K, value: V): void {
+    const valuesForKey = multiMap.get(key);
+    if (valuesForKey) {
+        valuesForKey.add(value);
+    } else {
+        multiMap.set(key, new Set<V>([value]));
+    }
+}
+
+export function removeFromMapOfSets<K, V>(multiMap: Map<K, Set<V>>, key: K, value: V): boolean {
+    const valuesForKey = multiMap.get(key);
+    if (!valuesForKey) {
+        return false;
+    }
+    valuesForKey.delete(value);
+    if (valuesForKey.size == 0) {
+        multiMap.delete(key);
+    }
+    return true;
+}
+
+export function addToMapOfLists<K, V>(multiMap: Map<K, V[]>, key: K, value: V): void {
+    const valuesForKey = multiMap.get(key);
+    if (valuesForKey) {
+        valuesForKey.push(value);
+    } else {
+        multiMap.set(key, [value]);
+    }
+}
+
+export function addAllToMapOfLists<K, V>(multiMap: Map<K, V[]>, key: K, values: V[]): void {
+    const valuesForKey = multiMap.get(key);
+    if (valuesForKey) {
+        valuesForKey.push(...values);
+    } else {
+        multiMap.set(key, values);
+    }
+}
+
+export function split<T>(collection: T[], predicate: (element: T) => boolean): [T[], T[]] {
+    const positives: T[] = [];
+    const negatives: T[] = [];
+
+    collection.forEach(element => {
+        if (predicate(element)) {
+            positives.push(element);
+        } else {
+            negatives.push(element);
+        }
+    });
+
+    return [positives, negatives];
+}

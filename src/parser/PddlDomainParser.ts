@@ -19,7 +19,12 @@ import { PddlSyntaxTreeBuilder } from "./PddlSyntaxTreeBuilder";
 import { Variable } from "../language";
 import { PddlFileParser } from "./PddlFileParser";
 import { URI } from "vscode-uri";
-import { JobSchedulingSyntaxInjector, SyntaxInjectors } from "../injector/SyntaxInjector";
+import { SyntaxInjectors } from "../injector/SyntaxInjector";
+import { JobSchedulingSyntaxInjector } from "../injector/JobSchedulingSyntaxInjector";
+
+export interface PddlParserOptions {
+    injectors: SyntaxInjectors;
+}
 
 /**
  * Planning Domain parser.
@@ -28,7 +33,7 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
     
     private readonly injectors: SyntaxInjectors;
     
-    constructor(private readonly options?: { injectors: SyntaxInjectors }) {
+    constructor(options?: PddlParserOptions) {
         super();
         this.injectors = options?.injectors ?? new SyntaxInjectors([new JobSchedulingSyntaxInjector()]);
     }
@@ -128,9 +133,9 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
             const requirements = requirementsNode.getNonWhitespaceChildren()
                 .filter(node => node.getToken().type === PddlTokenType.Keyword)
                 .map(node => node.getToken().tokenText.toLowerCase());
-            fileInfo.setRequirements(requirements);
+            fileInfo.setRequirements(requirements, requirementsNode);
         } else {
-            fileInfo.setRequirements([]);
+            fileInfo.setRequirements([], requirementsNode);
         }
     }
 

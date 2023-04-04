@@ -96,6 +96,7 @@ export class PddlRange {
  */
 export abstract class DocumentPositionResolver {
     abstract resolveToPosition(offset: number): PddlPosition;
+    abstract resolveToOffset(position: PddlPosition): number;
 
     resolveToRange(start: number, end: number): PddlRange {
         return new PddlRange({ start: this.resolveToPosition(start), end: this.resolveToPosition(end) });
@@ -119,6 +120,24 @@ export class SimpleDocumentPositionResolver extends DocumentPositionResolver {
         super();
         this.lineLengths = this.documentText.split('\n')
             .map(line => line.length + 1);
+    }
+
+    resolveToOffset(position: PddlPosition): number {
+        if (position.line >= this.lineLengths.length) {
+            throw new Error(`Position line ${position.line} exceeds the document length (${this.lineLengths.length-1} lines)`);
+        }
+
+        if (position.character >= this.lineLengths[position.line]) {
+            throw new Error(`Position character ${position.character} exceeds the line ${position.line} length (${this.lineLengths[position.line]} characters)`);
+        }
+
+        let documentLengthAtCurrentLineEnd = 0;
+        for (let lineIndex = 0; lineIndex < position.line; lineIndex++) {
+            const currentLineLength = this.lineLengths[lineIndex];
+            documentLengthAtCurrentLineEnd += currentLineLength;
+        }
+
+        return documentLengthAtCurrentLineEnd + position.character;
     }
 
     resolveToPosition(offset: number): PddlPosition {

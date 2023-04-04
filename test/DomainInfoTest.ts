@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import { describe, it, expect } from 'vitest';
 
 import { PddlRange } from './src';
-import { createPddlDomainParser } from './parser/PddlDomainParserTest';
+import { createPddlDomainParser } from './parser/testUtils';
 
 describe('DomainInfo', () => {
 

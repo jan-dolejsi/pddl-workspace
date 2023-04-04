@@ -7,24 +7,10 @@ import * as assert from 'assert';
 import { describe, it, expect } from 'vitest';
 
 import { PddlSyntaxTreeBuilder } from './src';
-import { SimpleDocumentPositionResolver, PddlRange, DomainInfo } from '../src';
+import { SimpleDocumentPositionResolver, PddlRange } from '../src';
 import { PddlDomainParser } from './src';
 import { URI } from 'vscode-uri';
-
-export function createPddlDomainParser(domainPddl: string): DomainInfo {
-    const syntaxTree = new PddlSyntaxTreeBuilder(domainPddl).getTree();
-    const domainNode = syntaxTree.getDefineNodeOrThrow().getFirstOpenBracketOrThrow('domain');
-    const positionResolver = new SimpleDocumentPositionResolver(domainPddl);
-
-    const domainInfo = new PddlDomainParser()
-        .parse(URI.parse("file:///mock"), 1, domainPddl, domainNode, syntaxTree, positionResolver);
-    if (domainInfo) {
-        return domainInfo;
-    } else {
-        expect(domainInfo).to.not.be.undefined;
-        throw new assert.AssertionError();
-    }
-}
+import { createPddlDomainParser } from './testUtils';
 
 describe('PddlDomainParser', () => {
 
@@ -193,7 +179,7 @@ describe('PddlDomainParser', () => {
             (:predicates 
                 (ready ?r - resource)
             )
-            (:functions )
+            (:functions)
             (:job ${actionName}
                 :parameters (?l - location ?r - resource ?o - other)
             )
@@ -213,8 +199,25 @@ describe('PddlDomainParser', () => {
                 actionName + '_job_started ?l - location ?o - other',
                 actionName + '_job_done ?l - location ?o - other'], 'there should be 1+5 predicates');
             expect(domainInfo?.getFunctions().map(p => p.getFullName())).to.deep.equal([
-                actionName + '_job_duration ?l - location ?o - other'], 'there should be 1+5 predicates');
-            });
+                'travel_time ?r - resource ?from - location ?to - location',
+                actionName + '_job_duration ?l - location ?o - other',
+            ], 'there should be 1+1 functions');
+            
+            const outputPddl = domainInfo.getCompilations().applyAll(domainPddl);
+            expect(outputPddl, 'should remove :job-scheduling').to.not.match(/:job-scheduling/);
+            expect(outputPddl, 'should require :durative-actions').to.match(/:durative-actions/);
+            expect(outputPddl, 'injected :predicates').toMatch(/\(ready \?r - resource\)\s*\(is_available \?a/gm);
+            expect(outputPddl, 'injected :functions').toMatch(/\(:functions\s*\(travel_time \?r - resource \?from - location \?to - location\) \(say_hello_job_duration \?l - location \?o - other\)\)/gm);
+            expect(outputPddl, 'injected :types').toMatch(/\(:types location resource - available other/gm);
+            expect(outputPddl, 'replaced :job by :durative-action').toMatch(/\(:durative-action say_hello\s+/gm);
+            expect(outputPddl, 'injected :job duration').toMatch(/\(:durative-action say_hello\s+:parameters\s*\(\?l - location \?r - resource \?o - other\)\s*\:duration\s*\(=\s*\?duration\s*\(say_hello_job_duration \?l \?o\)\)/gm);
+            expect(outputPddl, 'injected :job conditions').toMatch(/:condition \(and \(over all \(is_available \?l\)/gm);
+            expect(outputPddl, 'injected :job effects').toMatch(/:effect \(and \(at start \(say_hello_job_started \?l \?o\)/gm);
+            expect(outputPddl, 'injected move action').toMatch(/\(:durative-action move/gm);
+
+            const jobCount = 1;
+            expect(domainInfo.getCompilations().getAll(), "injections").toHaveLength(1 /* requirement */ + 3 + jobCount * 2 + 1 /* move action */);
+        });
 
         it('extracts 2 predicates without whitespace', () => {
             // GIVEN

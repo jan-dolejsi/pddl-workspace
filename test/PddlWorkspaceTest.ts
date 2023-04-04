@@ -62,7 +62,7 @@ describe('PddlWorkspace', () => {
         it('parsed two files in the same folder', async () => {
 
             // GIVEN
-            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3 });
             const insertedFiles: FileInfo[] = [];
             pddlWorkspace.on(PddlWorkspace.INSERTED, (file: FileInfo) => {
                 console.log(`Inserted: '${file.name}' from ${file.fileUri}.`);
@@ -107,7 +107,7 @@ describe('PddlWorkspace', () => {
         it('parsed two files in the same folder', async () => {
 
             // GIVEN
-            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3 });
             const insertedFiles: FileInfo[] = [];
             pddlWorkspace.on(PddlWorkspace.INSERTED, (file: FileInfo) => {
                 console.log(`Inserted: '${file.name}' from ${file.fileUri}.`);
@@ -181,7 +181,7 @@ describe('PddlWorkspace', () => {
 
             const pddlFileSystem = new MockPddlFileSystem();
 
-            const pddlWorkspace = new PddlWorkspace(1e-3, undefined, pddlFileSystem);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3, fileLoader: pddlFileSystem });
             const insertedFiles: FileInfo[] = [];
 
             let problemInfo: ProblemInfo
@@ -267,7 +267,7 @@ describe('PddlWorkspace', () => {
 
             const pddlFileSystem = new MockPddlFileSystem();
 
-            const pddlWorkspace = new PddlWorkspace(1e-3, undefined, pddlFileSystem);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3, fileLoader: pddlFileSystem });
             const insertedFiles: FileInfo[] = [];
 
             let problemInfo: ProblemInfo
@@ -357,7 +357,7 @@ describe('PddlWorkspace', () => {
 
             const pddlFileSystem = new MockPddlFileSystem();
 
-            const pddlWorkspace = new PddlWorkspace(1e-3, undefined, pddlFileSystem);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3, fileLoader: pddlFileSystem });
             const insertedFiles: FileInfo[] = [];
 
             pddlWorkspace.on(PddlWorkspace.INSERTED, (file: FileInfo) => {
@@ -377,7 +377,7 @@ describe('PddlWorkspace', () => {
 
         it('supports custom PDDL parsers', async () => {
             // GIVEN
-            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3 });
             pddlWorkspace.addExtension(new CustomPddlParserExtension());
             const pddlText = `(:custom-pddl)`;
 
@@ -390,7 +390,7 @@ describe('PddlWorkspace', () => {
 
         it('re-parses using the custom PDDL parsers', async () => {
             // GIVEN
-            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3 });
             const pddlText = `(:custom-pddl)`;
             const fileUri = URI.parse('file:///test');
             const unknownFile = await pddlWorkspace.upsertFile(fileUri, PddlLanguage.PDDL, 1, pddlText, new SimpleDocumentPositionResolver(pddlText));
@@ -418,7 +418,7 @@ describe('PddlWorkspace', () => {
 
         it('parses file only once per version', async () => {
             // GIVEN
-            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3 });
             const parsed = new Array<[URI, number]>();
             pddlWorkspace.addPddlFileParser([new CustomParser((file, version) => parsed.push([file, version]))]);
             const fileUri = URI.parse('file:///test');
@@ -462,7 +462,7 @@ describe('PddlWorkspace', () => {
 
         it('supports custom PDDL parsers', async () => {
             // GIVEN
-            const pddlWorkspace = new PddlWorkspace(1e-3);
+            const pddlWorkspace = new PddlWorkspace({ epsilon: 1e-3 });
             const extension = new CustomPlannerProviderExtension();
             pddlWorkspace.addExtension(extension);
 

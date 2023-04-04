@@ -13,6 +13,7 @@ import { PddlBracketNode } from "./parser/PddlSyntaxNode";
 import { PddlTokenType } from "./parser/PddlTokenizer";
 import { Constraint } from "./constraints";
 import { URI } from "vscode-uri";
+import { VariableDeclarationsInjection } from "./Compilations";
 
 
 /**
@@ -224,8 +225,9 @@ export class DomainInfo extends FileInfo {
         this.predicatesNode = predicatesNode;
     }
 
-    injectPredicates(predicates: Variable[]): void {
-        this.predicates.push(...predicates);
+    injectPredicates(injection: VariableDeclarationsInjection): void {
+        this.predicates.push(...injection.variables);
+        this.getCompilations().add(injection);
     }
 
     getFunctions(): Variable[] {
@@ -241,8 +243,9 @@ export class DomainInfo extends FileInfo {
         this.functionsNode = functionsNode;
     }
 
-    injectFunctions(functions: Variable[]): void {
-        this.functions.push(...functions);
+    injectFunctions(injection: VariableDeclarationsInjection): void {
+        this.functions.push(...injection.variables);
+        this.getCompilations().add(injection);
     }
 
     getFunction(liftedVariableName: string): Variable | undefined {
@@ -334,6 +337,10 @@ export class DomainInfo extends FileInfo {
 
     getTypesInheritingFrom(type: string): string[] {
         return this.typeInheritance.getSubtreePointingTo(type);
+    }
+
+    getTypesInheritingFromPlusSelf(type: string): string[] {
+        return [type].concat(this.typeInheritance.getSubtreePointingTo(type));
     }
 
     getEvents(): Action[] | undefined {
