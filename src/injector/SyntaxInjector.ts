@@ -23,7 +23,7 @@ export abstract class BaseSyntaxInjector implements SyntaxInjector {
      * @param options relative position around the reference node
      * @returns offset in the document
      */
-    protected getOffset(referenceNode: PddlBracketNode | undefined, positionResolver: DocumentPositionResolver, options: { position: InjectionPosition }): number {
+    protected getOffset(referenceNode: PddlBracketNode, positionResolver: DocumentPositionResolver, options: { position: InjectionPosition }): number {
         if (referenceNode) {
             switch (options.position) {
                 case InjectionPosition.OutsideStart: { 

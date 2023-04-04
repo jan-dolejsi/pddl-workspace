@@ -167,6 +167,7 @@ export class DomainInfo extends FileInfo {
     private typeInheritance: DirectionalGraph = new DirectionalGraph();
     private typesNode: PddlBracketNode | undefined;
     private typeLocations = new Map<string, PddlRange>();
+    private constantsNode: PddlBracketNode | undefined;
     private constants: TypeObjectMap = new TypeObjectMap();
     private events?: Action[];
     private processes?: Action[];
@@ -314,12 +315,17 @@ export class DomainInfo extends FileInfo {
         }
     }
 
-    setConstants(constants: TypeObjectMap): void {
+    setConstants(constants: TypeObjectMap, constantsNode?: PddlBracketNode): void {
         this.constants = constants;
+        this.constantsNode = constantsNode;
     }
 
     getConstants(): TypeObjectMap {
         return this.constants;
+    }
+
+    getConstantsNode(): PddlBracketNode | undefined {
+        return this.constantsNode;
     }
 
     getTypes(): string[] {

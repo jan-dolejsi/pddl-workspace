@@ -56,6 +56,7 @@ export class Variable {
     private documentation: string[] = []; // initialized lazily
     private unit = ''; // initialized lazily
 
+    /** @deprecated use one of the fromXyz methods or parseVariableDeclaration(fullName) function*/
     constructor(public readonly declaredName: string, public readonly parameters: Term[] = []) {
         this.declaredNameWithoutTypes = declaredName.replace(/\s+-\s+[\w-_]+/gi, '');
         this.name = declaredName.replace(/( .*)$/gi, '');
