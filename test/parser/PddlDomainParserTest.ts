@@ -170,7 +170,7 @@ describe('PddlDomainParser', () => {
             expect(domainInfo?.getPredicates()[0].getFullName()).to.equal("said_hello", 'the predicate should be "said_hello"');
         });
 
-        it('injects :job-scheduling types, predicates and functions', () => {
+        it('injects :job-scheduling types, predicates and functions when types, predicates and functions are defined', () => {
             // GIVEN
             const actionName = 'say_hello';
             const domainPddl = `(define (domain helloworld)
@@ -217,6 +217,56 @@ describe('PddlDomainParser', () => {
 
             const jobCount = 1;
             expect(domainInfo.getCompilations().getAll(), "injections").toHaveLength(1 /* requirement */ + 3 + jobCount * 2 + 1 /* move action */);
+        });
+
+        it('injects :job-scheduling types, predicates and functions when none of types, predicates, nor functions are defined', () => {
+            // GIVEN
+            const actionName = 'say_hello';
+            const domainPddl = `(define (domain helloworld)
+            (:requirements :job-scheduling)
+            (:job ${actionName}
+                :parameters (?l - location ?r - resource)
+            )
+            )`;
+
+            // WHEN
+            const domainInfo = createPddlDomainParser(domainPddl);
+
+            // THEN
+            expect(domainInfo).to.not.be.undefined;
+            expect(domainInfo.getTypes(), "all domain types").to.deep.equal(["available", "location", "resource"]);
+            expect(domainInfo?.getPredicates().map(p => p.getFullName())).to.deep.equal([
+                'is_available ?a - available',
+                'located_at ?r - resource ?l - location',
+                'busy ?r - resource',
+                actionName + '_job_started ?l - location',
+                actionName + '_job_done ?l - location'], 'there should be 1+5 predicates');
+            expect(domainInfo?.getFunctions().map(p => p.getFullName())).to.deep.equal([
+                'travel_time ?r - resource ?from - location ?to - location',
+                actionName + '_job_duration ?l - location',
+            ], 'there should be 1+1 functions');
+
+            // injections should not be at offset -1
+            [...domainInfo.getCompilations().getAll().entries()]
+                .forEach(entry => {
+                    expect(entry[0], entry[1].flatMap(c => c.code).join(' ') + ' offset')
+                        .to.be.greaterThan(0);
+                });
+
+            const outputPddl = domainInfo.getCompilations().applyAll(domainPddl);
+            expect(outputPddl, 'should remove :job-scheduling').to.not.match(/:job-scheduling/);
+            expect(outputPddl, 'should require :durative-actions').to.match(/:durative-actions/);
+            expect(outputPddl, 'injected :predicates').toMatch(/\(:predicates\s*\(is_available \?a/gm);
+            expect(outputPddl, 'injected :functions').toMatch(/\(:functions\s*\(travel_time \?r - resource \?from - location \?to - location\) \(say_hello_job_duration \?l - location\)\)/gm);
+            expect(outputPddl, 'injected :types').toMatch(/\(:types location resource - available/gm);
+            expect(outputPddl, 'replaced :job by :durative-action').toMatch(/\(:durative-action say_hello\s+/gm);
+            expect(outputPddl, 'injected :job duration').toMatch(/:duration\s*\(=\s*\?duration\s*\(say_hello_job_duration \?l\)\)/gm);
+            expect(outputPddl, 'injected :job conditions').toMatch(/:condition \(and \(over all \(is_available \?l\)/gm);
+            expect(outputPddl, 'injected :job effects').toMatch(/:effect \(and \(at start \(say_hello_job_started \?l\)/gm);
+            expect(outputPddl, 'injected move action').toMatch(/\(:durative-action move/gm);
+
+            const jobCount = 1;
+            expect(domainInfo.getCompilations().getAll(), "compilations").toHaveLength(1 /* requirement */ + 1 + jobCount * 2 + 1 /* move action */);
         });
 
         it('extracts 2 predicates without whitespace', () => {

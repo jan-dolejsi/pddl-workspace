@@ -58,17 +58,30 @@ export class PddlCodeInjection extends CodeInjection {
     }
 }
 
+export interface VariableDeclarationsInjectionOptions {
+    readonly documentation: CompilationDocumentation;
+    readonly offset: number;
+    readonly variables: Variable[];
+    readonly reason: string | undefined;
+    readonly prefix?: string;
+    readonly suffix?: string;
+}
+
 export class VariableDeclarationsInjection extends CodeInjection {
-    constructor(documentation: CompilationDocumentation,
-        offset: number, public readonly variables: Variable[],
-        reason: string | undefined
-    ) {
+    
+    public readonly variables: Variable[];
+    
+    constructor(options: VariableDeclarationsInjectionOptions) {
         super({
-            offset: offset,
-            code: variables.map(v => new VariableDeclarationNode(v).toPddlString()).join(' '),
-            documentation: documentation,
-            reason: reason,
+            offset: options.offset,
+            code:
+                (options.prefix ?? '') +
+                options.variables.map(v => new VariableDeclarationNode(v).toPddlString()).join(' ') +
+                (options.suffix ?? ''),
+            documentation: options.documentation,
+            reason: options.reason,
         });
+        this.variables = options.variables;
     }
 
     get shouldEnsureWhitespaceSeparation(): boolean {

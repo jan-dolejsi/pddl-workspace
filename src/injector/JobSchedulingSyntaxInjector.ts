@@ -5,7 +5,7 @@
 
 import { DocumentPositionResolver } from "../DocumentPositionResolver";
 import { Action, DomainInfo, DurativeAction } from "../DomainInfo";
-import { CodeInjection, CodeReplacement, Compilation, PddlCodeInjection, VariableDeclarationsInjection } from "../Compilations";
+import { CodeInjection, CodeReplacement, Compilation, CompilationDocumentation, PddlCodeInjection, VariableDeclarationsInjection } from "../Compilations";
 import { DurationExpressionNode, EqualityNode, ExpressionNode, VariableNode, and, atEnd, atStart, expression, not, overAll } from "../expression";
 import { Parameter, Variable } from "../language";
 import { PddlBracketNode, PddlInheritanceParser } from "../parser";
@@ -21,18 +21,18 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
 
     /* PREDICATE NAMES */
     private static readonly IS_AVAILABLE_PREDICATE_NAME = 'is_available';
-    private static readonly IS_AVAILABLE_PREDICATE = new Variable(JobSchedulingSyntaxInjector.IS_AVAILABLE_PREDICATE_NAME, [
+    private static readonly IS_AVAILABLE_PREDICATE = Variable.from(JobSchedulingSyntaxInjector.IS_AVAILABLE_PREDICATE_NAME, [
         new Parameter('a', JobSchedulingSyntaxInjector.AVAILABLE)
     ]);
     private static readonly LOCATED_AT_PREDICATE_NAME = 'located_at';
     /** (located_at ?r - resource ?l - location) */
-    private static readonly LOCATED_AT_PREDICATE = new Variable(JobSchedulingSyntaxInjector.LOCATED_AT_PREDICATE_NAME, [
+    private static readonly LOCATED_AT_PREDICATE = Variable.from(JobSchedulingSyntaxInjector.LOCATED_AT_PREDICATE_NAME, [
         new Parameter('r', JobSchedulingSyntaxInjector.RESOURCE),
         new Parameter('l', JobSchedulingSyntaxInjector.LOCATION)
     ]);
     private static readonly BUSY_PREDICATE_NAME = 'busy';
     /** (busy ?r - resource) */
-    private static readonly BUSY_PREDICATE = new Variable(JobSchedulingSyntaxInjector.BUSY_PREDICATE_NAME, [
+    private static readonly BUSY_PREDICATE = Variable.from(JobSchedulingSyntaxInjector.BUSY_PREDICATE_NAME, [
         new Parameter('r', JobSchedulingSyntaxInjector.RESOURCE)
     ]);
     private static readonly JOB_STARTED_SUFFIX = '_job_started';
@@ -42,7 +42,7 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
     static readonly JOB_DURATION_SUFFIX = '_job_duration';
     private static readonly TRAVEL_TIME = 'travel_time';
     /** (travel_time ?r - resource ?from ?to - location) */
-    private static readonly TRAVEL_TIME_FUNCTION = new Variable(JobSchedulingSyntaxInjector.TRAVEL_TIME, [
+    private static readonly TRAVEL_TIME_FUNCTION = Variable.from(JobSchedulingSyntaxInjector.TRAVEL_TIME, [
         new Parameter('r', JobSchedulingSyntaxInjector.RESOURCE),
         new Parameter('from', JobSchedulingSyntaxInjector.LOCATION),
         new Parameter('to', JobSchedulingSyntaxInjector.LOCATION)
@@ -74,7 +74,7 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
         const replacementRequirements = JobSchedulingSyntaxInjector.JOB_SCHEDULING_IMPLIED_REQS
             .filter(r => !origRequirements.has(r))
             .join(' ');
-        
+
         const requirementsNode = domainInfo.getRequirementsNode();
         if (!requirementsNode) {
             return;
@@ -82,11 +82,11 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
 
         const jobSchedulingNode = requirementsNode.getChildren()
             .find(node => node.getToken().tokenText.toLowerCase() === ':job-scheduling');
-        
+
         if (!jobSchedulingNode) {
             return;
         }
-        
+
         const replacement = new CodeReplacement({
             origCode: jobSchedulingNode.getToken().tokenText,
             newCode: replacementRequirements,
@@ -118,20 +118,42 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
             functions.push(...jd.generatedFunctions);
         });
 
-        const predicatesNode = domainInfo.getPredicatesNode();
-        domainInfo.injectPredicates(new VariableDeclarationsInjection(
-            { title: this.createHoverTitle('Predicates') },
-            this.getOffset(predicatesNode, positionResolver, { position: InjectionPosition.InsideEnd }),
-            predicates, JobSchedulingSyntaxInjector.JOB_SCHEDULING));
-        const functionsNode = domainInfo.getFunctionsNode();
-        domainInfo.injectFunctions(new VariableDeclarationsInjection(
-            { title: this.createHoverTitle('Functions') },
-            this.getOffset(functionsNode, positionResolver, { position: InjectionPosition.InsideEnd }),
-            functions, JobSchedulingSyntaxInjector.JOB_SCHEDULING));
+        // inject the accumulated predicates
+        this.injectVariables(domainInfo.getPredicatesNode(),
+            domainInfo.getConstantsNode() ?? domainInfo.getTypesNode() ?? domainInfo.getRequirementsNode(),
+            positionResolver, predicates, 'Predicates', 'predicates', (i) => domainInfo.injectPredicates(i));
+
+        // inject the accumulated functions
+        this.injectVariables(domainInfo.getFunctionsNode(),
+            domainInfo.getPredicatesNode() ?? domainInfo.getConstantsNode() ?? domainInfo.getTypesNode() ?? domainInfo.getRequirementsNode(),
+            positionResolver, functions, 'Functions', 'functions', (i) => domainInfo.injectFunctions(i));
 
         jobDecorations
             .flatMap(jd => jd.injections)
-            .forEach(i => domainInfo.getCompilations().add(i));
+            .forEach(c => domainInfo.getCompilations().add(c));
+    }
+
+    private injectVariables(variablesNode: PddlBracketNode | undefined, precedingNode: PddlBracketNode | undefined,
+        positionResolver: DocumentPositionResolver, variables: Variable[], docTitle: string, pddlPrefix: string,
+        injectionMethod: (injection: VariableDeclarationsInjection) => void) {
+        const doc: CompilationDocumentation = { title: this.createHoverTitle(docTitle) };
+        if (variablesNode) {
+            injectionMethod(new VariableDeclarationsInjection({
+                documentation: doc,
+                offset: this.getOffset(variablesNode, positionResolver, { position: InjectionPosition.InsideEnd }),
+                variables: variables,
+                reason: JobSchedulingSyntaxInjector.JOB_SCHEDULING
+            }));
+        } else if (precedingNode) {
+            injectionMethod(new VariableDeclarationsInjection({
+                documentation: doc,
+                offset: this.getOffset(precedingNode, positionResolver, { position: InjectionPosition.OutsideEnd }),
+                variables: variables,
+                reason: JobSchedulingSyntaxInjector.JOB_SCHEDULING,
+                prefix: `(:${pddlPrefix} `,
+                suffix: ')',
+            }));
+        }
     }
 
     private injectTypes(domainInfo: DomainInfo, positionResolver: DocumentPositionResolver): void {
@@ -142,11 +164,12 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
 
         const typesNode = domainInfo.getTypesNode();
         const hover = this.createHoverTitle('Types');
+        const injectedCode = `${JobSchedulingSyntaxInjector.LOCATION} ${JobSchedulingSyntaxInjector.RESOURCE} - ${JobSchedulingSyntaxInjector.AVAILABLE}`;
         if (typesNode) {
             domainInfo.getCompilations().add(new PddlCodeInjection({
                 documentation: { title: hover },
                 offset: this.getOffset(typesNode, positionResolver, { position: InjectionPosition.InsideStart }),
-                code: `${JobSchedulingSyntaxInjector.LOCATION} ${JobSchedulingSyntaxInjector.RESOURCE} - ${JobSchedulingSyntaxInjector.AVAILABLE}`,
+                code: injectedCode,
                 reason: JobSchedulingSyntaxInjector.JOB_SCHEDULING,
             }));
         } else {
@@ -154,7 +177,7 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
             precedingNode && domainInfo.getCompilations().add(new PddlCodeInjection({
                 documentation: { title: hover },
                 offset: this.getOffset(precedingNode, positionResolver, { position: InjectionPosition.OutsideEnd }),
-                code: `${JobSchedulingSyntaxInjector.LOCATION} ${JobSchedulingSyntaxInjector.RESOURCE} - ${JobSchedulingSyntaxInjector.AVAILABLE}`,
+                code: `(:types ${injectedCode})`,
                 reason: JobSchedulingSyntaxInjector.JOB_SCHEDULING,
             }));
         }
@@ -166,7 +189,8 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
         const decoration = new JobDecoration();
 
         const actionNode = job.actionNode;
-        if (!actionNode) {
+        const parametersNode = job.parametersNode;
+        if (!actionNode || !parametersNode) {
             return decoration;
         }
 
@@ -177,14 +201,14 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
             offset: actionNode.getStart() + 1,
             documentation: {
                 title: 'Job is a simplified durative action', codeblock: `:durative-action`,
-            }, 
+            },
             reason: JobSchedulingSyntaxInjector.JOB_SCHEDULING
         }));
 
-        if (!job.duration && job.parametersNode) {
+        if (!job.duration) {
             const durationDef = ':duration ' + new EqualityNode(new DurationExpressionNode(), new VariableNode(decoration.createDurationVariable(job, resourceTypes))).toPddlString();
             decoration.add(new PddlCodeInjection({
-                offset: this.getOffset(job.parametersNode, positionResolver, { position: InjectionPosition.OutsideEnd }),
+                offset: this.getOffset(parametersNode, positionResolver, { position: InjectionPosition.OutsideEnd }),
                 code: durationDef,
                 documentation: { title: 'Suggested job duration definition', codeblock: durationDef },
                 reason: JobSchedulingSyntaxInjector.JOB_SCHEDULING,
@@ -264,7 +288,7 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
         } else {
             // inject the :condition to the end of the action
             decoration.add(new PddlCodeInjection({
-                offset: this.getOffset(job.duration ?? job.parametersNode, positionResolver, { position: InjectionPosition.OutsideEnd }),
+                offset: this.getOffset(job.duration ?? parametersNode, positionResolver, { position: InjectionPosition.OutsideEnd }),
                 code: ':condition ' + and(conditions).toPddlString(),
                 documentation: conditionDocumentation,
                 reason: JobSchedulingSyntaxInjector.JOB_SCHEDULING,
@@ -298,7 +322,7 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
         } else {
             // inject the :effect to the end of the action
             decoration.add(new PddlCodeInjection({
-                offset: this.getOffset(job.condition ?? job.duration ?? job.parametersNode, positionResolver, { position: InjectionPosition.OutsideEnd }),
+                offset: this.getOffset(job.condition ?? job.duration ?? parametersNode, positionResolver, { position: InjectionPosition.OutsideEnd }),
                 code: ':effect ' + and(effects).toPddlString(),
                 documentation: effectDocumentation,
                 reason: JobSchedulingSyntaxInjector.JOB_SCHEDULING,

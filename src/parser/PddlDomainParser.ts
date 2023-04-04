@@ -93,7 +93,7 @@ export class PddlDomainParser extends PddlFileParser<DomainInfo> {
         const constantsNode = defineNode.getFirstOpenBracket(':constants');
         if (constantsNode) {
             const constantsText = constantsNode.getNestedNonCommentText();
-            domainInfo.setConstants(PddlInheritanceParser.toTypeObjects(PddlInheritanceParser.parseInheritance(constantsText)));
+            domainInfo.setConstants(PddlInheritanceParser.toTypeObjects(PddlInheritanceParser.parseInheritance(constantsText)), constantsNode);
         }
 
         const predicatesNode = defineNode.getFirstOpenBracket(':predicates');

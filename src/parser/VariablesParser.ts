@@ -29,6 +29,11 @@ export function parseParameters(fullSymbolName: string): Parameter[] {
     return parameters;
 }
 
+export function parseVariableDeclaration(fullName: string): Variable {
+    const parameters = parseParameters(fullName);
+    return new Variable(fullName, parameters);
+}
+
 /** Parses the `:predicates` and `:functions` section. */
 export class VariablesParser {
 
@@ -100,8 +105,7 @@ export class VariablesParser {
 
     createVariable(node: PddlSyntaxNode, documentation: string[]): Variable {
         const fullSymbolName = node.getText().replace(/[\(\)]/g, '');
-        const parameters = parseParameters(fullSymbolName);
-        const variable = new Variable(fullSymbolName, parameters);
+        const variable = parseVariableDeclaration(fullSymbolName);
         variable.setDocumentation(documentation);
         const startPosition = this.positionResolver.resolveToPosition(node.getStart());
         const endPosition = this.positionResolver.resolveToPosition(node.getEnd());
