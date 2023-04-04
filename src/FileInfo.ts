@@ -57,6 +57,10 @@ export abstract class FileInfo {
         this.text = text;
     }
 
+    getCompiledText(): string {
+        return this.getCompilations().applyAll(this.getText());
+    }
+
     isDomain(): boolean {
         return false;
     }

@@ -253,7 +253,7 @@ describe('PddlDomainParser', () => {
                         .to.be.greaterThan(0);
                 });
 
-            const outputPddl = domainInfo.getCompilations().applyAll(domainPddl);
+            const outputPddl = domainInfo.getCompiledText();
             expect(outputPddl, 'should remove :job-scheduling').to.not.match(/:job-scheduling/);
             expect(outputPddl, 'should require :durative-actions').to.match(/:durative-actions/);
             expect(outputPddl, 'injected :predicates').toMatch(/\(:predicates\s*\(is_available \?a/gm);
