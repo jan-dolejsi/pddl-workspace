@@ -208,4 +208,4 @@ Starting from version 3.5.0, the `PlannerProvider` may optionally also implement
 
 ## Compiling and contributing
 
-Install node.js 12.14.1.
+Install node.js 18.16.
