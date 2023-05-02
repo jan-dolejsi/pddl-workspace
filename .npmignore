@@ -1,5 +1,6 @@
 .vscode/
 .eslintrc.*
+.vite.config.ts
 tsconfig.json
 src/
 test/
