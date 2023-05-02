@@ -48,6 +48,7 @@ export class WellKnownPlannerKind {
     public static readonly EXECUTABLE = new PlannerKind("EXECUTABLE");
     public static readonly JAVA_JAR = new PlannerKind("JAVA_JAR");
     public static readonly NODE_JS_SCRIPT = new PlannerKind("NODE_JS_SCRIPT");
+    public static readonly PYTHON_SCRIPT = new PlannerKind("PYTHON_SCRIPT");
     public static readonly COMMAND = new PlannerKind("COMMAND");
     public static readonly SERVICE_SYNC = new PlannerKind("SERVICE_SYNC");
     public static readonly SERVICE_ASYNC = new PlannerKind("SERVICE_ASYNC");
