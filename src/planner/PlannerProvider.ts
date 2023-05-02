@@ -31,7 +31,7 @@ export interface PlannerProvider {
     showHelp?(output: OutputAdaptor): void;
 
     /** Custom `Planner` implementation. */
-    createPlanner?(configuration: PlannerConfiguration, plannerInvocationOptions: PlannerRunConfiguration): Planner | undefined;
+    createPlanner?(configuration: PlannerConfiguration, plannerInvocationOptions: PlannerRunConfiguration): Promise<Planner | undefined> | Planner | undefined;
 
     /** Command-line (or other) options specific to this `Planner` */
     getPlannerOptions?(): PlannerOption[];
