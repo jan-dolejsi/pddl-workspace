@@ -195,6 +195,7 @@ describe('PddlDomainParser', () => {
                 'ready ?r - resource',
                 'is_available ?a - available',
                 'located_at ?r - resource ?l - location',
+                "contains ?parent - location ?child - location",
                 'busy ?r - resource',
                 actionName + '_job_started ?l - location ?o - other',
                 actionName + '_job_done ?l - location ?o - other'], 'there should be 1+5 predicates');
@@ -238,6 +239,7 @@ describe('PddlDomainParser', () => {
             expect(domainInfo?.getPredicates().map(p => p.getFullName())).to.deep.equal([
                 'is_available ?a - available',
                 'located_at ?r - resource ?l - location',
+                "contains ?parent - location ?child - location",
                 'busy ?r - resource',
                 actionName + '_job_started ?l - location',
                 actionName + '_job_done ?l - location'], 'there should be 1+5 predicates');

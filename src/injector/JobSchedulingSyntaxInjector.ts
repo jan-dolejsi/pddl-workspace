@@ -35,6 +35,13 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
     private static readonly BUSY_PREDICATE = Variable.from(JobSchedulingSyntaxInjector.BUSY_PREDICATE_NAME, [
         new Parameter('r', JobSchedulingSyntaxInjector.RESOURCE)
     ]);
+    private static readonly CONTAINS_PREDICATE_NAME = "contains";
+    /** (contains ?parent ?child - location) */
+    private static readonly CONTAINS_PREDICATE = Variable.from(JobSchedulingSyntaxInjector.CONTAINS_PREDICATE_NAME, [
+        new Parameter('parent', JobSchedulingSyntaxInjector.LOCATION),
+        new Parameter('child', JobSchedulingSyntaxInjector.LOCATION),
+    ]);
+
     private static readonly JOB_STARTED_SUFFIX = '_job_started';
     private static readonly JOB_DONE_SUFFIX = '_job_done';
 
@@ -103,6 +110,7 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
         const predicates = [
             JobSchedulingSyntaxInjector.IS_AVAILABLE_PREDICATE,
             JobSchedulingSyntaxInjector.LOCATED_AT_PREDICATE,
+            JobSchedulingSyntaxInjector.CONTAINS_PREDICATE,
             JobSchedulingSyntaxInjector.BUSY_PREDICATE];
         const functions = [
             JobSchedulingSyntaxInjector.TRAVEL_TIME_FUNCTION];
