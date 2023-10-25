@@ -150,7 +150,7 @@ export interface PddlWorkspaceOptions {
 
 export class PddlWorkspace extends EventEmitter {
     public readonly folders: Map<string, Folder> = new Map<string, Folder>();
-    private parsingTimeout: NodeJS.Timer | undefined;
+    private parsingTimeout: NodeJS.Timeout | undefined;
     private defaultTimerDelayInSeconds = 1;
     private pddlFileParsers: PddlFileParser<FileInfo>[];
     private plannerRegistrar: PlannerRegistrar;
