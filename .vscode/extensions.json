@@ -2,6 +2,6 @@
     "recommendations": [
         "epivision.vscode-file-header",
         "dbaeumer.vscode-eslint",
-        "zixuanchen.vitest-explorer"
+        "vitest.explorer"
     ]
 }
