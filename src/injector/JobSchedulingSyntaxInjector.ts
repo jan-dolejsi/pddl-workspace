@@ -55,6 +55,13 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
         new Parameter('to', JobSchedulingSyntaxInjector.LOCATION)
     ]);
 
+    public static readonly TIME_STEPS_PER_DAY = 'time_steps_per_day';
+    public static readonly TIME_STEP_IN_DAYS = 'time_step_in_days';
+    /** (time_steps_per_day) ; number of time steps per day */
+    private static readonly TIME_STEPS_PER_DAY_FUNCTION = Variable.from(JobSchedulingSyntaxInjector.TIME_STEPS_PER_DAY, []);
+    /** (time_step_in_days) ; time step length in [day] unit */
+    private static readonly TIME_STEP_IN_DAYS_FUNCTION = Variable.from(JobSchedulingSyntaxInjector.TIME_STEP_IN_DAYS, []);
+
     private static readonly JOB_SCHEDULING = ':job-scheduling';
     /** PDDL Requirements that are implied by the :job-scheduling and therefore should be inserted in its place */
     private static readonly JOB_SCHEDULING_IMPLIED_REQS = [
@@ -113,7 +120,10 @@ export class JobSchedulingSyntaxInjector extends BaseSyntaxInjector {
             JobSchedulingSyntaxInjector.CONTAINS_PREDICATE,
             JobSchedulingSyntaxInjector.BUSY_PREDICATE];
         const functions = [
-            JobSchedulingSyntaxInjector.TRAVEL_TIME_FUNCTION];
+            JobSchedulingSyntaxInjector.TRAVEL_TIME_FUNCTION,
+            JobSchedulingSyntaxInjector.TIME_STEPS_PER_DAY_FUNCTION,
+            JobSchedulingSyntaxInjector.TIME_STEP_IN_DAYS_FUNCTION,
+        ];
 
         const resourceTypes = new Set(domainInfo.getTypesInheritingFromPlusSelf(JobSchedulingSyntaxInjector.RESOURCE));
         const locationTypes = new Set(domainInfo.getTypesInheritingFromPlusSelf(JobSchedulingSyntaxInjector.LOCATION));
