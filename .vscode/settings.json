@@ -8,4 +8,7 @@
     "git.branchProtection": [
         "master"
     ],
+    "files.associations": {
+        "plyconfig.json": "jsonc"
+    },
 }

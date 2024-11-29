@@ -201,6 +201,8 @@ describe('PddlDomainParser', () => {
                 actionName + '_job_done ?l - location ?o - other'], 'there should be 1+5 predicates');
             expect(domainInfo?.getFunctions().map(p => p.getFullName())).to.deep.equal([
                 'travel_time ?r - resource ?from - location ?to - location',
+                'time_steps_per_day',
+                'time_step_in_days',
                 actionName + '_job_duration ?l - location ?o - other',
             ], 'there should be 1+1 functions');
             
@@ -208,7 +210,7 @@ describe('PddlDomainParser', () => {
             expect(outputPddl, 'should remove :job-scheduling').to.not.match(/:job-scheduling/);
             expect(outputPddl, 'should require :durative-actions').to.match(/:durative-actions/);
             expect(outputPddl, 'injected :predicates').toMatch(/\(ready \?r - resource\)\s*\(is_available \?a/gm);
-            expect(outputPddl, 'injected :functions').toMatch(/\(:functions\s*\(travel_time \?r - resource \?from - location \?to - location\) \(say_hello_job_duration \?l - location \?o - other\)\)/gm);
+            expect(outputPddl, 'injected :functions').toMatch(/\(:functions\s*\(travel_time \?r - resource \?from - location \?to - location\) \(time_steps_per_day\) \(time_step_in_days\) \(say_hello_job_duration \?l - location \?o - other\)\)/gm);
             expect(outputPddl, 'injected :types').toMatch(/\(:types location resource - available other/gm);
             expect(outputPddl, 'replaced :job by :durative-action').toMatch(/\(:durative-action say_hello\s+/gm);
             expect(outputPddl, 'injected :job duration').toMatch(/\(:durative-action say_hello\s+:parameters\s*\(\?l - location \?r - resource \?o - other\)\s*\:duration\s*\(=\s*\?duration\s*\(say_hello_job_duration \?l \?o\)\)/gm);
@@ -245,6 +247,8 @@ describe('PddlDomainParser', () => {
                 actionName + '_job_done ?l - location'], 'there should be 1+5 predicates');
             expect(domainInfo?.getFunctions().map(p => p.getFullName())).to.deep.equal([
                 'travel_time ?r - resource ?from - location ?to - location',
+                'time_steps_per_day',
+                'time_step_in_days',
                 actionName + '_job_duration ?l - location',
             ], 'there should be 1+1 functions');
 
@@ -259,7 +263,7 @@ describe('PddlDomainParser', () => {
             expect(outputPddl, 'should remove :job-scheduling').to.not.match(/:job-scheduling/);
             expect(outputPddl, 'should require :durative-actions').to.match(/:durative-actions/);
             expect(outputPddl, 'injected :predicates').toMatch(/\(:predicates\s*\(is_available \?a/gm);
-            expect(outputPddl, 'injected :functions').toMatch(/\(:functions\s*\(travel_time \?r - resource \?from - location \?to - location\) \(say_hello_job_duration \?l - location\)\)/gm);
+            expect(outputPddl, 'injected :functions').toMatch(/\(:functions\s*\(travel_time \?r - resource \?from - location \?to - location\) \(time_steps_per_day\) \(time_step_in_days\) \(say_hello_job_duration \?l - location\)\)/gm);
             expect(outputPddl, 'injected :types').toMatch(/\(:types location resource - available/gm);
             expect(outputPddl, 'replaced :job by :durative-action').toMatch(/\(:durative-action say_hello\s+/gm);
             expect(outputPddl, 'injected :job duration').toMatch(/:duration\s*\(=\s*\?duration\s*\(say_hello_job_duration \?l\)\)/gm);
